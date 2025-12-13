@@ -3,18 +3,15 @@
     
     <!-- Config Tabs -->
     <nav class="sheet-tabs tabs">
-        <!-- Added logic to maintain active class based on JS state -->
         <a class="item {{#if (eq activeTab 'general')}}active{{/if}}" data-tab="general"><i class="fas fa-cogs"></i> General</a>
         <a class="item {{#if (eq activeTab 'categories')}}active{{/if}}" data-tab="categories"><i class="fas fa-eye"></i> Categories</a>
         <a class="item {{#if (eq activeTab 'tiers')}}active{{/if}}" data-tab="tiers"><i class="fas fa-layer-group"></i> Tiers</a>
-        <!-- New Tab -->
         <a class="item {{#if (eq activeTab 'compendiums')}}active{{/if}}" data-tab="compendiums"><i class="fas fa-book"></i> Custom Compendiums</a>
     </nav>
 
     <!-- Tab: General -->
     <div class="tab-content {{#if (eq activeTab 'general')}}active{{/if}}" data-tab="general">
         
-        <!-- Store Name (New Setting) -->
         <div class="form-group">
             <label>Store Window Name</label>
             <input type="text" name="storeName" value="{{storeName}}">
@@ -23,7 +20,6 @@
 
         <hr>
 
-        <!-- Party Actor Selection -->
         <div class="form-group">
             <label>Party Actor</label>
             <select name="partyActorId">
@@ -48,19 +44,17 @@
             <input type="number" name="saleDiscount" value="{{saleDiscount}}" min="1" max="99" step="1">
             <p class="notes">Percentage off for items marked as "On Sale".</p>
         </div>
-        
-        <!-- Custom Compendiums removed from here -->
     </div>
 
     <!-- Tab: Categories (Visibility Only) -->
     <div class="tab-content {{#if (eq activeTab 'categories')}}active{{/if}}" data-tab="categories">
-        <!-- Title Removed as requested -->
-        <p class="notes">Check the boxes below to hide entire categories from the store.</p>
+        <p class="notes">Uncheck a box to hide that category tab in the Store.</p>
         <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             {{#each categories}}
             <label>
-                <input type="checkbox" name="hiddenCategories.{{this.key}}" {{checked this.isHidden}}>
-                Hide {{this.key}}
+                <!-- Updated Logic: name="visibility", checked if isVisible -->
+                <input type="checkbox" name="visibility.{{this.key}}" {{checked this.isVisible}}>
+                Show {{this.label}}
             </label>
             {{/each}}
         </div>
@@ -68,19 +62,21 @@
 
     <!-- Tab: Tiers (Allowed Tiers Only) -->
     <div class="tab-content {{#if (eq activeTab 'tiers')}}active{{/if}}" data-tab="tiers">
-        <!-- Title Removed as requested -->
         <p class="notes">Select which tiers are available for purchase in each category.</p>
         <div class="tiers-config">
             {{#each categories}}
-            <div class="category-row">
-                <h4>{{this.key}}</h4>
-                <div class="checkbox-group">
-                    <label><input type="checkbox" name="tiers.{{this.key}}.1" {{checked (lookup this.tiers "1")}}> Tier 1</label>
-                    <label><input type="checkbox" name="tiers.{{this.key}}.2" {{checked (lookup this.tiers "2")}}> Tier 2</label>
-                    <label><input type="checkbox" name="tiers.{{this.key}}.3" {{checked (lookup this.tiers "3")}}> Tier 3</label>
-                    <label><input type="checkbox" name="tiers.{{this.key}}.4" {{checked (lookup this.tiers "4")}}> Tier 4</label>
+            <!-- Only show tiers for standard categories, not the Custom Tab (unless you implemented tiers there) -->
+            {{#if (ne this.key "CustomTab")}}
+                <div class="category-row">
+                    <h4>{{this.label}}</h4>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="tiers.{{this.key}}.1" {{checked (lookup this.tiers "1")}}> Tier 1</label>
+                        <label><input type="checkbox" name="tiers.{{this.key}}.2" {{checked (lookup this.tiers "2")}}> Tier 2</label>
+                        <label><input type="checkbox" name="tiers.{{this.key}}.3" {{checked (lookup this.tiers "3")}}> Tier 3</label>
+                        <label><input type="checkbox" name="tiers.{{this.key}}.4" {{checked (lookup this.tiers "4")}}> Tier 4</label>
+                    </div>
                 </div>
-            </div>
+            {{/if}}
             {{/each}}
         </div>
     </div>
@@ -88,7 +84,6 @@
     <!-- Tab: Custom Compendiums -->
     <div class="tab-content {{#if (eq activeTab 'compendiums')}}active{{/if}}" data-tab="compendiums">
         
-        <!-- 1. Custom Tab Configuration (NEW) -->
         <h3 style="margin-top:0;">Custom Tab Configuration</h3>
         <p class="notes">Create a special tab (e.g., "Merchant" or "Magic Items") linked to a specific compendium.</p>
         
@@ -109,7 +104,6 @@
 
         <hr style="border-top: 1px solid #444; margin: 15px 0;">
 
-        <!-- 2. Additional Compendiums (Existing) -->
         <h3>Merged Compendiums</h3>
         <p class="notes">Add additional compendiums to be merged into the standard categories (e.g. Loot, Weapons).</p>
         
@@ -139,7 +133,6 @@
         <button type="button" data-action="addCompendium" class="add-compendium"><i class="fas fa-plus"></i> Add Compendium</button>
     </div>
 
-    <!-- Added 'config-footer' class for specific targeting -->
     <footer class="sheet-footer config-footer">
         <button type="submit"><i class="fas fa-save"></i> Save Settings</button>
     </footer>

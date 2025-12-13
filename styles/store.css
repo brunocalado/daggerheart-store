@@ -131,6 +131,29 @@
     gap: 10px;
 }
 
+/* NEW: Preset Select Styling */
+.preset-select {
+    width: 200px; /* Fixed and somewhat long */
+    height: 32px;
+    background: #333; /* Dark background to match header */
+    color: #fff;
+    border: 1px solid #5d4037;
+    border-radius: 4px;
+    padding: 0 5px;
+    font-family: inherit;
+}
+
+.preset-select:focus {
+    border-color: #d4af37;
+    outline: none;
+}
+
+/* Style adjustment for icon-only buttons to align with select */
+.config-btn.icon-only {
+    padding: 6px 12px;
+    min-width: 40px;
+}
+
 .wealth-label {
     font-size: 0.9em;
     opacity: 0.8;
@@ -142,6 +165,19 @@
 .gold-display {
     font-size: 1.2em;
     font-weight: bold;
+}
+
+/* ==================================================== */
+/* HEADER SEPARATOR */
+/* ==================================================== */
+
+.header-separator {
+    margin: 0 8px;
+    color: #5d4037; /* Matches border color of wood buttons */
+    font-size: 1.5em;
+    font-weight: 300;
+    position: relative;
+    top: -1px;
 }
 
 /* ==================================================== */
@@ -173,6 +209,12 @@
     cursor: pointer;
     border-radius: 4px;
     transition: all 0.2s;
+    
+    /* Align items if needed */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
 }
 
 .config-btn:hover { 

@@ -5,15 +5,40 @@
             <strong>Daggerheart Store Manager</strong>
         </div>
         <div class="header-right">
-            <!-- V2 Button: data-action is key -->
+            <!-- New: Config Button -->
+            <button type="button" class="config-btn" data-action="openConfig" title="GM Configuration">
+                <i class="fas fa-cog"></i> Config
+            </button>
+            
+            <span class="header-separator">|</span>
+
+            <!-- Presets Combo & Buttons -->
+            <select class="preset-select" name="storePreset">
+                {{#each presets}}
+                <option value="{{this}}" {{#if (eq this ../currentProfile)}}selected{{/if}}>{{this}}</option>
+                {{/each}}
+            </select>
+
+            <button type="button" class="config-btn icon-only" data-action="savePreset" title="Save Preset">
+                <i class="fas fa-save"></i>
+            </button>
+            
+            <button type="button" class="config-btn icon-only" data-action="loadPreset" title="Load Preset">
+                <i class="fas fa-folder-open"></i>
+            </button>
+
+            <button type="button" class="config-btn icon-only" data-action="deletePreset" title="Delete Selected Profile" style="color: #ff9999; border-color: #8b3333;">
+                <i class="fas fa-trash"></i>
+            </button>
+
+            <span class="header-separator">|</span>
+
+            <!-- Original: Share Buttons -->
             <button type="button" class="config-btn" data-action="showToAll" title="Show to Everyone">
                 <i class="fas fa-globe"></i>
             </button>
             <button type="button" class="config-btn" data-action="showToPlayer" title="Show to Player">
                 <i class="fas fa-user"></i>
-            </button>
-            <button type="button" class="config-btn" data-action="openConfig" title="GM Configuration">
-                <i class="fas fa-cog"></i> Config
             </button>
         </div>
         {{else}}
@@ -68,7 +93,7 @@
         <div class="tab" data-tab="{{cat.id}}" style="display: {{#if (eq cat.id ../activeTab)}}block{{else}}none{{/if}};">
             
             <div class="search-container">
-                <!-- ALTERADO: Placeholder simplificado para "Search" -->
+                <!-- Placeholder simplificado para "Search" -->
                 <input type="text" class="store-search" placeholder="Search..." autocomplete="off">
             </div>
 

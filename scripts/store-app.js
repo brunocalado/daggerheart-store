@@ -3,6 +3,17 @@ import { PRICE_DATA, PACK_MAPPING } from "./price-data.js";
 const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api;
 const MODULE_ID = "daggerheart-store";
 
+// Helper: Standard Categories Definition
+const STANDARD_CATEGORIES = [
+    { id: "primary", label: "Primary Weapons", key: "Primary Weapons" },
+    { id: "secondary", label: "Secondary Weapons", key: "Secondary Weapons" },
+    { id: "wheelchairs", label: "Wheelchairs", key: "Wheelchairs" },
+    { id: "armors", label: "Armor", key: "Armors" },
+    { id: "potions", label: "Potions", key: "Potions" },
+    { id: "consumables", label: "Consumables", key: "Consumables" },
+    { id: "loot", label: "Loot", key: "Loot" }
+];
+
 /**
  * Main Store Application (Application V2)
  */
@@ -10,10 +21,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
     constructor(options) {
         super(options);
         this.searchQuery = ""; 
-        // Stores the active tab. Default: 'primary'
         this.activeTab = "primary";
-        
-        // Dynamically defines the title based on configuration
         this.options.window.title = game.settings.get(MODULE_ID, "storeName");
     }
 
@@ -22,14 +30,11 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         tag: "form",
         window: {
             title: "Daggerheart: Store",
-            icon: "fas fa-balance-scale", // Balance scale icon for commercial theme
+            icon: "fas fa-balance-scale",
             resizable: true,
             controls: []
         },
-        position: {
-            width: 800,
-            height: 700
-        },
+        position: { width: 950, height: 700 }, // Aumentado levemente para acomodar separadores
         classes: ["daggerheart-store"],
         actions: {
             buyItem: DaggerheartStore.prototype._onBuyItem,
@@ -38,7 +43,10 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             toggleSale: DaggerheartStore.prototype._onToggleSale,
             toggleHidden: DaggerheartStore.prototype._onToggleHidden,
             showToAll: DaggerheartStore.prototype._onShowToAll,
-            showToPlayer: DaggerheartStore.prototype._onShowToPlayer
+            showToPlayer: DaggerheartStore.prototype._onShowToPlayer,
+            savePreset: DaggerheartStore.prototype._onSavePreset,
+            loadPreset: DaggerheartStore.prototype._onLoadPreset,
+            deletePreset: DaggerheartStore.prototype._onDeletePreset
         }
     };
 
@@ -50,24 +58,28 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
     };
 
     async _prepareContext(options) {
-        // Ensure title is updated on every render
         this.options.window.title = game.settings.get(MODULE_ID, "storeName");
 
         const userActor = game.user.character;
         const isGM = game.user.isGM;
         const hasActor = !!userActor;
         
-        // 1. Get Party Configuration
         const partyActorId = game.settings.get(MODULE_ID, "partyActorId");
         let partyActor = null;
-        if (partyActorId) {
-            partyActor = game.actors.get(partyActorId);
-        }
+        if (partyActorId) partyActor = game.actors.get(partyActorId);
         const hasPartyActor = !!partyActor;
 
-        // 2. Calculate Wealth
         const userGold = userActor ? (foundry.utils.getProperty(userActor, "system.gold.coins") || 0) : 0;
         const partyGold = partyActor ? (foundry.utils.getProperty(partyActor, "system.gold.coins") || 0) : 0;
+        
+        // --- Logic for Presets ---
+        // Fetch stored profiles from settings
+        const storeProfiles = game.settings.get(MODULE_ID, "storeProfiles") || { "Default": {} };
+        const currentProfile = game.settings.get(MODULE_ID, "currentProfile") || "Default";
+        
+        // Ensure "Default" always exists in the list
+        const profileKeys = Object.keys(storeProfiles);
+        if (!profileKeys.includes("Default")) profileKeys.unshift("Default");
         
         const context = {
             isGM: isGM,
@@ -80,7 +92,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             tabs: {},
             categories: [],
             searchQuery: this.searchQuery,
-            activeTab: this.activeTab // Pass current state to template
+            activeTab: this.activeTab,
+            presets: profileKeys,
+            currentProfile: currentProfile 
         };
 
         const priceMod = game.settings.get(MODULE_ID, "priceModifier") / 100;
@@ -88,23 +102,14 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const hiddenCategories = game.settings.get(MODULE_ID, "hiddenCategories");
         const customCompendiums = game.settings.get(MODULE_ID, "customCompendiums") || [];
         const priceOverrides = game.settings.get(MODULE_ID, "priceOverrides") || {};
-        
         const saleDiscount = game.settings.get(MODULE_ID, "saleDiscount") || 10;
         const saleItems = game.settings.get(MODULE_ID, "saleItems") || {};
         const hiddenItems = game.settings.get(MODULE_ID, "hiddenItems") || {};
 
-        // --- Standard Categories (Must match Keys in price-data.js) ---
-        let categories = [
-            { id: "primary", label: "Primary Weapons", key: "Primary Weapons" },
-            { id: "secondary", label: "Secondary Weapons", key: "Secondary Weapons" },
-            { id: "wheelchairs", label: "Wheelchairs", key: "Wheelchairs" },
-            { id: "armors", label: "Armor", key: "Armors" }, // key matches PRICE_DATA key
-            { id: "potions", label: "Potions", key: "Potions" },
-            { id: "consumables", label: "Consumables", key: "Consumables" },
-            { id: "loot", label: "Loot", key: "Loot" }
-        ];
+        // 1. Build Category List (Clone Standard)
+        let categories = foundry.utils.deepClone(STANDARD_CATEGORIES);
 
-        // --- Custom Tab Logic ---
+        // 2. Add Custom Tab if configured
         const customTabCompendium = game.settings.get(MODULE_ID, "customTabCompendium");
         const customTabName = game.settings.get(MODULE_ID, "customTabName");
 
@@ -112,11 +117,11 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             categories.push({ 
                 id: "custom-tab", 
                 label: customTabName || "General", 
-                key: "CustomTab" // Unique key for internal logic
+                key: "CustomTab" 
             });
         }
 
-        // Filter categories hidden by GM
+        // 3. Filter Hidden Categories
         categories = categories.filter(c => !hiddenCategories[c.key]);
         context.categories = categories;
 
@@ -129,8 +134,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             }
         }
 
+        // 4. Populate Items
         for (const cat of categories) {
-            // === Special Logic for Custom Tab (No Tiers) ===
+            // === Custom Tab Logic ===
             if (cat.id === "custom-tab") {
                 const pack = game.packs.get(customTabCompendium);
                 const customItems = [];
@@ -143,21 +149,12 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
                         let basePrice = 0;
                         let isOverridden = false;
-
-                        // Attempt to extract price from item description using {{{X}}} pattern
-                        // Checks system.description.value (standard v12+) or system.description
                         const desc = foundry.utils.getProperty(doc, "system.description.value") || 
                                      foundry.utils.getProperty(doc, "system.description") || "";
-                        
-                        // Regex to find {{{number}}}
                         const descString = String(desc);
                         const priceMatch = descString.match(/\{\{\{(\d+)\}\}\}/);
                         
-                        if (priceMatch) {
-                            basePrice = parseInt(priceMatch[1], 10);
-                        }
-
-                        // 1. Check Overrides (Priority over description)
+                        if (priceMatch) basePrice = parseInt(priceMatch[1], 10);
                         if (priceOverrides.hasOwnProperty(doc.name)) {
                             basePrice = priceOverrides[doc.name];
                             isOverridden = true;
@@ -165,9 +162,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         
                         const isSale = saleItems[doc.name];
                         let finalPrice = basePrice;
-                        if (isSale) {
-                            finalPrice = Math.ceil(basePrice * (1 - saleDiscount/100));
-                        }
+                        if (isSale) finalPrice = Math.ceil(basePrice * (1 - saleDiscount/100));
 
                         const canAffordPersonal = userGold >= finalPrice;
                         const canBuyPersonal = hasActor && canAffordPersonal;
@@ -189,21 +184,12 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         });
                     }
                 }
-
-                // Sort alphabetically
                 customItems.sort((a, b) => a.name.localeCompare(b.name));
-
-                // Return a single group without label for this tab
-                context.tabs[cat.id] = [{
-                    id: "all",
-                    label: "", // Empty label to hide separator
-                    items: customItems
-                }];
-                
-                continue; // Skip standard Tier logic
+                context.tabs[cat.id] = [{ id: "all", label: "", items: customItems }];
+                continue;
             }
 
-            // === Standard Logic (With Tiers) ===
+            // === Standard Logic ===
             const tierGroups = {
                 1: { id: 1, label: "Tier 1 / Common", items: [] },
                 2: { id: 2, label: "Tier 2 / Uncommon", items: [] },
@@ -212,19 +198,12 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             };
 
             const packsToScan = [];
-            
-            // Add standard pack mapped to this category (if exists)
-            if (PACK_MAPPING[cat.key]) {
-                packsToScan.push({ id: PACK_MAPPING[cat.key], isDefault: true });
-            }
-            
-            // Add user-defined custom compendiums for this category
+            if (PACK_MAPPING[cat.key]) packsToScan.push({ id: PACK_MAPPING[cat.key], isDefault: true });
             customCompendiums.forEach(custom => {
-                if (custom.category === cat.key) {
-                    packsToScan.push({ id: custom.pack, isDefault: false });
-                }
+                if (custom.category === cat.key) packsToScan.push({ id: custom.pack, isDefault: false });
             });
 
+            // Default to all true if no config exists for this category
             const catConfig = allowedTiers[cat.key] || {1:true, 2:true, 3:true, 4:true};
             const priceList = PRICE_DATA[cat.key] || {};
 
@@ -243,30 +222,21 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     let knownItem = false;
                     let isOverridden = false;
 
-                    // 1. Whitelist Check (Based on PRICE_DATA for current category)
                     if (priceList.hasOwnProperty(doc.name)) {
-                        basePrice = priceList[doc.name].price;
+                        basePrice = Math.ceil(priceList[doc.name].price * priceMod);
                         tier = priceList[doc.name].tier;
                         knownItem = true;
-                        // Apply modifier only to database base price
-                        basePrice = Math.ceil(basePrice * priceMod); 
                     }
                     
-                    // 2. Strict Filter for Standard Packs
-                    if (packInfo.isDefault && !knownItem) {
-                        continue;
-                    }
+                    if (packInfo.isDefault && !knownItem) continue;
 
-                    // 3. Override Check
                     if (priceOverrides.hasOwnProperty(doc.name)) {
                         basePrice = priceOverrides[doc.name];
                         isOverridden = true;
                     } 
 
-                    // 4. Custom Compendiums Logic (Manually added)
                     if (!packInfo.isDefault) {
                         knownItem = true;
-                        // Try to discover Tier if not in priceList
                         if (!priceList.hasOwnProperty(doc.name)) {
                              const sysTier = foundry.utils.getProperty(doc, "system.tier") || 
                                            foundry.utils.getProperty(doc, "system.rarity") || 1;
@@ -275,13 +245,13 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     }
 
                     if (!knownItem) continue;
+                    
+                    // Check Tier Visibility
                     if (!catConfig[tier]) continue;
 
                     const isSale = saleItems[doc.name];
                     let finalPrice = basePrice;
-                    if (isSale) {
-                        finalPrice = Math.ceil(basePrice * (1 - saleDiscount/100));
-                    }
+                    if (isSale) finalPrice = Math.ceil(basePrice * (1 - saleDiscount/100));
 
                     const canAffordPersonal = userGold >= finalPrice;
                     const canBuyPersonal = hasActor && canAffordPersonal;
@@ -321,9 +291,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         super._onRender(context, options);
         const html = this.element;
 
-        if (this.window && this.window.titleElement) {
-            this.window.titleElement.innerText = this.options.window.title;
-        }
+        if (this.window) this.window.title = this.options.window.title;
 
         const searchInput = html.querySelector(".store-search");
         if (searchInput) {
@@ -350,7 +318,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             });
         });
 
-        // Handle tab switching logic manually to ensure proper display toggling
         const tabs = html.querySelectorAll(".sheet-tabs .item");
         tabs.forEach(tab => {
             tab.addEventListener("click", (e) => {
@@ -358,13 +325,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 const tabId = e.currentTarget.dataset.tab;
                 
                 this.activeTab = tabId; 
-
-                // 1. Update button visuals
                 tabs.forEach(t => t.classList.remove("active"));
                 e.currentTarget.classList.add("active");
                 
-                // 2. Update displayed content (Forcing display:none/block)
-                // We directly alter style.display because Handlebars defines inline styles with high specificity.
                 const contents = html.querySelectorAll(".content .tab");
                 contents.forEach(c => {
                     c.classList.remove("active");
@@ -379,13 +342,12 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             });
         });
 
-        // Ensure correct initial state
         if (!html.querySelector(".sheet-tabs .item.active")) {
             let targetTab = html.querySelector(`.sheet-tabs .item[data-tab="${this.activeTab}"]`);
             let targetContent = html.querySelector(`.content .tab[data-tab="${this.activeTab}"]`);
             
-            if (!targetTab) {
-                targetTab = html.querySelector(".sheet-tabs .item");
+            if (!targetTab && tabs.length > 0) {
+                targetTab = tabs[0];
                 targetContent = html.querySelector(".content .tab");
             }
 
@@ -600,6 +562,168 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             buttons: [{ action: "show", label: "Show", icon: "fas fa-share", callback: (event, button, dialog) => { const select = button.form.elements.targetPlayer; globalThis.Store.Show(select.value); } }]
         }).render(true);
     }
+    
+    // --- New Action Handlers: Profile System ---
+
+    async _onSavePreset(event, target) {
+        // Create Content for Dialog
+        const content = `
+            <div style="padding: 5px 0;">
+                <label>Profile Name:</label>
+                <input type="text" name="profileName" value="New Profile" style="width: 100%; margin-top: 5px; padding: 5px;">
+                <p class="notes" style="font-size: 0.9em; color: #888; margin-top: 5px;">
+                    This will save all current store settings (prices, sales, hidden items, configuration) to a new profile.
+                </p>
+            </div>
+        `;
+
+        new DialogV2({
+            window: { title: "Save Store Profile", icon: "fas fa-save" },
+            content: content,
+            buttons: [
+                {
+                    action: "save",
+                    label: "Save Profile",
+                    icon: "fas fa-save",
+                    callback: async (event, button, dialog) => {
+                        const name = button.form.elements.profileName.value.trim() || "New Profile";
+                        
+                        // Prevent overwriting the Default factory profile
+                        if (name === "Default") {
+                            return ui.notifications.error("You cannot overwrite the factory 'Default' profile. Please choose another name.");
+                        }
+
+                        // 1. Gather all current settings
+                        const currentSettings = {
+                            storeName: game.settings.get(MODULE_ID, "storeName"),
+                            currencyName: game.settings.get(MODULE_ID, "currencyName"),
+                            priceModifier: game.settings.get(MODULE_ID, "priceModifier"),
+                            allowedTiers: game.settings.get(MODULE_ID, "allowedTiers"),
+                            hiddenCategories: game.settings.get(MODULE_ID, "hiddenCategories"),
+                            customCompendiums: game.settings.get(MODULE_ID, "customCompendiums"),
+                            priceOverrides: game.settings.get(MODULE_ID, "priceOverrides"),
+                            saleDiscount: game.settings.get(MODULE_ID, "saleDiscount"),
+                            saleItems: game.settings.get(MODULE_ID, "saleItems"),
+                            hiddenItems: game.settings.get(MODULE_ID, "hiddenItems"),
+                            partyActorId: game.settings.get(MODULE_ID, "partyActorId"),
+                            customTabName: game.settings.get(MODULE_ID, "customTabName"),
+                            customTabCompendium: game.settings.get(MODULE_ID, "customTabCompendium")
+                        };
+
+                        // 2. Fetch existing profiles
+                        const profiles = foundry.utils.deepClone(game.settings.get(MODULE_ID, "storeProfiles")) || {};
+                        
+                        // 3. Save new profile
+                        profiles[name] = currentSettings;
+                        
+                        // 4. Update Settings
+                        await game.settings.set(MODULE_ID, "storeProfiles", profiles);
+                        await game.settings.set(MODULE_ID, "currentProfile", name);
+                        
+                        ui.notifications.info(`Profile "${name}" saved successfully.`);
+                        this.render();
+                    }
+                },
+                { action: "cancel", label: "Cancel", icon: "fas fa-times" }
+            ]
+        }).render(true);
+    }
+
+    async _onLoadPreset(event, target) {
+        // 1. Get selected profile from the dropdown in the UI
+        const selectEl = this.element.querySelector(".preset-select");
+        if (!selectEl) return;
+        
+        const profileName = selectEl.value;
+        let profileData;
+
+        // 2. Determine Profile Data
+        if (profileName === "Default") {
+            // Hardcoded Factory Defaults
+            profileData = {
+                storeName: "Daggerheart: Store",
+                currencyName: "Coins",
+                priceModifier: 100,
+                allowedTiers: {}, // Assuming empty object is handled as 'All Allowed' in prepareContext
+                hiddenCategories: {},
+                customCompendiums: [],
+                priceOverrides: {},
+                saleDiscount: 10,
+                saleItems: {},
+                hiddenItems: {},
+                partyActorId: "",
+                customTabName: "General",
+                customTabCompendium: "daggerheart-store.general-items"
+            };
+        } else {
+            // Fetch from saved profiles
+            const profiles = game.settings.get(MODULE_ID, "storeProfiles");
+            profileData = profiles[profileName];
+            
+            if (!profileData) return ui.notifications.error(`Profile "${profileName}" not found.`);
+        }
+
+        // 3. Apply settings
+        // We iterate and await to ensure all settings are applied before re-rendering
+        const settingsToUpdate = [
+            "storeName", "currencyName", "priceModifier", "allowedTiers", 
+            "hiddenCategories", "customCompendiums", "priceOverrides", 
+            "saleDiscount", "saleItems", "hiddenItems", "partyActorId", 
+            "customTabName", "customTabCompendium"
+        ];
+
+        for (const key of settingsToUpdate) {
+            // For Default profile, we always have the keys. For saved, we check.
+            if (profileData.hasOwnProperty(key)) {
+                await game.settings.set(MODULE_ID, key, profileData[key]);
+            }
+        }
+
+        // 5. Update Current Profile Tracker
+        await game.settings.set(MODULE_ID, "currentProfile", profileName);
+
+        const msg = profileName === "Default" ? "Factory Defaults restored." : `Profile "${profileName}" loaded.`;
+        ui.notifications.info(msg);
+        
+        this.render();
+    }
+    
+    async _onDeletePreset(event, target) {
+        const selectEl = this.element.querySelector(".preset-select");
+        if (!selectEl) return;
+        const profileName = selectEl.value;
+
+        if (profileName === "Default") {
+            return ui.notifications.warn("You cannot delete the Default profile.");
+        }
+
+        new DialogV2({
+            window: { title: "Delete Profile", icon: "fas fa-trash" },
+            content: `<p>Are you sure you want to delete the profile <strong>${profileName}</strong>? This cannot be undone.</p>`,
+            buttons: [
+                {
+                    action: "delete",
+                    label: "Delete",
+                    icon: "fas fa-trash",
+                    callback: async (event, button, dialog) => {
+                        const profiles = foundry.utils.deepClone(game.settings.get(MODULE_ID, "storeProfiles"));
+                        if (profiles[profileName]) {
+                            delete profiles[profileName];
+                            await game.settings.set(MODULE_ID, "storeProfiles", profiles);
+                            
+                            // Reset to Default
+                            await game.settings.set(MODULE_ID, "currentProfile", "Default");
+                            
+                            ui.notifications.info(`Profile "${profileName}" deleted.`);
+                            this.render();
+                        }
+                    }
+                },
+                { action: "cancel", label: "Cancel", icon: "fas fa-times" }
+            ]
+        }).render(true);
+    }
+
     async _onPriceOverrideChange(event) {
         event.preventDefault(); const input = event.currentTarget; const itemName = input.dataset.name; const newPrice = parseInt(input.value);
         const overrides = foundry.utils.deepClone(game.settings.get(MODULE_ID, "priceOverrides"));
@@ -628,7 +752,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
     constructor(options) {
         super(options);
-        this.currentTab = "general"; // Initialize default tab
+        this.currentTab = "general"; 
     }
 
     static DEFAULT_OPTIONS = {
@@ -650,26 +774,49 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         const customCompendiums = game.settings.get(MODULE_ID, "customCompendiums") || [];
         const selectedPartyActor = game.settings.get(MODULE_ID, "partyActorId");
         
-        // --- EXISTING SETTING ---
         const storeName = game.settings.get(MODULE_ID, "storeName");
-
-        // --- NEW SETTINGS ---
         const customTabName = game.settings.get(MODULE_ID, "customTabName");
         const customTabCompendium = game.settings.get(MODULE_ID, "customTabCompendium");
 
         const partyActors = game.actors.filter(a => a.type === "party").map(a => ({ id: a.id, name: a.name })).sort((a, b) => a.name.localeCompare(b.name));
-        const categoryList = Object.keys(allowedTiers).map(key => ({ key: key, tiers: allowedTiers[key], isHidden: hiddenCategories[key] }));
         const availablePacks = game.packs.filter(p => p.documentName === "Item").map(p => ({ id: p.collection, label: `${p.metadata.label} (${p.collection})` })).sort((a, b) => a.label.localeCompare(b.label));
+        
+        // --- 1. Construct Full Category List for UI ---
+        // Start with standard categories
+        let allCategories = foundry.utils.deepClone(STANDARD_CATEGORIES);
+
+        // Add Custom Tab to the list so it appears in config
+        if (customTabCompendium && customTabCompendium.trim() !== "") {
+            allCategories.push({
+                id: "custom-tab",
+                label: customTabName || "General",
+                key: "CustomTab"
+            });
+        }
+
+        // Map categories for template consumption
+        // We use !isHidden for the UI "Visible" checkbox
+        const categoryConfigList = allCategories.map(cat => ({
+            key: cat.key,
+            label: cat.label,
+            // Default Tiers: If no setting exists, all enabled.
+            tiers: allowedTiers[cat.key] || {1:true, 2:true, 3:true, 4:true},
+            // Visibility: Checkbox means "Visible", so we check if NOT hidden
+            isVisible: !hiddenCategories[cat.key]
+        }));
 
         return { 
             storeName: storeName,
-            customTabName: customTabName,         // Pass to Template
-            customTabCompendium: customTabCompendium, // Pass to Template
+            customTabName: customTabName,         
+            customTabCompendium: customTabCompendium,
             priceModifier: priceMod, 
             saleDiscount: saleDiscount, 
-            categories: categoryList, 
+            
+            // This now contains ALL categories (standard + custom), never empty.
+            categories: categoryConfigList, 
+            
             customCompendiums: customCompendiums, 
-            availableCategories: Object.keys(allowedTiers), 
+            availableCategories: STANDARD_CATEGORIES.map(c => c.key), // For dropdowns
             availablePacks: availablePacks, 
             partyActors: partyActors, 
             selectedPartyActor: selectedPartyActor,
@@ -686,8 +833,6 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             tab.addEventListener("click", (e) => {
                 e.preventDefault(); 
                 const tabId = e.currentTarget.dataset.tab; 
-                
-                // Update State
                 this.currentTab = tabId;
 
                 tabs.forEach(t => t.classList.remove("active"));
@@ -719,6 +864,22 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
     async _updateSettings(event, form, formData) {
         const expanded = foundry.utils.expandObject(formData.object);
         
+        // --- 1. Handle Visibility Logic Inversion ---
+        const hiddenCategories = {};
+        if (expanded.visibility) {
+            for (const [key, isVisible] of Object.entries(expanded.visibility)) {
+            }
+        }
+        
+        const allKeys = STANDARD_CATEGORIES.map(c => c.key);
+        if (expanded.customTabName) allKeys.push("CustomTab");
+
+        const finalHiddenMap = {};
+        allKeys.forEach(key => {
+            const isVisible = expanded.visibility && expanded.visibility[key];
+            finalHiddenMap[key] = !isVisible; // If visible (checked), hidden is false. If not checked, hidden is true.
+        });
+
         // --- SAVE NEW SETTINGS ---
         await game.settings.set(MODULE_ID, "storeName", expanded.storeName);
         await game.settings.set(MODULE_ID, "customTabName", expanded.customTabName);
@@ -726,10 +887,17 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
 
         await game.settings.set(MODULE_ID, "priceModifier", expanded.priceModifier);
         await game.settings.set(MODULE_ID, "saleDiscount", expanded.saleDiscount);
-        await game.settings.set(MODULE_ID, "allowedTiers", expanded.tiers);
-        await game.settings.set(MODULE_ID, "hiddenCategories", expanded.hiddenCategories);
+        
+        await game.settings.set(MODULE_ID, "allowedTiers", expanded.tiers || {});
+        
+        await game.settings.set(MODULE_ID, "hiddenCategories", finalHiddenMap);
         await game.settings.set(MODULE_ID, "partyActorId", expanded.partyActorId);
-        if (expanded.customCompendiums) { const compendiumArray = Object.values(expanded.customCompendiums); await game.settings.set(MODULE_ID, "customCompendiums", compendiumArray); }
+        
+        if (expanded.customCompendiums) { 
+            const compendiumArray = Object.values(expanded.customCompendiums); 
+            await game.settings.set(MODULE_ID, "customCompendiums", compendiumArray); 
+        }
+        
         ui.notifications.info("Store Configuration Saved.");
     }
 }

@@ -50,7 +50,26 @@ Hooks.once("init", () => {
         name: "Custom Tab Name", scope: "world", config: false, type: String, default: "General"
     });
     game.settings.register(MODULE_ID, "customTabCompendium", {
-        name: "Custom Tab Compendium", scope: "world", config: false, type: String, default: "world.custom-store-items"
+        name: "Custom Tab Compendium", scope: "world", config: false, type: String, default: "daggerheart-store.general-items"
+    });
+
+    // --- PROFILES SETTINGS ---
+    // Stores all saved profiles: { "Default": { ...settings... }, "Cheap Mode": { ...settings... } }
+    game.settings.register(MODULE_ID, "storeProfiles", {
+        name: "Store Profiles",
+        scope: "world",
+        config: false,
+        type: Object,
+        default: { "Default": {} } // "Default" starts empty or creates logic to populate later
+    });
+
+    // Tracks which profile is currently active in the UI
+    game.settings.register(MODULE_ID, "currentProfile", {
+        name: "Current Profile",
+        scope: "world",
+        config: false,
+        type: String,
+        default: "Default"
     });
 
     // Communication Channel Setting
@@ -135,10 +154,15 @@ Hooks.on("updateSetting", (setting) => {
         if (storeInstance && storeInstance.rendered) {
             console.log(`${MODULE_ID} | Configuration updated, refreshing UI.`);
             
-            // If the store name changed, update the window title dynamically
+            // If the store name changed, update the window title dynamically and immediately
             if (setting.key === `${MODULE_ID}.storeName`) {
                 const newTitle = game.settings.get(MODULE_ID, "storeName");
                 storeInstance.options.window.title = newTitle;
+                
+                // Directly update the window title if the window exists (AppV2)
+                if (storeInstance.window) {
+                    storeInstance.window.title = newTitle;
+                }
             }
             
             storeInstance.render();
