@@ -1,8 +1,6 @@
-# Daggerheart Store Module (Foundry VTT)
+# Daggerheart: Store
 
-![Daggerheart Store Banner](https://img.shields.io/badge/Foundry%20VTT-v13-orange) ![Version](https://img.shields.io/badge/Version-5.0.0-blue) ![License](https://img.shields.io/badge/License-MIT-green)
-
-A dynamic, interactive, and fully configurable store for the **Daggerheart** system in Foundry VTT. Allow your players to purchase weapons, armor, potions, and miscellaneous items directly from an elegant visual interface, while the GM maintains full control over prices, availability, and what is displayed.
+A dynamic, interactive, and fully configurable store for the **Daggerheart** system in Foundry VTT. Allow your players to purchase weapons, armor, potions, and miscellaneous items directly from an elegant visual interface, while the GM maintains full control over prices and what is displayed.
 
 ## 🌟 Key Features
 
@@ -25,43 +23,38 @@ A dynamic, interactive, and fully configurable store for the **Daggerheart** sys
     * **Filter by Tier:** Configure which Tiers (1, 2, 3, 4) appear in each category via settings.
 * **Customization:**
     * **Custom Compendiums:** Add your own item compendiums (Homebrew) to be scanned by the store.
-    * **Customizable Currency:** Change the currency name (e.g., "Gold", "Credits", "Glits").
+    * **Customizable Currency:** Change the currency name (e.g., "Gold", "Credits").
 
 ## 📸 Screenshots
 
 | Player Store | GM View (Editing) |
 | :---: | :---: |
 | *Clean interface with search and quick buy.* | *Price controls, hide, and sale buttons visible.* |
+|<p align="center"><img width="400" src="docs/player-view.webp"></p>|<p align="center"><img width="400" src="docs/gm-view.webp"></p>|
 
-*(Add screenshots of your module here)*
 
 ## 🚀 Installation
 
-1. Download the latest release of the module.
-2. Unzip the file into the `Data/modules/daggerheart-store` folder of your Foundry VTT.
-3. Restart Foundry and activate the module in your game world.
+Install via the Foundry VTT Module browser or use this manifest link:
+`https://raw.githubusercontent.com/brunocalado/daggerheart-store/main/module.json`
 
 ## ⚙️ How to Use
 
 ### Opening the Store
+* **As GM:** Open the store. You can use the system button or a macro with `Store.Open()`.
+<p align="center"><img width="400" src="docs/system-button.webp"></p>
 * **As GM:** You have buttons in the store window header to:
     * <i class="fas fa-globe"></i> **Show to Everyone:** Opens the store on the screen of all connected players.
     * <i class="fas fa-user"></i> **Show to Player:** Opens the store only for a specific selected player.
-* **Macro:** You can also use the command `Store.Open()` in a macro or script.
 
 ### Configuration (GM)
 Click the gear button (<i class="fas fa-cog"></i>) in the top right corner of the store to access advanced settings:
 1. **General:** Define the global price multiplier, the discount percentage for items on sale, and add custom compendiums.
 2. **Categories & Tiers:** Choose which tabs (Weapons, Potions, etc.) should appear and which Item Tiers are allowed.
 
-## 📦 Data Structure
-The module uses an internal database based on official Daggerheart rules to categorize items and set base prices. It is smart enough to:
-* Identify items by name.
-* Read the Tier of custom items.
-* Correctly separate weapons from wheelchairs and other equipment.
+## ⚖️ Credits and License
 
-## 🤝 Contribution
-Feel free to open Issues or Pull Requests to improve the module. The code uses the new **Application V2** API from Foundry V13+ to ensure performance and longevity.
+* **Code License:** MIT License.
+* **Assets:** Audio and images provided are [CC0 1.0 Universal Public Domain](https://creativecommons.org/publicdomain/zero/1.0/).
 
----
-*Developed for the Daggerheart community on Foundry VTT.*
+**Disclaimer:** This module is an independent creation and is not affiliated with Darrington Press.
