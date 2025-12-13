@@ -319,26 +319,29 @@
     background: #fff0f0;
 }
 
-/* --- Green Pulse Animation (Sale) --- */
+/* --- Green Pulse Animation (Sale - Dark Green & Menor) --- */
 @keyframes saleGreenPulse {
     0% {
-        box-shadow: 0 0 2px rgba(46, 204, 113, 0.2);
-        border-color: rgba(46, 204, 113, 0.4);
+        /* Reduzido de 2px para 1.5px */
+        box-shadow: 0 0 1.5px rgba(0, 100, 0, 0.2); 
+        border-color: rgba(0, 100, 0, 0.4);
     }
     50% {
-        box-shadow: 0 0 12px rgba(46, 204, 113, 0.8);
-        border-color: #2ecc71; /* Vibrant Green */
+        /* Reduzido de 12px para 8px (aprox. -30%) */
+        box-shadow: 0 0 8px rgba(0, 100, 0, 0.8);
+        border-color: #006400; 
     }
     100% {
-        box-shadow: 0 0 2px rgba(46, 204, 113, 0.2);
-        border-color: rgba(46, 204, 113, 0.4);
+        /* Reduzido de 2px para 1.5px */
+        box-shadow: 0 0 1.5px rgba(0, 100, 0, 0.2);
+        border-color: rgba(0, 100, 0, 0.4);
     }
 }
 
 .store-row.sale-pulse {
-    animation: saleGreenPulse 3s infinite ease-in-out; /* Slow 3-second pulse */
-    border: 1px solid #2ecc71;
-    z-index: 1; /* Ensures glow stays above other items */
+    animation: saleGreenPulse 3s infinite ease-in-out;
+    border: 1px solid #006400;
+    z-index: 1;
 }
 
 .row-left {
@@ -499,7 +502,7 @@
 
 /* Buy Button */
 .buy-btn {
-    background: #8b0000; 
+    background: #005700; /* Dark Green #005700 */
     color: white;
     border: none;
     padding: 6px 12px;
@@ -515,8 +518,8 @@
 }
 
 .buy-btn:hover:not(:disabled) {
-    background: #b90000;
-    box-shadow: 0 0 8px rgba(185, 0, 0, 0.4);
+    background: #007500; /* Slightly lighter Green for hover */
+    box-shadow: 0 0 8px rgba(0, 87, 0, 0.4);
 }
 
 .buy-btn:disabled {
@@ -532,11 +535,11 @@
 
 /* Party Button Variant */
 .buy-btn.party-btn {
-    background: #3b008b; 
+    background: #0c2481; /* Dark Blue #0c2481 */
 }
 
 .buy-btn.party-btn:hover:not(:disabled) {
-    background: #5500b9;
+    background: #1532b0; /* Slightly lighter Blue for hover */
 }
 
 /* Split Payment Dialog Styling */
