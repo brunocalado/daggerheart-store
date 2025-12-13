@@ -1,0 +1,201 @@
+<form class="daggerheart-store-container">
+    <header class="store-header">
+        {{#if isGM}}
+        <div class="header-left">
+            <strong>Daggerheart Store Manager</strong>
+        </div>
+        <div class="header-right">
+            <!-- V2 Button: data-action is key -->
+            <button type="button" class="config-btn" data-action="showToAll" title="Show to Everyone">
+                <i class="fas fa-globe"></i>
+            </button>
+            <button type="button" class="config-btn" data-action="showToPlayer" title="Show to Player">
+                <i class="fas fa-user"></i>
+            </button>
+            <button type="button" class="config-btn" data-action="openConfig" title="GM Configuration">
+                <i class="fas fa-cog"></i> Config
+            </button>
+        </div>
+        {{else}}
+            {{#if hasPartyActor}}
+                <!-- Party Actor Selected: Layout Split -->
+                <div class="header-left">
+                    <label>Character:</label> <strong>{{actorName}}</strong>
+                </div>
+                <div class="header-right">
+                    <!-- PC Wealth -->
+                    <label>PC Wealth:</label>
+                    <span class="gold-display"><i class="fas fa-coins"></i> {{userGold}} {{currency}}</span>
+                    
+                    <!-- Separator -->
+                    <span style="margin: 0 10px; opacity: 0.5;">|</span>
+                    
+                    <!-- Party Wealth -->
+                    <label>Party Wealth:</label>
+                    <span class="gold-display"><i class="fas fa-users"></i> {{partyGold}} {{currency}}</span>
+                </div>
+            {{else}}
+                <!-- No Party Actor: Standard Display -->
+                <div class="header-left">
+                    <label>Character:</label> <strong>{{actorName}}</strong>
+                </div>
+                <div class="header-right">
+                    <label>PC Wealth:</label>
+                    <span class="gold-display"><i class="fas fa-coins"></i> {{userGold}} {{currency}}</span>
+                </div>
+            {{/if}}
+        {{/if}}
+    </header>
+
+    {{#unless isGM}}
+        {{#unless hasActor}}
+        <div class="error-banner">
+            Warning: You have no assigned character. You cannot make purchases.
+        </div>
+        {{/unless}}
+    {{/unless}}
+
+    <!-- Tab Navigation -->
+    <nav class="sheet-tabs tabs">
+        {{#each categories}}
+        <a class="item {{#if (eq this.id ../activeTab)}}active{{/if}}" data-tab="{{this.id}}">{{this.label}}</a>
+        {{/each}}
+    </nav>
+
+    <!-- Content -->
+    <section class="content">
+        {{#each categories as |cat|}}
+        <div class="tab" data-tab="{{cat.id}}" style="display: {{#if (eq cat.id ../activeTab)}}block{{else}}none{{/if}};">
+            
+            <div class="search-container">
+                <!-- ALTERADO: Placeholder simplificado para "Search" -->
+                <input type="text" class="store-search" placeholder="Search..." autocomplete="off">
+            </div>
+
+            {{#each (lookup ../tabs cat.id) as |group|}}
+                {{#if group.label}}
+                <div class="tier-separator">{{group.label}}</div>
+                {{/if}}
+                
+                <div class="item-list">
+                    {{#each group.items}}
+                    <div class="store-row {{#if this.isHidden}}gm-hidden-item{{/if}} {{#if this.isSale}}sale-pulse{{/if}}">
+                        
+                        <!-- Left Side: Icon and Name -->
+                        <div class="row-left">
+                            <img src="{{this.img}}" title="Click to view details" class="item-image" data-uuid="{{this.uuid}}" width="36" height="36"/>
+                            <span class="store-item-name">{{this.name}}</span>
+                        </div>
+
+                        <!-- MIDDLE: Sale Image (Stretch Top to Bottom) - Only for Players -->
+                        {{#unless ../../../isGM}}
+                            {{#if this.isSale}}
+                                <img src="modules/daggerheart-store/assets/images/sale.webp" class="sale-icon" alt="On Sale!">
+                            {{/if}}
+                        {{/unless}}
+
+                        <!-- Right Side: Controls -->
+                        <div class="row-right">
+                            {{#if ../../../isGM}}
+                                <div class="gm-controls">
+                                    <div class="gm-buttons">
+                                        <button type="button" 
+                                                data-action="toggleSale" 
+                                                data-name="{{this.name}}"
+                                                class="icon-btn {{#if this.isSale}}active-sale{{/if}}"
+                                                title="Toggle Sale">
+                                            <i class="fas fa-tag"></i>
+                                        </button>
+                                        
+                                        <button type="button" 
+                                                data-action="toggleHidden" 
+                                                data-name="{{this.name}}"
+                                                class="icon-btn {{#if this.isHidden}}active-hidden{{/if}}"
+                                                title="Toggle Visibility">
+                                            <i class="fas fa-eye{{#if this.isHidden}}-slash{{/if}}"></i>
+                                        </button>
+
+                                        {{#if this.isOverridden}}
+                                        <button type="button" 
+                                                class="reset-price-btn" 
+                                                data-action="resetPrice"
+                                                data-name="{{this.name}}" 
+                                                title="Reset to Default Price">
+                                            <i class="fas fa-undo"></i>
+                                        </button>
+                                        {{/if}}
+                                    </div>
+
+                                    <input type="number" 
+                                           class="gm-price-input" 
+                                           value="{{this.price}}" 
+                                           data-name="{{this.name}}" 
+                                           min="0" step="1">
+                                </div>
+                            {{else}}
+                                <div class="player-controls">
+                                    <div class="price-display">
+                                        {{#if this.isSale}}
+                                            <span class="item-price sale">
+                                                <span class="original">{{this.originalPrice}}</span>
+                                                <span class="new">{{this.price}} {{../../../currency}}</span>
+                                            </span>
+                                        {{else}}
+                                            <span class="item-price">{{this.price}} {{../../../currency}}</span>
+                                        {{/if}}
+                                    </div>
+
+                                    {{#if ../../../hasPartyActor}}
+                                        <!-- CASE: Party Actor Exists -> Two Buttons -->
+                                        <button type="button" 
+                                                class="buy-btn" 
+                                                data-action="buyItem"
+                                                data-source="personal"
+                                                data-id="{{this.id}}" 
+                                                data-uuid="{{this.uuid}}" 
+                                                data-price="{{this.price}}"
+                                                data-name="{{this.name}}"
+                                                title="Buy for Yourself"
+                                                {{#unless this.canBuyPersonal}}disabled{{/unless}}>
+                                            <i class="fas fa-coins"></i>
+                                        </button>
+
+                                        <button type="button" 
+                                                class="buy-btn party-btn" 
+                                                data-action="buyItem"
+                                                data-source="party"
+                                                data-id="{{this.id}}" 
+                                                data-uuid="{{this.uuid}}" 
+                                                data-price="{{this.price}}"
+                                                data-name="{{this.name}}"
+                                                title="Split Payment with Party Funds"
+                                                {{#unless this.canBuyParty}}disabled{{/unless}}>
+                                            <i class="fas fa-users"></i>
+                                        </button>
+                                    {{else}}
+                                        <!-- CASE: No Party Actor -> Single Button -->
+                                        <button type="button" 
+                                                class="buy-btn" 
+                                                data-action="buyItem"
+                                                data-source="personal"
+                                                data-id="{{this.id}}" 
+                                                data-uuid="{{this.uuid}}" 
+                                                data-price="{{this.price}}"
+                                                data-name="{{this.name}}"
+                                                {{#unless this.canBuyPersonal}}disabled{{/unless}}>
+                                            <i class="fas fa-coins"></i> Buy
+                                        </button>
+                                    {{/if}}
+                                </div>
+                            {{/if}}
+                        </div>
+                    </div>
+                    {{/each}}
+                </div>
+            {{else}}
+                <p class="empty-tab">No items available in this category based on current GM settings.</p>
+            {{/each}}
+        </div>
+        {{/each}}
+    </section>
+</form>

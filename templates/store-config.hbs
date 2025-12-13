@@ -1,0 +1,146 @@
+<div class="daggerheart-store-config">
+    <!-- Title Removed as requested -->
+    
+    <!-- Config Tabs -->
+    <nav class="sheet-tabs tabs">
+        <!-- Added logic to maintain active class based on JS state -->
+        <a class="item {{#if (eq activeTab 'general')}}active{{/if}}" data-tab="general"><i class="fas fa-cogs"></i> General</a>
+        <a class="item {{#if (eq activeTab 'categories')}}active{{/if}}" data-tab="categories"><i class="fas fa-eye"></i> Categories</a>
+        <a class="item {{#if (eq activeTab 'tiers')}}active{{/if}}" data-tab="tiers"><i class="fas fa-layer-group"></i> Tiers</a>
+        <!-- New Tab -->
+        <a class="item {{#if (eq activeTab 'compendiums')}}active{{/if}}" data-tab="compendiums"><i class="fas fa-book"></i> Custom Compendiums</a>
+    </nav>
+
+    <!-- Tab: General -->
+    <div class="tab-content {{#if (eq activeTab 'general')}}active{{/if}}" data-tab="general">
+        
+        <!-- Store Name (New Setting) -->
+        <div class="form-group">
+            <label>Store Window Name</label>
+            <input type="text" name="storeName" value="{{storeName}}">
+            <p class="notes">Sets the title of the main store window.</p>
+        </div>
+
+        <hr>
+
+        <!-- Party Actor Selection -->
+        <div class="form-group">
+            <label>Party Actor</label>
+            <select name="partyActorId">
+                <option value="">None</option>
+                {{#each partyActors}}
+                <option value="{{this.id}}" {{#if (eq this.id ../selectedPartyActor)}}selected{{/if}}>{{this.name}}</option>
+                {{/each}}
+            </select>
+            <p class="notes">Select a party actor. If selected, the group can access the wealth stored in this sheet.</p>
+        </div>
+
+        <hr>
+
+        <div class="form-group">
+            <label>Global Price Multiplier (%)</label>
+            <input type="number" name="priceModifier" value="{{priceModifier}}" min="1" step="1">
+            <p class="notes">100 = Normal Price. Example: 110 = +10% cost.</p>
+        </div>
+
+        <div class="form-group">
+            <label>Sale Discount (%)</label>
+            <input type="number" name="saleDiscount" value="{{saleDiscount}}" min="1" max="99" step="1">
+            <p class="notes">Percentage off for items marked as "On Sale".</p>
+        </div>
+        
+        <!-- Custom Compendiums removed from here -->
+    </div>
+
+    <!-- Tab: Categories (Visibility Only) -->
+    <div class="tab-content {{#if (eq activeTab 'categories')}}active{{/if}}" data-tab="categories">
+        <!-- Title Removed as requested -->
+        <p class="notes">Check the boxes below to hide entire categories from the store.</p>
+        <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            {{#each categories}}
+            <label>
+                <input type="checkbox" name="hiddenCategories.{{this.key}}" {{checked this.isHidden}}>
+                Hide {{this.key}}
+            </label>
+            {{/each}}
+        </div>
+    </div>
+
+    <!-- Tab: Tiers (Allowed Tiers Only) -->
+    <div class="tab-content {{#if (eq activeTab 'tiers')}}active{{/if}}" data-tab="tiers">
+        <!-- Title Removed as requested -->
+        <p class="notes">Select which tiers are available for purchase in each category.</p>
+        <div class="tiers-config">
+            {{#each categories}}
+            <div class="category-row">
+                <h4>{{this.key}}</h4>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="tiers.{{this.key}}.1" {{checked (lookup this.tiers "1")}}> Tier 1</label>
+                    <label><input type="checkbox" name="tiers.{{this.key}}.2" {{checked (lookup this.tiers "2")}}> Tier 2</label>
+                    <label><input type="checkbox" name="tiers.{{this.key}}.3" {{checked (lookup this.tiers "3")}}> Tier 3</label>
+                    <label><input type="checkbox" name="tiers.{{this.key}}.4" {{checked (lookup this.tiers "4")}}> Tier 4</label>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+
+    <!-- Tab: Custom Compendiums -->
+    <div class="tab-content {{#if (eq activeTab 'compendiums')}}active{{/if}}" data-tab="compendiums">
+        
+        <!-- 1. Custom Tab Configuration (NEW) -->
+        <h3 style="margin-top:0;">Custom Tab Configuration</h3>
+        <p class="notes">Create a special tab (e.g., "Merchant" or "Magic Items") linked to a specific compendium.</p>
+        
+        <div class="form-group">
+            <label>Custom Tab Name</label>
+            <input type="text" name="customTabName" value="{{customTabName}}" placeholder="General">
+        </div>
+
+        <div class="form-group">
+            <label>Custom Tab Compendium</label>
+            <select name="customTabCompendium">
+                <option value="">-- Select Compendium --</option>
+                {{#each availablePacks}}
+                <option value="{{this.id}}" {{#if (eq this.id ../customTabCompendium)}}selected{{/if}}>{{this.label}}</option>
+                {{/each}}
+            </select>
+        </div>
+
+        <hr style="border-top: 1px solid #444; margin: 15px 0;">
+
+        <!-- 2. Additional Compendiums (Existing) -->
+        <h3>Merged Compendiums</h3>
+        <p class="notes">Add additional compendiums to be merged into the standard categories (e.g. Loot, Weapons).</p>
+        
+        <div class="compendiums-list">
+            {{#each customCompendiums}}
+            <div class="compendium-row form-group" style="display:flex; gap:10px; align-items:center; margin-bottom:5px;">
+                <select name="customCompendiums.{{@index}}.pack" style="flex:2">
+                    <option value="">Select a Compendium...</option>
+                    {{#each ../availablePacks}}
+                    <option value="{{this.id}}" {{#if (eq this.id ../pack)}}selected{{/if}}>{{this.label}}</option>
+                    {{/each}}
+                </select>
+                <select name="customCompendiums.{{@index}}.category" style="flex:1">
+                    {{#each ../availableCategories}}
+                    <option value="{{this}}" {{#if (eq this ../category)}}selected{{/if}}>{{this}}</option>
+                    {{/each}}
+                </select>
+                <button type="button" 
+                        data-action="removeCompendium" 
+                        data-index="{{@index}}" 
+                        style="width: 30px; height: 30px; color: red;">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            {{/each}}
+        </div>
+        <button type="button" data-action="addCompendium" class="add-compendium"><i class="fas fa-plus"></i> Add Compendium</button>
+    </div>
+
+    <!-- Added 'config-footer' class for specific targeting -->
+    <footer class="sheet-footer config-footer">
+        <button type="submit"><i class="fas fa-save"></i> Save Settings</button>
+    </footer>
+</div>

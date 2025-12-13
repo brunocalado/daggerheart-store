@@ -1,0 +1,76 @@
+{
+  "id": "daggerheart-store",
+  "title": "Daggerheart: Store",
+  "version": "0.0.1",
+  "compatibility": {
+    "minimum": "13",
+    "verified": "13"
+  },
+  "authors": [
+    {
+      "name": "Mestre Digital",
+      "flags": {}
+    }
+  ],
+  "esmodules": [
+    "scripts/module.js"
+  ],
+  "styles": [
+    "styles/store.css"
+  ],
+  "packs": [
+    {
+      "label": "General Items",
+      "type": "Item",
+      "name": "general-items",
+      "path": "packs/general-items",
+      "system": "daggerheart",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
+    },
+    {
+      "label": "Macros",
+      "type": "Macro",
+      "name": "macros",
+      "path": "packs/macros",
+      "system": "daggerheart",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
+    },
+    {
+      "label": "Journals",
+      "type": "JournalEntry",
+      "name": "journals",
+      "path": "packs/journals",
+      "system": "daggerheart",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
+    } 
+  ],  
+  "packFolders": [
+    {
+      "name": "Daggerheart: Store",
+      "sorting": "a",
+      "color": "#ad0000",
+      "packs": [        
+        "general-items",        
+        "journals",
+        "macros"
+      ],
+      "folders": []
+    }
+  ],
+  
+  "url": "https://github.com/brunocalado/daggerheart-store",
+  "manifest": "https://raw.githubusercontent.com/brunocalado/daggerheart-store/main/module.json",
+  "download": "https://codeload.github.com/brunocalado/daggerheart-store/zip/main"
+}
