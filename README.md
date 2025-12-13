@@ -27,22 +27,27 @@ A dynamic, interactive, and fully configurable store for the **Daggerheart** sys
 
 ## 📸 Screenshots
 
-| Player Store | GM View (Editing) |
-| :---: | :---: |
-| *Clean interface with search and quick buy.* | *Price controls, hide, and sale buttons visible.* |
-|<p align="center"><img width="400" src="docs/player-view.webp"></p>|<p align="center"><img width="400" src="docs/gm-view.webp"></p>|
+| Player Store |
+| :---: |
+| *Clean interface with search and quick buy.* |
+|<p align="center"><img width="400" src="docs/player-view.webp"></p>|
 
+| GM View (Editing) |
+| :---: |
+| *Price controls, hide, and sale buttons visible.* |
+|<p align="center"><img width="400" src="docs/gm-view.webp"></p>|
 
 ## 🚀 Installation
 
 Install via the Foundry VTT Module browser or use this manifest link:
-`https://raw.githubusercontent.com/brunocalado/daggerheart-store/main/module.json`
+- `https://raw.githubusercontent.com/brunocalado/daggerheart-store/main/module.json`
 
 ## ⚙️ How to Use
 
 ### Opening the Store
 * **As GM:** Open the store. You can use the system button or a macro with `Store.Open()`.
 <p align="center"><img width="400" src="docs/system-button.webp"></p>
+
 * **As GM:** You have buttons in the store window header to:
     * <i class="fas fa-globe"></i> **Show to Everyone:** Opens the store on the screen of all connected players.
     * <i class="fas fa-user"></i> **Show to Player:** Opens the store only for a specific selected player.
