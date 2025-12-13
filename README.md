@@ -9,10 +9,12 @@ A dynamic, interactive, and fully configurable store for the **Daggerheart** sys
 * **Real-Time Search:** Find the desired item instantly by typing its name.
 * **Visual Details:** Clear icons, names, and prices. Click on the item image to open the full compendium sheet.
 * **Automated Purchase:** Clicking "Buy" automatically deducts currency from the character sheet and adds the item to the inventory.
+* **Party Funds & Split Payment:** If enabled, view Party Wealth and split the cost of purchases between your character's funds and the Party's treasury.
 * **Visual & Audio Feedback:** Coin sounds upon purchase and stylized chat messages confirm the transaction.
 * **Items on Sale:** Spot discounted items marked with special tags and reduced prices.
 
 ### 🛠️ For the Gamemaster (GM)
+* **Store Profiles:** Save and load different store configurations (Presets) to quickly switch settings between different towns, merchants, or campaign acts.
 * **Total Control:** Open the store for all players or a specific one with a single click using the header buttons.
 * **Dynamic Pricing:**
     * **Global Multiplier:** Adjust world inflation (e.g., everything 20% more expensive or 10% cheaper).
@@ -22,20 +24,25 @@ A dynamic, interactive, and fully configurable store for the **Daggerheart** sys
     * **Promotions (Sale):** Mark items as "On Sale" to apply a configurable automatic discount.
     * **Filter by Tier:** Configure which Tiers (1, 2, 3, 4) appear in each category via settings.
 * **Customization:**
+    * **Party Actor:** Link a Party Actor to the store to enable group purchases.
     * **Custom Compendiums:** Add your own item compendiums (Homebrew) to be scanned by the store.
+    * **Custom Tab:** Configure a dedicated tab linked to a specific compendium for special merchant inventories.
     * **Customizable Currency:** Change the currency name (e.g., "Gold", "Credits").
 
 ## 📸 Screenshots
 
-| Player Store |
-| :---: |
-| *Clean interface with search and quick buy.* |
-|<p align="center"><img width="400" src="docs/player-view.webp"></p>|
+### Player Store
 
-| GM View (Editing) |
-| :---: |
-| *Price controls, hide, and sale buttons visible.* |
-|<p align="center"><img width="400" src="docs/gm-view.webp"></p>|
+Clean interface with search, quick buy, and party fund options.
+
+<p align="center"><img width="700" src="docs/player-view.webp"></p>
+
+### GM View (Editing)
+
+Price controls, hide, sale buttons, and profile management visible.
+
+<p align="center"><img width="700" src="docs/gm-view.webp"></p>
+
 
 ## 🚀 Installation
 
@@ -54,12 +61,19 @@ Install via the Foundry VTT Module browser or use this manifest link:
 
 ### Configuration (GM)
 Click the gear button (<i class="fas fa-cog"></i>) in the top right corner of the store to access advanced settings:
-1. **General:** Define the global price multiplier, the discount percentage for items on sale, and add custom compendiums.
+1. **General:** Define the global price multiplier, the discount percentage, link a Party Actor, and manage profiles.
 2. **Categories & Tiers:** Choose which tabs (Weapons, Potions, etc.) should appear and which Item Tiers are allowed.
+3. **Custom Compendiums:** Configure the Custom Tab and merge external compendiums into standard categories.
+
+### Profiles (Presets)
+Use the dropdown menu and buttons in the store header to:
+* **Save:** Store the current configuration (prices, visibility, settings) as a new profile.
+* **Load:** Instantly apply a saved profile.
+* **Delete:** Remove an obsolete profile.
 
 ## ⚖️ Credits and License
 
 * **Code License:** MIT License.
-* **Assets:** Audio and images provided are [CC0 1.0 Universal Public Domain](https://creativecommons.org/publicdomain/zero/1.0/).
+* **Assets:** AI Audio and images provided are [CC0 1.0 Universal Public Domain](https://creativecommons.org/publicdomain/zero/1.0/).
 
 **Disclaimer:** This module is an independent creation and is not affiliated with Darrington Press.
