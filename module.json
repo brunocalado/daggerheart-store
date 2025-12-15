@@ -1,7 +1,7 @@
 {
   "id": "daggerheart-store",
   "title": "Daggerheart: Store",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "compatibility": {
     "minimum": "13",
     "verified": "13"
@@ -12,6 +12,9 @@
       "flags": {}
     }
   ],
+  
+  "description": "A dynamic, interactive, and fully configurable store for the Daggerheart system in Foundry VTT. Allow your players to purchase weapons, armor, potions, and miscellaneous items directly from an elegant visual interface, while the GM maintains full control over prices and what is displayed.",
+  
   "esmodules": [
     "scripts/module.js"
   ],
