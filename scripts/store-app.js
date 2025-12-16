@@ -34,8 +34,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             resizable: true,
             controls: []
         },
-        // AJUSTE: Largura padrão reduzida para 800px para ficar mais compacta
-        position: { width: 800, height: 700 }, 
+        // AJUSTE: Largura padrão aumentada para acomodar o min-width de 870px
+        position: { width: 900, height: 700 }, 
         classes: ["daggerheart-store"],
         actions: {
             buyItem: DaggerheartStore.prototype._onBuyItem,
@@ -314,12 +314,12 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const tabs = html.querySelectorAll(".sheet-tabs .item");
         tabs.forEach(tab => {
             tab.addEventListener("click", (e) => {
-                e.preventDefault();
-                const tabId = e.currentTarget.dataset.tab;
-                
-                this.activeTab = tabId; 
+                e.preventDefault(); 
+                const tabId = e.currentTarget.dataset.tab; 
+                this.currentTab = tabId;
+
                 tabs.forEach(t => t.classList.remove("active"));
-                e.currentTarget.classList.add("active");
+                e.currentTarget.classList.add("active"); 
                 
                 const contents = html.querySelectorAll(".content .tab");
                 contents.forEach(c => {

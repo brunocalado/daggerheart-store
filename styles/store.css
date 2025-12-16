@@ -51,7 +51,6 @@
 
 .daggerheart-store .sheet-tabs {
     display: flex;
-    /* justify-content: center; -> Removido pois flex-grow cuidará do preenchimento */
     flex-wrap: wrap;
     
     background: transparent; 
@@ -69,9 +68,8 @@
 /* ==================================================== */
 
 .daggerheart-store .sheet-tabs .item {
-    /* AJUSTE: flex: 1 faz o botão crescer para preencher o espaço */
     flex: 1; 
-    text-align: center; /* Centraliza o texto no botão expandido */
+    text-align: center;
     
     background: transparent;
     background-image: none;
@@ -92,7 +90,7 @@
     
     opacity: 0.8;
     transition: all 0.2s ease;
-    white-space: nowrap; /* Evita quebra de linha em telas apertadas */
+    white-space: nowrap; 
 }
 
 .daggerheart-store .sheet-tabs .item:hover {
@@ -511,7 +509,18 @@
     display: flex;
     flex-direction: column;
 }
-.daggerheart-store-config h3 { border-bottom: 1px solid #d4af37; color: #d4af37; }
+
+/* AJUSTE: Títulos Gerais da Config (H3) - Dourado, menor e com fonte do sistema */
+.daggerheart-store-config h3 { 
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+    color: #d4af37; 
+    font-family: "Aleo", serif;
+    font-size: 1.2em; /* Reduzido */
+    margin-top: 15px;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+}
+
 .daggerheart-store-config .sheet-tabs .item { color: #aaa; border: none; background: transparent; }
 .daggerheart-store-config .sheet-tabs .item.active { color: #d4af37; border-bottom: 2px solid #d4af37; }
 
@@ -524,4 +533,29 @@
 
 .daggerheart-store-config .tab-content.active {
     display: block; 
+}
+
+/* AJUSTE: Aba Tiers (H4) */
+.daggerheart-store-config .tiers-config .category-row h4 {
+    color: #d4af37;
+    font-family: "Aleo", serif;
+    font-size: 1.1em;
+    margin-bottom: 5px; /* Título mais próximo das opções */
+    margin-top: 0;
+    border-bottom: none;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* AJUSTE: Aba Tiers (Espaçamento entre Categorias) */
+.daggerheart-store-config .tiers-config .category-row {
+    margin-bottom: 20px; /* Mais espaço antes do próximo título */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Divisor sutil opcional */
+    padding-bottom: 5px;
+}
+
+.daggerheart-store-config .checkbox-group {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 0; /* Remove margem extra para controle via category-row */
 }
