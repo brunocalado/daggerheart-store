@@ -146,6 +146,8 @@ Price controls, hide toggles, sale buttons, and profile management.
 
 <p align="center"><img width="700" src="docs/gm-view.webp"></p>
 
+<p align="center"><img width="700" src="docs/settings.webp"></p>
+
 ## 🚀 Installation
 
 Install via the Foundry VTT Module browser or use this manifest link:
