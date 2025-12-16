@@ -110,7 +110,8 @@
 }
 
 .daggerheart-store .store-item-name {
-    color: #e0e0e0 !important; /* Adjusted for dark background */
+    /* UPDATED: Dark Text for Light Background */
+    color: #191919 !important; 
     font-weight: bold;
 }
 
@@ -304,8 +305,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: rgba(40, 40, 40, 0.8); /* Darker row background */
-    border: 1px solid #444;
+    /* UPDATED: Light Background for better contrast/readability */
+    background: rgba(255, 255, 255, 0.85); 
+    border: 1px solid #7a6b58; /* Muted brown border */
     border-radius: 4px;
     padding: 0;
     transition: all 0.2s ease-in-out;
@@ -314,15 +316,17 @@
 }
 
 .store-row:hover {
+    /* Golden Border and Glow on Hover */
     border-color: #d4af37;
-    background: rgba(60, 60, 60, 0.9);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    background: #ffffff;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+    z-index: 5;
 }
 
 .store-row.gm-hidden-item {
     opacity: 0.6;
     border: 1px dashed #7a1d1d !important;
-    background: rgba(80, 20, 20, 0.3);
+    background: rgba(255, 240, 240, 0.8);
 }
 
 /* --- Green Pulse Animation --- */
@@ -370,7 +374,7 @@
 .store-item-name {
     font-weight: bold;
     font-size: 1em;
-    color: #e0e0e0;
+    color: #191919; /* Force dark text */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -472,15 +476,16 @@
 /* Price Styling */
 .item-price {
     font-size: 1em;
-    color: #ccc;
-    background: rgba(0, 0, 0, 0.3);
+    color: #333; /* Dark text for light background */
+    background: rgba(0, 0, 0, 0.05); /* Subtle grey background */
+    border: 1px solid rgba(0,0,0,0.1);
     border-radius: 4px;
     padding: 4px 8px;
     display: inline-block;
 }
 
 .item-price.sale {
-    background: rgba(39, 174, 96, 0.2);
+    background: rgba(39, 174, 96, 0.1);
     color: #27ae60;
     border: 1px solid #27ae60;
     display: flex;
