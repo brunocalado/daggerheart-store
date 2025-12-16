@@ -108,6 +108,12 @@
                         <!-- Left Side: Icon, Name AND Sale Text -->
                         <div class="row-left">
                             <img src="{{this.img}}" title="Click to view details" class="item-image" data-uuid="{{this.uuid}}" width="36" height="36"/>
+                            
+                            <!-- NEW: Recommendation Crown -->
+                            {{#if this.isRecommended}}
+                                <i class="fas fa-crown recommended-icon" title="Recommended for your highest Trait"></i>
+                            {{/if}}
+
                             <span class="store-item-name">{{this.name}}</span>
 
                             {{#unless ../../../isGM}}

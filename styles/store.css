@@ -629,3 +629,24 @@
     color: #d4af37;
     font-family: "Aleo", serif;
 }
+
+/* RECOMMENDED ITEM ICON (NEW) */
+.recommended-icon {
+    color: #ffd700; /* Gold */
+    margin-left: 5px;
+    margin-right: 5px;
+    /* Black outline using text-shadow for better visibility on light backgrounds */
+    text-shadow: 
+        -1px -1px 0 #000,  
+         1px -1px 0 #000,
+        -1px  1px 0 #000,
+         1px  1px 0 #000,
+         0 0 5px rgba(255, 215, 0, 0.6); /* Gold Glow behind black border */
+    animation: pulseCrown 2s infinite ease-in-out;
+}
+
+@keyframes pulseCrown {
+    0% { transform: scale(1); opacity: 0.9; }
+    50% { transform: scale(1.15); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.9; }
+}

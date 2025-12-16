@@ -24,6 +24,11 @@ A dynamic, interactive, and fully configurable store for the **Daggerheart** sys
 
 * **Items on Sale:** Spot discounted items marked with special tags and reduced prices.
 
+* **Quick Stats:** View essential stats for Weapons (Damage, Range, Trait) and Armor (Score, Thresholds) directly in the store list without opening the sheet.
+
+* **Smart Recommendations:** Weapons that match your character's highest Trait are highlighted with a gold crown, helping you find the best gear for your build.
+
+
 ### 🛠️ For the Gamemaster (GM)
 
 * **Store Profiles:** Save and load different store configurations (Presets) to quickly switch settings between different towns, merchants, or campaign acts.

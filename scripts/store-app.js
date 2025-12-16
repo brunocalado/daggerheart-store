@@ -183,7 +183,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
     /**
      * Generates the armor summary string.
-     * Pattern: Score: [baseScore] Thresholds: [major]/[severe]
+     * Pattern: Score: [baseScore] - Thresholds: [major]/[severe]
      */
     _getArmorSummary(doc) {
         try {
@@ -195,7 +195,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             const baseThresholdsMajor = system.baseThresholds?.major ?? 0;
             const baseThresholdsSevere = system.baseThresholds?.severe ?? 0;
 
-            return `Score: ${baseScore} Thresholds: ${baseThresholdsMajor}/${baseThresholdsSevere}`;
+            // UPDATED: Added hyphen separator
+            return `Score: ${baseScore} - Thresholds: ${baseThresholdsMajor}/${baseThresholdsSevere}`;
         } catch (err) {
             console.error(`${MODULE_ID} | Error generating armor summary for ${doc.name}:`, err);
             return "";
@@ -287,6 +288,30 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         
         // Fetch currency from system
         const currencyName = getSystemCurrency();
+
+        // -------------------------------------------------------------
+        // NEW LOGIC: Calculate Highest Traits for Recommendations
+        // -------------------------------------------------------------
+        let bestTraits = [];
+        if (hasActor && !isGM) {
+            const traitKeys = ["agility", "strength", "finesse", "instinct", "presence", "knowledge"];
+            let maxVal = -Infinity;
+            
+            // 1. Find Max Value
+            traitKeys.forEach(t => {
+                const val = foundry.utils.getProperty(userActor, `system.traits.${t}.value`) || 0;
+                if (val > maxVal) maxVal = val;
+            });
+
+            // 2. Identify all traits that match this max value
+            if (maxVal > -Infinity) {
+                bestTraits = traitKeys.filter(t => {
+                    const val = foundry.utils.getProperty(userActor, `system.traits.${t}.value`) || 0;
+                    return val === maxVal;
+                });
+            }
+        }
+        // -------------------------------------------------------------
 
         const context = {
             isGM: isGM,
@@ -390,6 +415,15 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             itemSummary = this._getArmorSummary(doc);
                         }
 
+                        // --- CHECK RECOMMENDATION ---
+                        let isRecommended = false;
+                        if (hasActor && !isGM && doc.type === "weapon") {
+                            const itemTrait = String(foundry.utils.getProperty(doc, "system.attack.roll.trait") || "").toLowerCase();
+                            if (itemTrait && bestTraits.includes(itemTrait)) {
+                                isRecommended = true;
+                            }
+                        }
+
                         customItems.push({
                             id: doc.id,
                             uuid: doc.uuid,
@@ -398,14 +432,14 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             price: finalPrice,
                             originalPrice: basePrice,
                             isSale: isSale,
-                            // Only report hidden to template if GM. If player owns it, they see it normally.
                             isHidden: isGM && isHidden,
                             isOverridden: isOverridden,
                             canBuyPersonal: canBuyPersonal,
                             canBuyParty: canBuyParty,
                             canSell: canSell,   
                             sellPrice: sellPrice,
-                            itemSummary: itemSummary // Renamed from weaponSummary
+                            itemSummary: itemSummary,
+                            isRecommended: isRecommended // New Flag
                         });
                     }
                 }
@@ -499,6 +533,15 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         itemSummary = this._getArmorSummary(doc);
                     }
 
+                    // --- CHECK RECOMMENDATION ---
+                    let isRecommended = false;
+                    if (hasActor && !isGM && doc.type === "weapon") {
+                        const itemTrait = String(foundry.utils.getProperty(doc, "system.attack.roll.trait") || "").toLowerCase();
+                        if (itemTrait && bestTraits.includes(itemTrait)) {
+                            isRecommended = true;
+                        }
+                    }
+
                     if (tierGroups[tier]) {
                         tierGroups[tier].items.push({
                             id: doc.id,
@@ -515,7 +558,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             canBuyParty: canBuyParty,
                             canSell: canSell,
                             sellPrice: sellPrice,
-                            itemSummary: itemSummary // Renamed from weaponSummary
+                            itemSummary: itemSummary,
+                            isRecommended: isRecommended // New Flag
                         });
                     }
                 }
