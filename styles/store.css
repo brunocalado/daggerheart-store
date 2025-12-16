@@ -4,6 +4,7 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    background: transparent; /* Ensure window content is transparent so container background shows */
 }
 
 .daggerheart-store-container {
@@ -11,10 +12,11 @@
     flex-direction: column;
     height: 100%;
     
-    /* Parchment background texture */
-    background: url("/modules/daggerheart-store/assets/images/parchment.webp");
-    background-size: cover;
-    background-repeat: no-repeat;
+    /* Foundryborne-blur & background treatment */
+    background: var(--background);
+    backdrop-filter: blur(10px);
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+    border-radius: 0 0 5px 5px;
     
     overflow: hidden; 
 }
@@ -25,22 +27,27 @@
 
 .daggerheart-store {
     background-color: transparent; 
-    color: #333;
+    color: var(--color-text-light-1); /* Updated to use variable if available, fallback to #333 handled below if var fails */
     
     /* Force minimum width to ensure layout stability */
     min-width: 1050px !important;
 }
 
+/* Fallback color if variable doesn't exist in scope */
+.daggerheart-store {
+    color: #e0e0e0; /* Lighter text for dark backgrounds */
+}
+
 .daggerheart-store .store-header {
-    background: #222;
+    background: rgba(0, 0, 0, 0.4); /* Darker semi-transparent header */
     color: #d4af37;
     border-bottom: 2px solid #d4af37;
 }
 
 /* Tabs Container */
 .daggerheart-store .sheet-tabs {
-    background: rgba(0, 0, 0, 0.2); /* Subtle dark background behind wooden tabs */
-    border-bottom: 1px solid #5c4033; /* Brown border */
+    background: rgba(0, 0, 0, 0.2); 
+    border-bottom: 1px solid #5c4033;
     padding-top: 5px;
 }
 
@@ -96,13 +103,14 @@
     background: transparent; 
 }
 .daggerheart-store .tier-separator {
-    background: #333;
+    background: rgba(51, 51, 51, 0.8);
     color: #fff;
     border-radius: 4px;
+    border: 1px solid #444;
 }
 
 .daggerheart-store .store-item-name {
-    color: #000000 !important; 
+    color: #e0e0e0 !important; /* Adjusted for dark background */
     font-weight: bold;
 }
 
@@ -133,9 +141,9 @@
 
 /* NEW: Preset Select Styling */
 .preset-select {
-    width: 200px; /* Fixed and somewhat long */
+    width: 200px; 
     height: 32px;
-    background: #333; /* Dark background to match header */
+    background: rgba(0, 0, 0, 0.5);
     color: #fff;
     border: 1px solid #5d4037;
     border-radius: 4px;
@@ -148,7 +156,6 @@
     outline: none;
 }
 
-/* Style adjustment for icon-only buttons to align with select */
 .config-btn.icon-only {
     padding: 6px 12px;
     min-width: 40px;
@@ -173,7 +180,7 @@
 
 .header-separator {
     margin: 0 8px;
-    color: #5d4037; /* Matches border color of wood buttons */
+    color: #5d4037;
     font-size: 1.5em;
     font-weight: 300;
     position: relative;
@@ -190,7 +197,6 @@
     background-size: cover; 
     background-position: center;
     
-    /* Contrast */
     color: #ffffff;
     font-weight: bold;
     font-size: 1.1em;
@@ -210,7 +216,6 @@
     border-radius: 4px;
     transition: all 0.2s;
     
-    /* Align items if needed */
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -243,7 +248,6 @@
 }
 
 .daggerheart-store .sheet-tabs .item {
-    /* Specific tab layout */
     padding: 8px 15px;
     flex: 1 0 auto; 
     text-align: center;
@@ -265,6 +269,8 @@
 .store-search {
     width: 100%;
     padding: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    color: #fff;
     border: 1px solid #d4af37;
     border-radius: 4px;
     box-sizing: border-box; 
@@ -298,41 +304,38 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid #ccc;
+    background: rgba(40, 40, 40, 0.8); /* Darker row background */
+    border: 1px solid #444;
     border-radius: 4px;
-    padding: 0; /* Zero padding to allow full-height image */
+    padding: 0;
     transition: all 0.2s ease-in-out;
     position: relative; 
-    min-height: 46px; /* Consistent minimum height */
+    min-height: 46px;
 }
 
 .store-row:hover {
     border-color: #d4af37;
-    background: #fff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    background: rgba(60, 60, 60, 0.9);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
 
 .store-row.gm-hidden-item {
     opacity: 0.6;
     border: 1px dashed #7a1d1d !important;
-    background: #fff0f0;
+    background: rgba(80, 20, 20, 0.3);
 }
 
-/* --- Green Pulse Animation (Sale - Dark Green & Menor) --- */
+/* --- Green Pulse Animation --- */
 @keyframes saleGreenPulse {
     0% {
-        /* Reduzido de 2px para 1.5px */
         box-shadow: 0 0 1.5px rgba(0, 100, 0, 0.2); 
         border-color: rgba(0, 100, 0, 0.4);
     }
     50% {
-        /* Reduzido de 12px para 8px (aprox. -30%) */
         box-shadow: 0 0 8px rgba(0, 100, 0, 0.8);
         border-color: #006400; 
     }
     100% {
-        /* Reduzido de 2px para 1.5px */
         box-shadow: 0 0 1.5px rgba(0, 100, 0, 0.2);
         border-color: rgba(0, 100, 0, 0.4);
     }
@@ -351,12 +354,11 @@
     flex: 1;
     overflow: hidden; 
     padding: 5px 10px;
-    /* padding-right removed to allow flexbox flow */
 }
 
 .item-image {
     cursor: pointer;
-    border: 1px solid #999;
+    border: 1px solid #666;
     border-radius: 4px;
     transition: box-shadow 0.2s;
     background: #000;
@@ -368,7 +370,7 @@
 .store-item-name {
     font-weight: bold;
     font-size: 1em;
-    color: #000;
+    color: #e0e0e0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -404,7 +406,9 @@
 .gm-price-input {
     width: 60px;
     text-align: center;
-    border: 1px solid #aaa;
+    border: 1px solid #666;
+    background: #333;
+    color: #fff;
     border-radius: 3px;
     padding: 4px;
 }
@@ -423,17 +427,13 @@
     min-width: 60px;
 }
 
-/* FIXED: Sale Icon Position - END OF LEFT ROW
-   Static position inside flex container.
-   Margin left creates space from the item name.
-*/
 .sale-icon {
     position: static; 
     height: 38px; 
     width: auto;
     object-fit: contain;
     
-    margin-left: 10px; /* Space from Item Name */
+    margin-left: 10px;
     margin-right: 0;
     
     pointer-events: none;
@@ -444,9 +444,9 @@
 
 /* GM Toggle Icons */
 .icon-btn {
-    background: #f0f0f0;
-    border: 1px solid #ccc;
-    color: #888;
+    background: #444;
+    border: 1px solid #666;
+    color: #aaa;
     cursor: pointer;
     padding: 4px 6px;
     border-radius: 3px;
@@ -455,7 +455,7 @@
     align-items: center;
     justify-content: center;
 }
-.icon-btn:hover { background: #e0e0e0; color: #333; }
+.icon-btn:hover { background: #555; color: #fff; }
 .icon-btn.active-sale { background: #27ae60; color: white; border-color: #27ae60; }
 .icon-btn.active-hidden { background: #7a1d1d; color: white; border-color: #7a1d1d; }
 
@@ -467,22 +467,22 @@
     padding: 4px 6px;
     border-radius: 3px;
 }
-.reset-price-btn:hover { background: #ffebeb; }
+.reset-price-btn:hover { background: rgba(255, 0, 0, 0.1); }
 
 /* Price Styling */
 .item-price {
     font-size: 1em;
-    color: #555;
-    background: #eee;
+    color: #ccc;
+    background: rgba(0, 0, 0, 0.3);
     border-radius: 4px;
     padding: 4px 8px;
     display: inline-block;
 }
 
 .item-price.sale {
-    background: #e8f5e9;
+    background: rgba(39, 174, 96, 0.2);
     color: #27ae60;
-    border: 1px solid #a5d6a7;
+    border: 1px solid #27ae60;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -492,7 +492,7 @@
 .item-price.sale .original {
     font-size: 0.75em;
     text-decoration: line-through;
-    color: #999;
+    color: #888;
 }
 .item-price.sale .new {
     font-weight: bold;
@@ -500,7 +500,7 @@
 
 /* Buy Button */
 .buy-btn {
-    background: #005700; /* Dark Green #005700 */
+    background: #005700;
     color: white;
     border: none;
     padding: 6px 12px;
@@ -516,13 +516,13 @@
 }
 
 .buy-btn:hover:not(:disabled) {
-    background: #007500; /* Slightly lighter Green for hover */
+    background: #007500;
     box-shadow: 0 0 8px rgba(0, 87, 0, 0.4);
 }
 
 .buy-btn:disabled {
-    background: #ccc;
-    color: #666;
+    background: #555;
+    color: #888;
     cursor: not-allowed;
 }
 
@@ -531,16 +531,14 @@
     filter: drop-shadow(0 1px 1px rgba(0,0,0,0.5));
 }
 
-/* Party Button Variant */
 .buy-btn.party-btn {
-    background: #0c2481; /* Dark Blue #0c2481 */
+    background: #0c2481;
 }
 
 .buy-btn.party-btn:hover:not(:disabled) {
-    background: #1532b0; /* Slightly lighter Blue for hover */
+    background: #1532b0;
 }
 
-/* Split Payment Dialog Styling */
 .split-row {
     display: flex;
     align-items: center;
@@ -655,7 +653,6 @@
     text-decoration: none !important; 
 }
 
-/* Reset native appearance for full control */
 .daggerheart-store-config input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
@@ -674,20 +671,17 @@
     flex-shrink: 0;
 }
 
-/* Hover state */
 .daggerheart-store-config input[type="checkbox"]:hover {
     border-color: #d4af37 !important;
     background: #555;
 }
 
-/* Checked state: Gold background, no dash/line-through artifact */
 .daggerheart-store-config input[type="checkbox"]:checked {
     background-color: #d4af37;
     border-color: #d4af37 !important;
     box-shadow: 0 0 5px rgba(212, 175, 55, 0.4) !important;
 }
 
-/* The Checkmark (Pure CSS "V" Shape) - Crisp and Clean */
 .daggerheart-store-config input[type="checkbox"]:checked::after {
     content: '';
     position: absolute;
