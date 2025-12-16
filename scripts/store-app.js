@@ -34,7 +34,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             resizable: true,
             controls: []
         },
-        position: { width: 950, height: 700 }, // Aumentado levemente para acomodar separadores
+        // AJUSTE: Largura padrão reduzida para 800px para ficar mais compacta
+        position: { width: 800, height: 700 }, 
         classes: ["daggerheart-store"],
         actions: {
             buyItem: DaggerheartStore.prototype._onBuyItem,
@@ -73,11 +74,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const partyGold = partyActor ? (foundry.utils.getProperty(partyActor, "system.gold.coins") || 0) : 0;
         
         // --- Logic for Presets ---
-        // Fetch stored profiles from settings
         const storeProfiles = game.settings.get(MODULE_ID, "storeProfiles") || { "Default": {} };
         const currentProfile = game.settings.get(MODULE_ID, "currentProfile") || "Default";
         
-        // Ensure "Default" always exists in the list
         const profileKeys = Object.keys(storeProfiles);
         if (!profileKeys.includes("Default")) profileKeys.unshift("Default");
         
@@ -125,7 +124,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         categories = categories.filter(c => !hiddenCategories[c.key]);
         context.categories = categories;
 
-        // Ensure active tab is valid
         if (categories.length > 0) {
             const currentTabExists = categories.find(c => c.id === this.activeTab);
             if (!currentTabExists) {
@@ -136,7 +134,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
         // 4. Populate Items
         for (const cat of categories) {
-            // === Custom Tab Logic ===
             if (cat.id === "custom-tab") {
                 const pack = game.packs.get(customTabCompendium);
                 const customItems = [];
@@ -189,7 +186,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 continue;
             }
 
-            // === Standard Logic ===
             const tierGroups = {
                 1: { id: 1, label: "Tier 1 / Common", items: [] },
                 2: { id: 2, label: "Tier 2 / Uncommon", items: [] },
@@ -203,7 +199,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 if (custom.category === cat.key) packsToScan.push({ id: custom.pack, isDefault: false });
             });
 
-            // Default to all true if no config exists for this category
             const catConfig = allowedTiers[cat.key] || {1:true, 2:true, 3:true, 4:true};
             const priceList = PRICE_DATA[cat.key] || {};
 
@@ -245,8 +240,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     }
 
                     if (!knownItem) continue;
-                    
-                    // Check Tier Visibility
                     if (!catConfig[tier]) continue;
 
                     const isSale = saleItems[doc.name];
