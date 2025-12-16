@@ -180,7 +180,8 @@ Hooks.on("renderDaggerheartMenu", (app, html, data) => {
     // 1. Create the button
     const myButton = document.createElement("button");
     myButton.type = "button";
-    myButton.innerHTML = `<i class="fas fa-shopping-bag"></i> Open Store`;
+    // UPDATE: Changed icon from fa-shopping-bag to fa-balance-scale
+    myButton.innerHTML = `<i class="fas fa-balance-scale"></i> Open Store`;
     myButton.classList.add("dh-custom-btn"); 
     
     myButton.style.marginTop = "10px";
@@ -202,7 +203,7 @@ Hooks.on("renderDaggerheartMenu", (app, html, data) => {
     if (fieldset) {
         const newFieldset = document.createElement("fieldset");
         const legend = document.createElement("legend");
-        legend.innerText = "Store Module";
+        legend.innerText = "Store";
         
         newFieldset.appendChild(legend);
         newFieldset.appendChild(myButton);
