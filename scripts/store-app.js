@@ -15,6 +15,19 @@ const STANDARD_CATEGORIES = [
 ];
 
 /**
+ * Helper to get Currency Name from System Settings
+ */
+function getSystemCurrency() {
+    try {
+        const homebrewSettings = game.settings.get(CONFIG.DH.id, CONFIG.DH.SETTINGS.gameSettings.Homebrew);
+        return homebrewSettings?.currency?.coins?.label || "Coins";
+    } catch (e) {
+        console.warn(`${MODULE_ID} | Could not fetch system currency name, falling back to 'Coins'.`, e);
+        return "Coins";
+    }
+}
+
+/**
  * Main Store Application (Application V2)
  */
 export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) {
@@ -148,11 +161,14 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const profileKeys = Object.keys(storeProfiles);
         if (!profileKeys.includes("Default")) profileKeys.unshift("Default");
         
+        // FETCH CURRENCY FROM SYSTEM
+        const currencyName = getSystemCurrency();
+
         const context = {
             isGM: isGM,
             hasActor: hasActor,
             actorName: userActor ? userActor.name : "None",
-            currency: game.settings.get(MODULE_ID, "currencyName"),
+            currency: currencyName,
             hasPartyActor: hasPartyActor,
             userGold: userGold,
             partyGold: partyGold,
@@ -519,7 +535,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const newTotal = currentCoins + sellPrice;
         await userActor.update({ "system.gold.coins": newTotal });
 
-        const currency = game.settings.get(MODULE_ID, "currencyName");
+        // FETCH CURRENCY
+        const currency = getSystemCurrency();
+
         // UPDATED: Styling matches standard chat cards (Gold #C9A060), but with RED title (#ff9999).
         const rawContent = `
         <div class="chat-card" style="border: 2px solid #C9A060; border-radius: 8px; overflow: hidden;">
@@ -554,7 +572,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
     async _handleSplitPurchase(itemUuid, itemName, price, userActor, partyActor) {
         const userGold = foundry.utils.getProperty(userActor, "system.gold.coins") || 0;
         const partyGold = foundry.utils.getProperty(partyActor, "system.gold.coins") || 0;
-        const currency = game.settings.get(MODULE_ID, "currencyName");
+        // FETCH CURRENCY
+        const currency = getSystemCurrency();
 
         let defaultPartyPay = Math.min(partyGold, price);
         let defaultUserPay = price - defaultPartyPay;
@@ -640,7 +659,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const itemFromPack = await fromUuid(itemUuid);
         if (!itemFromPack) return ui.notifications.error("Item data not found.");
 
-        const currency = game.settings.get(MODULE_ID, "currencyName");
+        // FETCH CURRENCY
+        const currency = getSystemCurrency();
 
         for (const payer of payers) {
             if (payer.amount > 0) {
@@ -738,7 +758,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
                         const currentSettings = {
                             storeName: game.settings.get(MODULE_ID, "storeName"),
-                            currencyName: game.settings.get(MODULE_ID, "currencyName"),
+                            // REMOVED currencyName
                             priceModifier: game.settings.get(MODULE_ID, "priceModifier"),
                             allowedTiers: game.settings.get(MODULE_ID, "allowedTiers"),
                             hiddenCategories: game.settings.get(MODULE_ID, "hiddenCategories"),
@@ -778,7 +798,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         if (profileName === "Default") {
             profileData = {
                 storeName: "Daggerheart: Store",
-                currencyName: "Coins",
+                // REMOVED currencyName
                 priceModifier: 100,
                 allowedTiers: {}, 
                 hiddenCategories: {},
@@ -800,7 +820,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         }
 
         const settingsToUpdate = [
-            "storeName", "currencyName", "priceModifier", "allowedTiers", 
+            "storeName", "priceModifier", "allowedTiers", 
             "hiddenCategories", "customCompendiums", "priceOverrides", 
             "saleDiscount", "saleItems", "hiddenItems", "partyActorId", 
             "customTabName", "customTabCompendium", "sellRatio"

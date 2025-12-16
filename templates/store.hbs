@@ -161,10 +161,12 @@
                                         {{#if this.isSale}}
                                             <span class="item-price sale">
                                                 <span class="original">{{this.originalPrice}}</span>
-                                                <span class="new">{{this.price}} {{../../../currency}}</span>
+                                                <!-- REMOVIDO: currency -->
+                                                <span class="new">{{this.price}}</span>
                                             </span>
                                         {{else}}
-                                            <span class="item-price">{{this.price}} {{../../../currency}}</span>
+                                            <!-- REMOVIDO: currency -->
+                                            <span class="item-price">{{this.price}}</span>
                                         {{/if}}
                                     </div>
 
