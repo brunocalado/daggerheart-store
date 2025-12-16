@@ -152,6 +152,19 @@
     color: #191919 !important; 
     font-weight: bold;
     font-family: "Lato", sans-serif;
+    white-space: nowrap; /* Prevent breaking item names */
+}
+
+/* Weapon Stats Styling (New) */
+.daggerheart-store .weapon-stats {
+    color: #666;
+    font-size: 0.85em;
+    font-family: "Lato", sans-serif;
+    margin-left: 10px;
+    font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* ==================================================== */

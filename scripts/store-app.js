@@ -47,7 +47,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             resizable: true,
             controls: []
         },
-        position: { width: 900, height: 700 }, 
+        position: { width: 950, height: 700 }, // Increased width slightly for weapon stats
         classes: ["daggerheart-store"],
         actions: {
             buyItem: DaggerheartStore.prototype._onBuyItem,
@@ -76,6 +76,130 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
              await this._handleCurrencyConversion(game.user.character);
         }
         return super.render(options, _options);
+    }
+
+    /**
+     * Generates the weapon summary string based on updated rules.
+     * Pattern: Trait - Range - Damage+Bonus(Type) - Burden
+     */
+    _getWeaponSummary(doc) {
+        try {
+            if (doc.type !== "weapon") return "";
+            
+            const system = doc.system;
+            if (!system.attack) return "";
+
+            // 1. Weapon Trait (First 3 letters, Uppercase)
+            const traitRaw = String(system.attack.roll?.trait || "");
+            const weaponTrait = traitRaw.length >= 3 ? traitRaw.substring(0, 3).toUpperCase() : traitRaw.toUpperCase();
+
+            // 2. Weapon Range (Formatted)
+            const rangeRaw = system.attack.range || "";
+            const rangeMap = {
+                "melee": "Melee",
+                "veryClose": "Very Close",
+                "close": "Close",
+                "far": "Far",
+                "veryFar": "Very Far"
+            };
+            const weaponRange = rangeMap[rangeRaw] || (rangeRaw ? String(rangeRaw).charAt(0).toUpperCase() + String(rangeRaw).slice(1) : "");
+
+            // 3. Damage Processing
+            const part0 = system.attack.damage?.parts?.[0] || {};
+            const val = part0.value || {};
+            
+            // Custom Check
+            const weaponCustom = val.custom?.enabled === true;
+            
+            let damageSection = "";
+
+            if (weaponCustom) {
+                damageSection = "C";
+            } else {
+                const weaponDamage = val.dice || ""; 
+                const typeRaw = part0.type;
+                let damageType = "";
+
+                // Robust handling for typeRaw (Array, Set, String, or Object)
+                let typesList = [];
+                
+                if (Array.isArray(typeRaw)) {
+                    typesList = typeRaw;
+                } else if (typeRaw instanceof Set) {
+                    typesList = Array.from(typeRaw);
+                } else if (typeof typeRaw === "string") {
+                    // Sometimes comma separated strings appear in legacy data
+                    typesList = typeRaw.includes(",") ? typeRaw.split(",") : [typeRaw];
+                } else if (typeRaw && typeof typeRaw === "object") {
+                    // Fallback for object-based lists (e.g. {0: 'physical'})
+                    typesList = Object.values(typeRaw);
+                }
+
+                // Process list: convert to string -> trim -> uppercase 3 letters
+                damageType = typesList
+                    .map(t => {
+                        const s = String(t || "").trim();
+                        if (!s) return "";
+                        return s.length >= 3 ? s.substring(0, 3).toUpperCase() : s.toUpperCase();
+                    })
+                    .filter(t => t) // Remove empty entries
+                    .join("/"); // Join with slash
+                
+                // Weapon Bonus
+                const bonusVal = val.bonus;
+                let weaponBonus = "";
+                if (bonusVal !== null && bonusVal !== undefined && String(bonusVal).trim() !== "") {
+                    weaponBonus = `+${bonusVal}`;
+                }
+
+                // Compose: Damage+Bonus(Type) -> e.g., d8+2(PHY)
+                damageSection = `${weaponDamage}${weaponBonus}`;
+                if (damageType) {
+                    damageSection += `(${damageType})`;
+                }
+            }
+
+            // 4. Burden (One-Handed / Two-Handed)
+            const burdenRaw = String(system.burden || "");
+            const burdenMap = {
+                "1": "One-Handed",
+                "2": "Two-Handed",
+                "oneHanded": "One-Handed",
+                "twoHanded": "Two-Handed"
+            };
+            const weaponBurden = burdenMap[burdenRaw] || burdenRaw; // Fallback to raw if not in map
+
+            // Final Composition
+            const parts = [weaponTrait, weaponRange, damageSection, weaponBurden];
+            
+            // Filter out empty strings to avoid " - - "
+            return parts.filter(p => p && String(p).trim() !== "").join(" - ");
+
+        } catch (err) {
+            console.error(`${MODULE_ID} | Error generating weapon summary for ${doc.name}:`, err);
+            return ""; 
+        }
+    }
+
+    /**
+     * Generates the armor summary string.
+     * Pattern: Score: [baseScore] Thresholds: [major]/[severe]
+     */
+    _getArmorSummary(doc) {
+        try {
+            if (doc.type !== "armor") return "";
+            
+            const system = doc.system;
+            // Ensure values exist or default to 0/empty
+            const baseScore = system.baseScore ?? 0;
+            const baseThresholdsMajor = system.baseThresholds?.major ?? 0;
+            const baseThresholdsSevere = system.baseThresholds?.severe ?? 0;
+
+            return `Score: ${baseScore} Thresholds: ${baseThresholdsMajor}/${baseThresholdsSevere}`;
+        } catch (err) {
+            console.error(`${MODULE_ID} | Error generating armor summary for ${doc.name}:`, err);
+            return "";
+        }
     }
 
     async _handleCurrencyConversion(actor) {
@@ -258,6 +382,14 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         const combinedWealth = partyGold + userGold;
                         const canBuyParty = hasPartyActor && hasActor && (combinedWealth >= finalPrice) && (!isHidden || isGM);
 
+                        // --- GENERATE ITEM SUMMARY (Weapon or Armor) ---
+                        let itemSummary = "";
+                        if (doc.type === "weapon") {
+                            itemSummary = this._getWeaponSummary(doc);
+                        } else if (doc.type === "armor") {
+                            itemSummary = this._getArmorSummary(doc);
+                        }
+
                         customItems.push({
                             id: doc.id,
                             uuid: doc.uuid,
@@ -272,7 +404,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             canBuyPersonal: canBuyPersonal,
                             canBuyParty: canBuyParty,
                             canSell: canSell,   
-                            sellPrice: sellPrice 
+                            sellPrice: sellPrice,
+                            itemSummary: itemSummary // Renamed from weaponSummary
                         });
                     }
                 }
@@ -358,6 +491,14 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     const combinedWealth = partyGold + userGold;
                     const canBuyParty = hasPartyActor && hasActor && (combinedWealth >= finalPrice) && (!isHidden || isGM);
 
+                    // --- GENERATE ITEM SUMMARY (Weapon or Armor) ---
+                    let itemSummary = "";
+                    if (doc.type === "weapon") {
+                        itemSummary = this._getWeaponSummary(doc);
+                    } else if (doc.type === "armor") {
+                        itemSummary = this._getArmorSummary(doc);
+                    }
+
                     if (tierGroups[tier]) {
                         tierGroups[tier].items.push({
                             id: doc.id,
@@ -373,7 +514,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             canBuyPersonal: canBuyPersonal,
                             canBuyParty: canBuyParty,
                             canSell: canSell,
-                            sellPrice: sellPrice
+                            sellPrice: sellPrice,
+                            itemSummary: itemSummary // Renamed from weaponSummary
                         });
                     }
                 }

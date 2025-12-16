@@ -115,6 +115,11 @@
                                     <span class="sale-badge">(SALE)</span>
                                 {{/if}}
                             {{/unless}}
+
+                            <!-- Item Summary (Replaces Weapon Summary) -->
+                            {{#if this.itemSummary}}
+                                <span class="weapon-stats">{{this.itemSummary}}</span>
+                            {{/if}}
                         </div>
 
                         <!-- Right Side: Controls -->
