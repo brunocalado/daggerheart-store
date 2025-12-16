@@ -111,6 +111,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         });
 
         // Construct Rich Chat Message
+        // Changed fa-chest to fa-box-open to ensure visibility in standard FontAwesome
         const messageContent = `
             <div class="chat-card" style="border: 2px solid #C9A060; border-radius: 8px; overflow: hidden;">
                 <header class="card-header flexrow" style="background: #191919 !important; padding: 8px; border-bottom: 2px solid #C9A060;">
@@ -125,7 +126,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.9em; color: #ccc; text-align: left; display: inline-block;">
                         ${handfuls > 0 ? `<li><i class="fas fa-hand-holding-usd"></i> ${handfuls} Handfuls → ${coinsFromHandfuls} Coins</li>` : ""}
                         ${bags > 0 ? `<li><i class="fas fa-sack-dollar"></i> ${bags} Bags → ${coinsFromBags} Coins</li>` : ""}
-                        ${chests > 0 ? `<li><i class="fas fa-chest"></i> ${chests} Chests → ${coinsFromChests} Coins</li>` : ""}
+                        ${chests > 0 ? `<li><i class="fas fa-box-open"></i> ${chests} Chests → ${coinsFromChests} Coins</li>` : ""}
                     </ul>
                     <hr style="border-color: #444; width: 100%; margin: 15px 0;">
                     <p style="font-size: 1.2em; color: #d4af37; margin: 0;">

@@ -106,15 +106,16 @@
                     {{#each group.items}}
                     <div class="store-row {{#if this.isHidden}}gm-hidden-item{{/if}} {{#if this.isSale}}sale-pulse{{/if}}">
                         
-                        <!-- Left Side: Icon, Name AND Sale Image -->
+                        <!-- Left Side: Icon, Name AND Sale Text -->
                         <div class="row-left">
                             <img src="{{this.img}}" title="Click to view details" class="item-image" data-uuid="{{this.uuid}}" width="36" height="36"/>
                             <span class="store-item-name">{{this.name}}</span>
 
-                            <!-- MOVED: Sale Image to End of Left Row (After Name) -->
+                            <!-- MOVED: Sale Badge to End of Left Row (After Name) -->
                             {{#unless ../../../isGM}}
                                 {{#if this.isSale}}
-                                    <img src="modules/daggerheart-store/assets/images/sale.webp" class="sale-icon" alt="On Sale!">
+                                    <!-- Changed from Image to Pulsing Text -->
+                                    <span class="sale-badge">(SALE)</span>
                                 {{/if}}
                             {{/unless}}
                         </div>

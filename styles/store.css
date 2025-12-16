@@ -404,12 +404,25 @@
     min-width: 60px;
 }
 
-.sale-icon {
-    height: 38px; 
-    width: auto;
+/* Substituted .sale-icon with .sale-badge 
+  This creates the pulsing text "(SALE)"
+*/
+.sale-badge {
+    color: #27ae60;
+    font-family: "Aleo", serif;
+    font-weight: bold;
+    font-size: 0.9em;
     margin-left: 10px;
-    opacity: 0.95;
-    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
+    letter-spacing: 1px;
+    animation: saleTextPulse 2s infinite ease-in-out;
+    display: inline-block;
+    text-shadow: 0 0 1px rgba(39, 174, 96, 0.2);
+}
+
+@keyframes saleTextPulse {
+    0% { opacity: 0.7; transform: scale(1); text-shadow: 0 0 2px rgba(39, 174, 96, 0.2); }
+    50% { opacity: 1; transform: scale(1.1); text-shadow: 0 0 8px rgba(39, 174, 96, 0.6); }
+    100% { opacity: 0.7; transform: scale(1); text-shadow: 0 0 2px rgba(39, 174, 96, 0.2); }
 }
 
 .icon-btn {
