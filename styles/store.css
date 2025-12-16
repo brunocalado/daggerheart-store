@@ -29,7 +29,7 @@
     background-color: transparent; 
     color: var(--color-text-light-1);
     
-    /* AJUSTE: Aumentado para 870px conforme solicitado */
+    /* Minimum width enforcement */
     min-width: 870px !important;
 }
 
@@ -113,7 +113,7 @@
     filter: none;
 }
 
-/* Rolagem */
+/* Scrolling */
 .daggerheart-store .content {
     background: transparent; 
     flex: 1; 
@@ -123,7 +123,7 @@
     scrollbar-color: #d4af37 rgba(0,0,0,0.3);
 }
 
-/* Separadores de Tier */
+/* Tier Separators */
 .daggerheart-store .tier-separator {
     background: linear-gradient(to right, rgba(45, 35, 10, 0.7), rgba(0, 0, 0, 0.2));
     
@@ -404,9 +404,7 @@
     min-width: 60px;
 }
 
-/* Substituted .sale-icon with .sale-badge 
-  This creates the pulsing text "(SALE)"
-*/
+/* Creates the pulsing text "(SALE)" for the badge */
 .sale-badge {
     color: #27ae60;
     font-family: "Aleo", serif;
@@ -548,12 +546,12 @@
     flex-direction: column;
 }
 
-/* AJUSTE: Títulos Gerais da Config (H3) - Dourado, menor e com fonte do sistema */
+/* General Config Titles (H3) */
 .daggerheart-store-config h3 { 
     border-bottom: 1px solid rgba(212, 175, 55, 0.3);
     color: #d4af37; 
     font-family: "Aleo", serif;
-    font-size: 1.2em; /* Reduzido */
+    font-size: 1.2em; /* Reduced size */
     margin-top: 15px;
     margin-bottom: 10px;
     padding-bottom: 5px;
@@ -573,32 +571,32 @@
     display: block; 
 }
 
-/* AJUSTE: Aba Tiers (H4) */
+/* Tiers Tab Headers (H4) */
 .daggerheart-store-config .tiers-config .category-row h4 {
     color: #d4af37;
     font-family: "Aleo", serif;
     font-size: 1.1em;
-    margin-bottom: 5px; /* Título mais próximo das opções */
+    margin-bottom: 5px; /* Title closer to options */
     margin-top: 0;
     border-bottom: none;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
-/* AJUSTE: Aba Tiers (Espaçamento entre Categorias) */
+/* Tiers Tab (Spacing between categories) */
 .daggerheart-store-config .tiers-config .category-row {
-    margin-bottom: 20px; /* Mais espaço antes do próximo título */
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Divisor sutil opcional */
+    margin-bottom: 20px; /* More space before next title */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Optional subtle divider */
     padding-bottom: 5px;
 }
 
 .daggerheart-store-config .checkbox-group {
     display: flex;
     gap: 15px;
-    margin-bottom: 0; /* Remove margem extra para controle via category-row */
+    margin-bottom: 0; /* Remove extra margin for control via category-row */
 }
 
-/* SLIDER STYLES (NEW) */
+/* Slider Styles */
 .daggerheart-store-config .form-group .form-fields {
     display: flex;
     align-items: center;

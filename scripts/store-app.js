@@ -161,7 +161,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const profileKeys = Object.keys(storeProfiles);
         if (!profileKeys.includes("Default")) profileKeys.unshift("Default");
         
-        // FETCH CURRENCY FROM SYSTEM
+        // Fetch currency from system
         const currencyName = getSystemCurrency();
 
         const context = {
@@ -224,7 +224,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     for (const doc of docs) {
                         const isHidden = hiddenItems[doc.name];
                         
-                        // --- VISIBILITY & OWNERSHIP CHECK ---
+                        // --- Visibility & Ownership Check ---
                         const inventoryItem = hasActor ? userActor.items.find(i => i.name === doc.name) : null;
                         const canSell = !!inventoryItem;
 
@@ -248,10 +248,10 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         let finalPrice = basePrice;
                         if (isSale) finalPrice = Math.ceil(basePrice * (1 - saleDiscount/100));
 
-                        // --- SELL PRICE CALCULATION ---
+                        // --- Sell Price Calculation ---
                         const sellPrice = Math.floor(basePrice * sellRatio);
 
-                        // --- BUY PERMISSIONS ---
+                        // --- Buy Permissions ---
                         const canAffordPersonal = userGold >= finalPrice;
                         const canBuyPersonal = hasActor && canAffordPersonal && (!isHidden || isGM);
                         const combinedWealth = partyGold + userGold;
@@ -265,7 +265,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             price: finalPrice,
                             originalPrice: basePrice,
                             isSale: isSale,
-                            // UPDATE: Only report hidden to template if GM. If player owns it, they see it normally.
+                            // Only report hidden to template if GM. If player owns it, they see it normally.
                             isHidden: isGM && isHidden,
                             isOverridden: isOverridden,
                             canBuyPersonal: canBuyPersonal,
@@ -280,7 +280,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 continue;
             }
 
-            // --- STANDARD CATEGORIES LOGIC ---
+            // --- Standard Categories Logic ---
 
             const tierGroups = {
                 1: { id: 1, label: "Tier 1 / Common", items: [] },
@@ -307,7 +307,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 for (const doc of docs) {
                     const isHidden = hiddenItems[doc.name];
                     
-                    // --- VISIBILITY & OWNERSHIP CHECK ---
+                    // --- Visibility & Ownership Check ---
                     const inventoryItem = hasActor ? userActor.items.find(i => i.name === doc.name) : null;
                     const canSell = !!inventoryItem;
 
@@ -348,10 +348,10 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     let finalPrice = basePrice;
                     if (isSale) finalPrice = Math.ceil(basePrice * (1 - saleDiscount/100));
 
-                    // --- SELL PRICE CALCULATION ---
+                    // --- Sell Price Calculation ---
                     const sellPrice = Math.floor(basePrice * sellRatio);
 
-                    // --- BUY PERMISSIONS ---
+                    // --- Buy Permissions ---
                     const canAffordPersonal = userGold >= finalPrice;
                     const canBuyPersonal = hasActor && canAffordPersonal && (!isHidden || isGM);
                     const combinedWealth = partyGold + userGold;
@@ -366,7 +366,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             price: finalPrice,
                             originalPrice: basePrice,
                             isSale: isSale,
-                            // UPDATE: Only report hidden to template if GM. If player owns it, they see it normally.
+                            // Only report hidden to template if GM. If player owns it, they see it normally.
                             isHidden: isGM && isHidden,
                             isOverridden: isOverridden,
                             canBuyPersonal: canBuyPersonal,
@@ -405,7 +405,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             });
         }
         
-        // --- SLIDER LOGIC ---
+        // --- Slider Logic ---
         // Find all range inputs and add listeners to update their neighbor span
         const sliders = html.querySelectorAll("input[type='range']");
         sliders.forEach(range => {
@@ -535,10 +535,10 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const newTotal = currentCoins + sellPrice;
         await userActor.update({ "system.gold.coins": newTotal });
 
-        // FETCH CURRENCY
+        // Fetch currency
         const currency = getSystemCurrency();
 
-        // UPDATED: Styling matches standard chat cards (Gold #C9A060), but with RED title (#ff9999).
+        // Chat card styling for item sales
         const rawContent = `
         <div class="chat-card" style="border: 2px solid #C9A060; border-radius: 8px; overflow: hidden;">
             <header class="card-header flexrow" style="background: #191919 !important; padding: 8px; border-bottom: 2px solid #C9A060;">
@@ -565,14 +565,13 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             AudioHelper.play({ src: "modules/daggerheart-store/assets/audio/coins.mp3", volume: 0.8, loop: false }, false);
         }
 
-        // Notification Removed
         this.render();
     }
 
     async _handleSplitPurchase(itemUuid, itemName, price, userActor, partyActor) {
         const userGold = foundry.utils.getProperty(userActor, "system.gold.coins") || 0;
         const partyGold = foundry.utils.getProperty(partyActor, "system.gold.coins") || 0;
-        // FETCH CURRENCY
+        // Fetch currency
         const currency = getSystemCurrency();
 
         let defaultPartyPay = Math.min(partyGold, price);
@@ -659,7 +658,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const itemFromPack = await fromUuid(itemUuid);
         if (!itemFromPack) return ui.notifications.error("Item data not found.");
 
-        // FETCH CURRENCY
+        // Fetch currency
         const currency = getSystemCurrency();
 
         for (const payer of payers) {
@@ -712,7 +711,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             }, false); 
         }
 
-        // Notification Removed
         this.render();
     }
 
@@ -758,7 +756,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
                         const currentSettings = {
                             storeName: game.settings.get(MODULE_ID, "storeName"),
-                            // REMOVED currencyName
                             priceModifier: game.settings.get(MODULE_ID, "priceModifier"),
                             allowedTiers: game.settings.get(MODULE_ID, "allowedTiers"),
                             hiddenCategories: game.settings.get(MODULE_ID, "hiddenCategories"),
@@ -798,7 +795,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         if (profileName === "Default") {
             profileData = {
                 storeName: "Daggerheart: Store",
-                // REMOVED currencyName
                 priceModifier: 100,
                 allowedTiers: {}, 
                 hiddenCategories: {},
@@ -920,7 +916,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
     async _prepareContext(options) {
         const priceMod = game.settings.get(MODULE_ID, "priceModifier");
         const saleDiscount = game.settings.get(MODULE_ID, "saleDiscount");
-        // NEW: Get Sell Ratio
+        // Get Sell Ratio
         const sellRatio = game.settings.get(MODULE_ID, "sellRatio");
         
         const allowedTiers = game.settings.get(MODULE_ID, "allowedTiers");

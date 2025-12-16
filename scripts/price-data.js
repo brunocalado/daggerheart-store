@@ -1,7 +1,7 @@
 /**
  * Database of item prices and Tiers.
  * Maps Item Name -> { price: Number, tier: Number }
- * Based on "Regras de Itens.txt"
+ * based on the Item Rules reference.
  */
 
 export const PRICE_DATA = {

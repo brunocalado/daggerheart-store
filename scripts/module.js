@@ -10,19 +10,17 @@ Hooks.once("init", () => {
     game.settings.register(MODULE_ID, "storeName", {
         name: "Store Name", scope: "world", config: false, type: String, default: "Daggerheart: Store"
     });
-
-    // REMOVED: currencyName setting. Now fetched from System Configuration.
     
     game.settings.register(MODULE_ID, "priceModifier", {
         name: "Price Multiplier (%)", scope: "world", config: false, type: Number, default: 100
     });
     
-    // Sell Ratio: config set to false so it only appears in the Store Config window
+    // Sell Ratio: Hidden from sidebar settings; managed within the Store Config UI
     game.settings.register(MODULE_ID, "sellRatio", {
         name: "Sell Ratio", 
         hint: "Multiplier for selling items (0.5 = 50% of store price).",
         scope: "world", 
-        config: false, // HIDDEN FROM SIDEBAR SETTINGS
+        config: false, 
         type: Number, 
         default: 0.5
     });
@@ -63,13 +61,13 @@ Hooks.once("init", () => {
     });
 
     // --- PROFILES SETTINGS ---
-    // Stores all saved profiles: { "Default": { ...settings... }, "Cheap Mode": { ...settings... } }
+    // Stores all saved profiles, e.g., { "Default": { ... }, "Cheap Mode": { ... } }
     game.settings.register(MODULE_ID, "storeProfiles", {
         name: "Store Profiles",
         scope: "world",
         config: false,
         type: Object,
-        default: { "Default": {} } // "Default" starts empty or creates logic to populate later
+        default: { "Default": {} } 
     });
 
     // Tracks which profile is currently active in the UI
@@ -82,7 +80,7 @@ Hooks.once("init", () => {
     });
 
     // Communication Channel Setting
-    // This setting acts as a socket trigger. When changed, all clients receive 'updateSetting'.
+    // Acts as a socket trigger. Changes to this setting fire the 'onChange' callback on all clients.
     game.settings.register(MODULE_ID, "openStoreRequest", {
         scope: "world",
         config: false,
@@ -120,7 +118,7 @@ function _handleOpenStoreRequest(value) {
         app.render({ force: true, window: { display: "block" } });
         if (app.minimized) app.maximize();
         
-        // Use bringToFront() for ApplicationV2
+        // Brings the application window to the top of the stack
         app.bringToFront(); 
     }
 }
@@ -145,7 +143,7 @@ Hooks.once("ready", () => {
 
             console.log(`${MODULE_ID} | Triggering Store Open for:`, targetId);
             
-            // We update the setting with a new timestamp to ensure onChange fires even if target is same
+            // Update the setting with a new timestamp to ensure onChange fires even if target is the same
             await game.settings.set(MODULE_ID, "openStoreRequest", {
                 target: targetId,
                 time: Date.now()
@@ -158,7 +156,7 @@ Hooks.once("ready", () => {
 
 // React to Config Settings Changes (Price, Tiers, etc.)
 Hooks.on("updateSetting", (setting) => {
-    // We filter out our trigger setting because it's handled by 'onChange' in register
+    // Filter out the trigger setting because it is handled by 'onChange' in register
     if (setting.key.startsWith(MODULE_ID) && setting.key !== `${MODULE_ID}.openStoreRequest`) {
         if (storeInstance && storeInstance.rendered) {
             console.log(`${MODULE_ID} | Configuration updated, refreshing UI.`);
@@ -168,7 +166,7 @@ Hooks.on("updateSetting", (setting) => {
                 const newTitle = game.settings.get(MODULE_ID, "storeName");
                 storeInstance.options.window.title = newTitle;
                 
-                // Directly update the window title if the window exists (AppV2)
+                // Directly update the window title if the window exists
                 if (storeInstance.window) {
                     storeInstance.window.title = newTitle;
                 }
@@ -183,20 +181,19 @@ Hooks.on("updateSetting", (setting) => {
 // Daggerheart Menu Integration
 // --------------------------------------------------------------------------
 Hooks.on("renderDaggerheartMenu", (app, html, data) => {
-    // Ensure we are working with the raw HTMLElement for V13/AppV2 compatibility
+    // Normalize the HTML element to ensure compatibility with jQuery or raw DOM objects
     const element = (html instanceof jQuery) ? html[0] : html;
 
     // 1. Create the button
     const myButton = document.createElement("button");
     myButton.type = "button";
-    // UPDATE: Changed icon from fa-shopping-bag to fa-balance-scale
     myButton.innerHTML = `<i class="fas fa-balance-scale"></i> Open Store`;
     myButton.classList.add("dh-custom-btn"); 
     
     myButton.style.marginTop = "10px";
     myButton.style.width = "100%";
 
-    // 2. Define what happens on click
+    // 2. Define click behavior
     myButton.onclick = (event) => {
         event.preventDefault();
         if (globalThis.Store) {
@@ -206,7 +203,7 @@ Hooks.on("renderDaggerheartMenu", (app, html, data) => {
         }
     };
 
-    // 3. Find where to insert the button
+    // 3. Insert the button into the DOM
     const fieldset = element.querySelector("fieldset");
     
     if (fieldset) {
