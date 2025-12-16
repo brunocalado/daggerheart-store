@@ -58,6 +58,98 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         }
     };
 
+    /**
+     * Override render to handle automatic currency conversion for players BEFORE the UI is drawn.
+     */
+    async render(options, _options) {
+        // Feature: Auto-convert currency for players
+        // Check: Not GM, User has Character, Character exists
+        if (!game.user.isGM && game.user.character) {
+             await this._handleCurrencyConversion(game.user.character);
+        }
+        
+        // Proceed with standard render (which will now fetch updated gold values)
+        return super.render(options, _options);
+    }
+
+    /**
+     * Logic to convert handfuls, bags, and chests into coins.
+     * 1 Handful = 10 Coins
+     * 1 Bag = 100 Coins
+     * 1 Chest = 1000 Coins
+     */
+    async _handleCurrencyConversion(actor) {
+        // Safe access to gold object
+        const gold = actor.system.gold || {};
+        
+        // Ensure values exist or default to 0
+        const handfuls = gold.handfuls || 0;
+        const bags = gold.bags || 0;
+        const chests = gold.chests || 0;
+
+        // If nothing to convert, exit immediately to prevent loops/updates
+        if (handfuls <= 0 && bags <= 0 && chests <= 0) return;
+
+        // Calculate Value
+        const coinsFromHandfuls = handfuls * 10;
+        const coinsFromBags = bags * 100;
+        const coinsFromChests = chests * 1000;
+        const totalAdded = coinsFromHandfuls + coinsFromBags + coinsFromChests;
+
+        const currentCoins = gold.coins || 0;
+        const newCoins = currentCoins + totalAdded;
+
+        console.log(`${MODULE_ID} | Converting currency for ${actor.name}: +${totalAdded} Coins`);
+
+        // Perform Update
+        // This sets the treasures to 0 and updates the coin count
+        await actor.update({
+            "system.gold.handfuls": 0,
+            "system.gold.bags": 0,
+            "system.gold.chests": 0,
+            "system.gold.coins": newCoins
+        });
+
+        // Construct Rich Chat Message
+        const messageContent = `
+            <div class="chat-card" style="border: 2px solid #C9A060; border-radius: 8px; overflow: hidden;">
+                <header class="card-header flexrow" style="background: #191919 !important; padding: 8px; border-bottom: 2px solid #C9A060;">
+                    <h3 class="noborder" style="margin: 0; font-weight: bold; color: #C9A060 !important; font-family: 'Aleo', serif; text-align: center; text-transform: uppercase; letter-spacing: 1px; width: 100%;">
+                        Currency Exchange
+                    </h3>
+                </header>
+                <div class="card-content" style="background: #2a2a2a; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #eee;">
+                    <p style="margin-bottom: 10px; font-family: 'Lato', sans-serif;">
+                        <strong>${actor.name}</strong> automatically exchanged treasures for coins.
+                    </p>
+                    <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.9em; color: #ccc; text-align: left; display: inline-block;">
+                        ${handfuls > 0 ? `<li><i class="fas fa-hand-holding-usd"></i> ${handfuls} Handfuls → ${coinsFromHandfuls} Coins</li>` : ""}
+                        ${bags > 0 ? `<li><i class="fas fa-sack-dollar"></i> ${bags} Bags → ${coinsFromBags} Coins</li>` : ""}
+                        ${chests > 0 ? `<li><i class="fas fa-chest"></i> ${chests} Chests → ${coinsFromChests} Coins</li>` : ""}
+                    </ul>
+                    <hr style="border-color: #444; width: 100%; margin: 15px 0;">
+                    <p style="font-size: 1.2em; color: #d4af37; margin: 0;">
+                        <strong>+${totalAdded} Coins</strong>
+                    </p>
+                    <p style="font-size: 0.8em; color: #888; margin-top: 5px;">
+                        New Balance: ${newCoins}
+                    </p>
+                </div>
+            </div>
+        `;
+
+        // Send to Chat
+        await ChatMessage.create({
+            user: game.user.id,
+            speaker: ChatMessage.getSpeaker({ actor }),
+            content: messageContent,
+            sound: "sounds/dice.wav" // Simple sound effect
+        });
+        
+        // Notification
+        ui.notifications.info(`Store: Converted treasure to ${totalAdded} coins for ${actor.name}.`);
+    }
+
     async _prepareContext(options) {
         this.options.window.title = game.settings.get(MODULE_ID, "storeName");
 

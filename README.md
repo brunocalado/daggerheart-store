@@ -29,6 +29,9 @@ A dynamic, interactive, and fully configurable store for the **Daggerheart** sys
     * **Custom Tab:** Configure a dedicated tab linked to a specific compendium for special merchant inventories.
     * **Customizable Currency:** Change the currency name (e.g., "Gold", "Credits").
 
+### Standard Prices
+The loot/consumables are classified as Common, Uncommon, Rare, and Legendary, which correspond to Tier 1, 2, 3, and 4. Therefore, using the table on page 165, I applied the same pricing to them. Weapons and armor are priced according to the same table.
+
 ## 📸 Screenshots
 
 ### Player Store
