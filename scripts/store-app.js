@@ -34,7 +34,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
     constructor(options) {
         super(options);
         this.searchQuery = ""; 
-        this.activeTab = "primary";
+        this.activeTab = "primary"; // IMPORTANT: This is the source of truth for the active tab
         this.options.window.title = game.settings.get(MODULE_ID, "storeName");
     }
 
@@ -175,7 +175,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             tabs: {},
             categories: [],
             searchQuery: this.searchQuery,
-            activeTab: this.activeTab,
+            activeTab: this.activeTab, // Ensures template receives current state
             presets: profileKeys,
             currentProfile: currentProfile 
         };
@@ -207,6 +207,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         context.categories = categories;
 
         if (categories.length > 0) {
+            // Validate if activeTab still exists in visible categories
             const currentTabExists = categories.find(c => c.id === this.activeTab);
             if (!currentTabExists) {
                 this.activeTab = categories[0].id;
@@ -433,12 +434,15 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             });
         });
 
+        // --- FIX IS HERE ---
         const tabs = html.querySelectorAll(".sheet-tabs .item");
         tabs.forEach(tab => {
             tab.addEventListener("click", (e) => {
                 e.preventDefault(); 
                 const tabId = e.currentTarget.dataset.tab; 
-                this.currentTab = tabId;
+                
+                // FIX: Update this.activeTab instead of this.currentTab
+                this.activeTab = tabId;
 
                 tabs.forEach(t => t.classList.remove("active"));
                 e.currentTarget.classList.add("active"); 
@@ -457,6 +461,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             });
         });
 
+        // Ensure active tab logic is respected visually if Handlebars didn't catch it
         if (!html.querySelector(".sheet-tabs .item.active")) {
             let targetTab = html.querySelector(`.sheet-tabs .item[data-tab="${this.activeTab}"]`);
             let targetContent = html.querySelector(`.content .tab[data-tab="${this.activeTab}"]`);
