@@ -39,10 +39,25 @@
             <p class="notes">100 = Normal Price. Example: 110 = +10% cost.</p>
         </div>
 
+        <!-- Sale Discount Slider -->
         <div class="form-group">
-            <label>Sale Discount (%)</label>
-            <input type="number" name="saleDiscount" value="{{saleDiscount}}" min="1" max="99" step="1">
+            <label>Sale Discount</label>
+            <div class="form-fields">
+                <input type="range" name="saleDiscount" value="{{saleDiscount}}" min="0" max="100" step="1">
+                <span class="range-value">{{saleDiscount}}%</span>
+            </div>
             <p class="notes">Percentage off for items marked as "On Sale".</p>
+        </div>
+
+        <!-- Sell Ratio Slider -->
+        <div class="form-group">
+            <label>Sell Ratio</label>
+            <div class="form-fields">
+                <!-- Using a computed percentage value here for the slider (0-100) -->
+                <input type="range" name="sellRatioPercent" value="{{sellRatioPercent}}" min="0" max="100" step="1">
+                <span class="range-value">{{sellRatioPercent}}%</span>
+            </div>
+            <p class="notes">Percentage of the item's value returned when selling (e.g., 50%).</p>
         </div>
     </div>
 

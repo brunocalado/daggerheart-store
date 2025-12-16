@@ -18,6 +18,18 @@ Hooks.once("init", () => {
     game.settings.register(MODULE_ID, "priceModifier", {
         name: "Price Multiplier (%)", scope: "world", config: false, type: Number, default: 100
     });
+    
+    // Configuração de Venda (Novo)
+    game.settings.register(MODULE_ID, "sellRatio", {
+        name: "Sell Ratio", 
+        hint: "Multiplier for selling items (0.5 = 50% of store price).",
+        scope: "world", 
+        config: true, 
+        type: Number, 
+        default: 0.5,
+        range: { min: 0.1, max: 1.0, step: 0.1 }
+    });
+
     game.settings.register(MODULE_ID, "allowedTiers", {
         name: "Allowed Tiers", scope: "world", config: false, type: Object, default: {}
     });
@@ -54,16 +66,14 @@ Hooks.once("init", () => {
     });
 
     // --- PROFILES SETTINGS ---
-    // Stores all saved profiles: { "Default": { ...settings... }, "Cheap Mode": { ...settings... } }
     game.settings.register(MODULE_ID, "storeProfiles", {
         name: "Store Profiles",
         scope: "world",
         config: false,
         type: Object,
-        default: { "Default": {} } // "Default" starts empty or creates logic to populate later
+        default: { "Default": {} } 
     });
 
-    // Tracks which profile is currently active in the UI
     game.settings.register(MODULE_ID, "currentProfile", {
         name: "Current Profile",
         scope: "world",
@@ -72,14 +82,12 @@ Hooks.once("init", () => {
         default: "Default"
     });
 
-    // Communication Channel Setting
-    // This setting acts as a socket trigger. When changed, all clients receive 'updateSetting'.
     game.settings.register(MODULE_ID, "openStoreRequest", {
         scope: "world",
         config: false,
         type: Object,
         default: { target: "none", time: 0 },
-        onChange: _handleOpenStoreRequest // Trigger logic directly on change
+        onChange: _handleOpenStoreRequest 
     });
 });
 
@@ -101,23 +109,16 @@ function _handleOpenStoreRequest(value) {
     const targetUser = value.target;
     const currentUser = game.user.id;
 
-    // Check if this client is the intended target
     if (targetUser === "all" || targetUser === currentUser) {
-        
         console.log(`${MODULE_ID} | Received Open Request for: ${targetUser}`);
         const app = getStoreInstance();
-        
-        // Force render and maximize
         app.render({ force: true, window: { display: "block" } });
         if (app.minimized) app.maximize();
-        
-        // Use bringToFront() for ApplicationV2
         app.bringToFront(); 
     }
 }
 
 Hooks.once("ready", () => {
-    // Expose global API
     globalThis.Store = {
         Open: () => {
             const app = getStoreInstance();
@@ -136,7 +137,6 @@ Hooks.once("ready", () => {
 
             console.log(`${MODULE_ID} | Triggering Store Open for:`, targetId);
             
-            // We update the setting with a new timestamp to ensure onChange fires even if target is same
             await game.settings.set(MODULE_ID, "openStoreRequest", {
                 target: targetId,
                 time: Date.now()
@@ -147,47 +147,35 @@ Hooks.once("ready", () => {
     };
 });
 
-// React to Config Settings Changes (Price, Tiers, etc.)
+// React to Config Settings Changes
 Hooks.on("updateSetting", (setting) => {
-    // We filter out our trigger setting because it's handled by 'onChange' in register
     if (setting.key.startsWith(MODULE_ID) && setting.key !== `${MODULE_ID}.openStoreRequest`) {
         if (storeInstance && storeInstance.rendered) {
             console.log(`${MODULE_ID} | Configuration updated, refreshing UI.`);
-            
-            // If the store name changed, update the window title dynamically and immediately
             if (setting.key === `${MODULE_ID}.storeName`) {
                 const newTitle = game.settings.get(MODULE_ID, "storeName");
                 storeInstance.options.window.title = newTitle;
-                
-                // Directly update the window title if the window exists (AppV2)
                 if (storeInstance.window) {
                     storeInstance.window.title = newTitle;
                 }
             }
-            
             storeInstance.render();
         }
     }
 });
 
-// --------------------------------------------------------------------------
 // Daggerheart Menu Integration
-// --------------------------------------------------------------------------
 Hooks.on("renderDaggerheartMenu", (app, html, data) => {
-    // Ensure we are working with the raw HTMLElement for V13/AppV2 compatibility
     const element = (html instanceof jQuery) ? html[0] : html;
 
-    // 1. Create the button
     const myButton = document.createElement("button");
     myButton.type = "button";
-    // UPDATE: Changed icon from fa-shopping-bag to fa-balance-scale
     myButton.innerHTML = `<i class="fas fa-balance-scale"></i> Open Store`;
     myButton.classList.add("dh-custom-btn"); 
     
     myButton.style.marginTop = "10px";
     myButton.style.width = "100%";
 
-    // 2. Define what happens on click
     myButton.onclick = (event) => {
         event.preventDefault();
         if (globalThis.Store) {
@@ -197,7 +185,6 @@ Hooks.on("renderDaggerheartMenu", (app, html, data) => {
         }
     };
 
-    // 3. Find where to insert the button
     const fieldset = element.querySelector("fieldset");
     
     if (fieldset) {

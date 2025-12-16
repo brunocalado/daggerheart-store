@@ -470,6 +470,7 @@
     font-weight: normal;
 }
 
+/* Buy Button */
 .buy-btn {
     background: #1a5c1a;
     color: white;
@@ -509,6 +510,30 @@
     background: #224ea3;
     box-shadow: 0 0 5px rgba(34, 78, 163, 0.5);
     border-color: #d4af37;
+}
+
+/* Sell Button */
+.sell-btn {
+    background: #8b3333; /* Dark Red/Orange */
+    color: white;
+    border: 1px solid #5a1e1e;
+    padding: 6px 14px;
+    cursor: pointer;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: bold;
+    font-family: "Lato", sans-serif;
+    text-transform: uppercase;
+    font-size: 0.9em;
+    transition: all 0.2s;
+}
+
+.sell-btn:hover {
+    background: #b54545;
+    box-shadow: 0 0 5px rgba(181, 69, 69, 0.5);
+    border-color: #ff9999;
 }
 
 /* ==================================================== */
@@ -571,4 +596,25 @@
     display: flex;
     gap: 15px;
     margin-bottom: 0; /* Remove margem extra para controle via category-row */
+}
+
+/* SLIDER STYLES (NEW) */
+.daggerheart-store-config .form-group .form-fields {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 2; 
+}
+
+.daggerheart-store-config input[type="range"] {
+    flex: 1;
+    cursor: pointer;
+}
+
+.range-value {
+    min-width: 40px;
+    text-align: right;
+    font-weight: bold;
+    color: #d4af37;
+    font-family: "Aleo", serif;
 }

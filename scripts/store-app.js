@@ -34,11 +34,11 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             resizable: true,
             controls: []
         },
-        // AJUSTE: Largura padrão aumentada para acomodar o min-width de 870px
         position: { width: 900, height: 700 }, 
         classes: ["daggerheart-store"],
         actions: {
             buyItem: DaggerheartStore.prototype._onBuyItem,
+            sellItem: DaggerheartStore.prototype._onSellItem,
             openConfig: DaggerheartStore.prototype._onOpenConfig,
             resetPrice: DaggerheartStore.prototype._onResetPrice,
             toggleSale: DaggerheartStore.prototype._onToggleSale,
@@ -58,39 +58,21 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         }
     };
 
-    /**
-     * Override render to handle automatic currency conversion for players BEFORE the UI is drawn.
-     */
     async render(options, _options) {
-        // Feature: Auto-convert currency for players
-        // Check: Not GM, User has Character, Character exists
         if (!game.user.isGM && game.user.character) {
              await this._handleCurrencyConversion(game.user.character);
         }
-        
-        // Proceed with standard render (which will now fetch updated gold values)
         return super.render(options, _options);
     }
 
-    /**
-     * Logic to convert handfuls, bags, and chests into coins.
-     * 1 Handful = 10 Coins
-     * 1 Bag = 100 Coins
-     * 1 Chest = 1000 Coins
-     */
     async _handleCurrencyConversion(actor) {
-        // Safe access to gold object
         const gold = actor.system.gold || {};
-        
-        // Ensure values exist or default to 0
         const handfuls = gold.handfuls || 0;
         const bags = gold.bags || 0;
         const chests = gold.chests || 0;
 
-        // If nothing to convert, exit immediately to prevent loops/updates
         if (handfuls <= 0 && bags <= 0 && chests <= 0) return;
 
-        // Calculate Value
         const coinsFromHandfuls = handfuls * 10;
         const coinsFromBags = bags * 100;
         const coinsFromChests = chests * 1000;
@@ -101,8 +83,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
         console.log(`${MODULE_ID} | Converting currency for ${actor.name}: +${totalAdded} Coins`);
 
-        // Perform Update
-        // This sets the treasures to 0 and updates the coin count
         await actor.update({
             "system.gold.handfuls": 0,
             "system.gold.bags": 0,
@@ -110,8 +90,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             "system.gold.coins": newCoins
         });
 
-        // Construct Rich Chat Message
-        // Changed fa-chest to fa-box-open to ensure visibility in standard FontAwesome
         const messageContent = `
             <div class="chat-card" style="border: 2px solid #C9A060; border-radius: 8px; overflow: hidden;">
                 <header class="card-header flexrow" style="background: #191919 !important; padding: 8px; border-bottom: 2px solid #C9A060;">
@@ -139,15 +117,13 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             </div>
         `;
 
-        // Send to Chat
         await ChatMessage.create({
             user: game.user.id,
             speaker: ChatMessage.getSpeaker({ actor }),
             content: messageContent,
-            sound: "sounds/dice.wav" // Simple sound effect
+            sound: "sounds/dice.wav"
         });
         
-        // Notification
         ui.notifications.info(`Store: Converted treasure to ${totalAdded} coins for ${actor.name}.`);
     }
 
@@ -166,7 +142,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const userGold = userActor ? (foundry.utils.getProperty(userActor, "system.gold.coins") || 0) : 0;
         const partyGold = partyActor ? (foundry.utils.getProperty(partyActor, "system.gold.coins") || 0) : 0;
         
-        // --- Logic for Presets ---
         const storeProfiles = game.settings.get(MODULE_ID, "storeProfiles") || { "Default": {} };
         const currentProfile = game.settings.get(MODULE_ID, "currentProfile") || "Default";
         
@@ -190,6 +165,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         };
 
         const priceMod = game.settings.get(MODULE_ID, "priceModifier") / 100;
+        const sellRatio = game.settings.get(MODULE_ID, "sellRatio") || 0.5;
         const allowedTiers = game.settings.get(MODULE_ID, "allowedTiers");
         const hiddenCategories = game.settings.get(MODULE_ID, "hiddenCategories");
         const customCompendiums = game.settings.get(MODULE_ID, "customCompendiums") || [];
@@ -198,10 +174,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const saleItems = game.settings.get(MODULE_ID, "saleItems") || {};
         const hiddenItems = game.settings.get(MODULE_ID, "hiddenItems") || {};
 
-        // 1. Build Category List (Clone Standard)
         let categories = foundry.utils.deepClone(STANDARD_CATEGORIES);
 
-        // 2. Add Custom Tab if configured
         const customTabCompendium = game.settings.get(MODULE_ID, "customTabCompendium");
         const customTabName = game.settings.get(MODULE_ID, "customTabName");
 
@@ -213,7 +187,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             });
         }
 
-        // 3. Filter Hidden Categories
         categories = categories.filter(c => !hiddenCategories[c.key]);
         context.categories = categories;
 
@@ -225,7 +198,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             }
         }
 
-        // 4. Populate Items
         for (const cat of categories) {
             if (cat.id === "custom-tab") {
                 const pack = game.packs.get(customTabCompendium);
@@ -254,6 +226,12 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         let finalPrice = basePrice;
                         if (isSale) finalPrice = Math.ceil(basePrice * (1 - saleDiscount/100));
 
+                        // --- SELL LOGIC START ---
+                        const inventoryItem = hasActor ? userActor.items.find(i => i.name === doc.name) : null;
+                        const canSell = !!inventoryItem;
+                        const sellPrice = Math.floor(finalPrice * sellRatio);
+                        // --- SELL LOGIC END ---
+
                         const canAffordPersonal = userGold >= finalPrice;
                         const canBuyPersonal = hasActor && canAffordPersonal;
                         const combinedWealth = partyGold + userGold;
@@ -270,7 +248,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             isHidden: isHidden,
                             isOverridden: isOverridden,
                             canBuyPersonal: canBuyPersonal,
-                            canBuyParty: canBuyParty
+                            canBuyParty: canBuyParty,
+                            canSell: canSell,   // Passed to template
+                            sellPrice: sellPrice // Passed to template
                         });
                     }
                 }
@@ -339,6 +319,12 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     let finalPrice = basePrice;
                     if (isSale) finalPrice = Math.ceil(basePrice * (1 - saleDiscount/100));
 
+                    // --- SELL LOGIC START ---
+                    const inventoryItem = hasActor ? userActor.items.find(i => i.name === doc.name) : null;
+                    const canSell = !!inventoryItem;
+                    const sellPrice = Math.floor(finalPrice * sellRatio);
+                    // --- SELL LOGIC END ---
+
                     const canAffordPersonal = userGold >= finalPrice;
                     const canBuyPersonal = hasActor && canAffordPersonal;
                     const combinedWealth = partyGold + userGold;
@@ -356,7 +342,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             isHidden: isHidden,
                             isOverridden: isOverridden,
                             canBuyPersonal: canBuyPersonal,
-                            canBuyParty: canBuyParty
+                            canBuyParty: canBuyParty,
+                            canSell: canSell,
+                            sellPrice: sellPrice
                         });
                     }
                 }
@@ -388,6 +376,19 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 this._applySearch(e.target);
             });
         }
+        
+        // --- SLIDER LOGIC ---
+        // Find all range inputs and add listeners to update their neighbor span
+        const sliders = html.querySelectorAll("input[type='range']");
+        sliders.forEach(range => {
+            const display = range.nextElementSibling; // The <span> next to the input
+            if (display && display.classList.contains("range-value")) {
+                range.addEventListener("input", (e) => {
+                    display.innerText = `${e.target.value}%`;
+                });
+            }
+        });
+        // --------------------
 
         const priceInputs = html.querySelectorAll(".gm-price-input");
         priceInputs.forEach(input => {
@@ -488,6 +489,53 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             recipient: userActor,
             payers: [{ actor: userActor, amount: itemPrice, name: userActor.name }]
         });
+    }
+
+    async _onSellItem(event, target) {
+        const itemName = target.dataset.name;
+        const sellPrice = parseInt(target.dataset.price);
+        const userActor = game.user.character;
+
+        if (!userActor) return ui.notifications.error("You need an assigned character to sell items.");
+
+        const itemToDelete = userActor.items.find(i => i.name === itemName);
+        if (!itemToDelete) return ui.notifications.warn(`You do not have a "${itemName}" to sell.`);
+
+        await itemToDelete.delete();
+
+        const currentCoins = foundry.utils.getProperty(userActor, "system.gold.coins") || 0;
+        const newTotal = currentCoins + sellPrice;
+        await userActor.update({ "system.gold.coins": newTotal });
+
+        const currency = game.settings.get(MODULE_ID, "currencyName");
+        const rawContent = `
+        <div class="chat-card" style="border: 2px solid #8b3333; border-radius: 8px; overflow: hidden;">
+            <header class="card-header flexrow" style="background: #191919 !important; padding: 8px; border-bottom: 2px solid #8b3333;">
+                <h3 class="noborder" style="margin: 0; font-weight: bold; color: #ff9999 !important; font-family: 'Aleo', serif; text-align: center; text-transform: uppercase; letter-spacing: 1px; width: 100%;">
+                    Item Sold
+                </h3>
+            </header>
+            <div class="card-content" style="background: #2a2a2a; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+                <span style="color: #ffffff; font-size: 1.1em; font-weight: bold; font-family: 'Lato', sans-serif;">
+                    <strong>${userActor.name}</strong> sold <strong>${itemName}</strong>
+                </span>
+                <span style="color: #d4af37; font-size: 1.2em; font-weight: bold; margin-top: 10px;">
+                    +${sellPrice} ${currency}
+                </span>
+            </div>
+        </div>`;
+
+        await ChatMessage.create({
+            content: rawContent,
+            speaker: ChatMessage.getSpeaker({ actor: userActor })
+        });
+
+        if (game.audio) {
+            AudioHelper.play({ src: "modules/daggerheart-store/assets/audio/coins.mp3", volume: 0.8, loop: false }, false);
+        }
+
+        ui.notifications.info(`Sold ${itemName} for ${sellPrice} ${currency}.`);
+        this.render();
     }
 
     async _handleSplitPurchase(itemUuid, itemName, price, userActor, partyActor) {
@@ -649,10 +697,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         }).render(true);
     }
     
-    // --- New Action Handlers: Profile System ---
-
     async _onSavePreset(event, target) {
-        // Create Content for Dialog
         const content = `
             <div style="padding: 5px 0;">
                 <label>Profile Name:</label>
@@ -674,12 +719,10 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     callback: async (event, button, dialog) => {
                         const name = button.form.elements.profileName.value.trim() || "New Profile";
                         
-                        // Prevent overwriting the Default factory profile
                         if (name === "Default") {
                             return ui.notifications.error("You cannot overwrite the factory 'Default' profile. Please choose another name.");
                         }
 
-                        // 1. Gather all current settings
                         const currentSettings = {
                             storeName: game.settings.get(MODULE_ID, "storeName"),
                             currencyName: game.settings.get(MODULE_ID, "currencyName"),
@@ -693,16 +736,13 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             hiddenItems: game.settings.get(MODULE_ID, "hiddenItems"),
                             partyActorId: game.settings.get(MODULE_ID, "partyActorId"),
                             customTabName: game.settings.get(MODULE_ID, "customTabName"),
-                            customTabCompendium: game.settings.get(MODULE_ID, "customTabCompendium")
+                            customTabCompendium: game.settings.get(MODULE_ID, "customTabCompendium"),
+                            sellRatio: game.settings.get(MODULE_ID, "sellRatio")
                         };
 
-                        // 2. Fetch existing profiles
                         const profiles = foundry.utils.deepClone(game.settings.get(MODULE_ID, "storeProfiles")) || {};
-                        
-                        // 3. Save new profile
                         profiles[name] = currentSettings;
                         
-                        // 4. Update Settings
                         await game.settings.set(MODULE_ID, "storeProfiles", profiles);
                         await game.settings.set(MODULE_ID, "currentProfile", name);
                         
@@ -716,21 +756,18 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
     }
 
     async _onLoadPreset(event, target) {
-        // 1. Get selected profile from the dropdown in the UI
         const selectEl = this.element.querySelector(".preset-select");
         if (!selectEl) return;
         
         const profileName = selectEl.value;
         let profileData;
 
-        // 2. Determine Profile Data
         if (profileName === "Default") {
-            // Hardcoded Factory Defaults
             profileData = {
                 storeName: "Daggerheart: Store",
                 currencyName: "Coins",
                 priceModifier: 100,
-                allowedTiers: {}, // Assuming empty object is handled as 'All Allowed' in prepareContext
+                allowedTiers: {}, 
                 hiddenCategories: {},
                 customCompendiums: [],
                 priceOverrides: {},
@@ -739,33 +776,29 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 hiddenItems: {},
                 partyActorId: "",
                 customTabName: "General",
-                customTabCompendium: "daggerheart-store.general-items"
+                customTabCompendium: "daggerheart-store.general-items",
+                sellRatio: 0.5
             };
         } else {
-            // Fetch from saved profiles
             const profiles = game.settings.get(MODULE_ID, "storeProfiles");
             profileData = profiles[profileName];
             
             if (!profileData) return ui.notifications.error(`Profile "${profileName}" not found.`);
         }
 
-        // 3. Apply settings
-        // We iterate and await to ensure all settings are applied before re-rendering
         const settingsToUpdate = [
             "storeName", "currencyName", "priceModifier", "allowedTiers", 
             "hiddenCategories", "customCompendiums", "priceOverrides", 
             "saleDiscount", "saleItems", "hiddenItems", "partyActorId", 
-            "customTabName", "customTabCompendium"
+            "customTabName", "customTabCompendium", "sellRatio"
         ];
 
         for (const key of settingsToUpdate) {
-            // For Default profile, we always have the keys. For saved, we check.
             if (profileData.hasOwnProperty(key)) {
                 await game.settings.set(MODULE_ID, key, profileData[key]);
             }
         }
 
-        // 5. Update Current Profile Tracker
         await game.settings.set(MODULE_ID, "currentProfile", profileName);
 
         const msg = profileName === "Default" ? "Factory Defaults restored." : `Profile "${profileName}" loaded.`;
@@ -797,7 +830,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             delete profiles[profileName];
                             await game.settings.set(MODULE_ID, "storeProfiles", profiles);
                             
-                            // Reset to Default
                             await game.settings.set(MODULE_ID, "currentProfile", "Default");
                             
                             ui.notifications.info(`Profile "${profileName}" deleted.`);
@@ -855,6 +887,9 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
     async _prepareContext(options) {
         const priceMod = game.settings.get(MODULE_ID, "priceModifier");
         const saleDiscount = game.settings.get(MODULE_ID, "saleDiscount");
+        // NEW: Get Sell Ratio
+        const sellRatio = game.settings.get(MODULE_ID, "sellRatio");
+        
         const allowedTiers = game.settings.get(MODULE_ID, "allowedTiers");
         const hiddenCategories = game.settings.get(MODULE_ID, "hiddenCategories");
         const customCompendiums = game.settings.get(MODULE_ID, "customCompendiums") || [];
@@ -867,11 +902,8 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         const partyActors = game.actors.filter(a => a.type === "party").map(a => ({ id: a.id, name: a.name })).sort((a, b) => a.name.localeCompare(b.name));
         const availablePacks = game.packs.filter(p => p.documentName === "Item").map(p => ({ id: p.collection, label: `${p.metadata.label} (${p.collection})` })).sort((a, b) => a.label.localeCompare(b.label));
         
-        // --- 1. Construct Full Category List for UI ---
-        // Start with standard categories
         let allCategories = foundry.utils.deepClone(STANDARD_CATEGORIES);
 
-        // Add Custom Tab to the list so it appears in config
         if (customTabCompendium && customTabCompendium.trim() !== "") {
             allCategories.push({
                 id: "custom-tab",
@@ -880,14 +912,10 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             });
         }
 
-        // Map categories for template consumption
-        // We use !isHidden for the UI "Visible" checkbox
         const categoryConfigList = allCategories.map(cat => ({
             key: cat.key,
             label: cat.label,
-            // Default Tiers: If no setting exists, all enabled.
             tiers: allowedTiers[cat.key] || {1:true, 2:true, 3:true, 4:true},
-            // Visibility: Checkbox means "Visible", so we check if NOT hidden
             isVisible: !hiddenCategories[cat.key]
         }));
 
@@ -897,12 +925,10 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             customTabCompendium: customTabCompendium,
             priceModifier: priceMod, 
             saleDiscount: saleDiscount, 
-            
-            // This now contains ALL categories (standard + custom), never empty.
+            sellRatioPercent: Math.round(sellRatio * 100), // Converted to percent for display
             categories: categoryConfigList, 
-            
             customCompendiums: customCompendiums, 
-            availableCategories: STANDARD_CATEGORIES.map(c => c.key), // For dropdowns
+            availableCategories: STANDARD_CATEGORIES.map(c => c.key), 
             availablePacks: availablePacks, 
             partyActors: partyActors, 
             selectedPartyActor: selectedPartyActor,
@@ -930,6 +956,17 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
                 if (target) target.classList.add("active");
             });
         });
+
+        // Slider logic
+        const sliders = html.querySelectorAll("input[type='range']");
+        sliders.forEach(range => {
+            const display = range.nextElementSibling; // The <span> next to the input
+            if (display && display.classList.contains("range-value")) {
+                range.addEventListener("input", (e) => {
+                    display.innerText = `${e.target.value}%`;
+                });
+            }
+        });
     }
 
     async _onAddCompendium(event, target) {
@@ -950,7 +987,6 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
     async _updateSettings(event, form, formData) {
         const expanded = foundry.utils.expandObject(formData.object);
         
-        // --- 1. Handle Visibility Logic Inversion ---
         const hiddenCategories = {};
         if (expanded.visibility) {
             for (const [key, isVisible] of Object.entries(expanded.visibility)) {
@@ -963,16 +999,19 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         const finalHiddenMap = {};
         allKeys.forEach(key => {
             const isVisible = expanded.visibility && expanded.visibility[key];
-            finalHiddenMap[key] = !isVisible; // If visible (checked), hidden is false. If not checked, hidden is true.
+            finalHiddenMap[key] = !isVisible; 
         });
 
-        // --- SAVE NEW SETTINGS ---
         await game.settings.set(MODULE_ID, "storeName", expanded.storeName);
         await game.settings.set(MODULE_ID, "customTabName", expanded.customTabName);
         await game.settings.set(MODULE_ID, "customTabCompendium", expanded.customTabCompendium);
 
         await game.settings.set(MODULE_ID, "priceModifier", expanded.priceModifier);
         await game.settings.set(MODULE_ID, "saleDiscount", expanded.saleDiscount);
+        
+        // Convert Percentage back to Decimal for Sell Ratio
+        const sellRatioDecimal = expanded.sellRatioPercent / 100;
+        await game.settings.set(MODULE_ID, "sellRatio", sellRatioDecimal);
         
         await game.settings.set(MODULE_ID, "allowedTiers", expanded.tiers || {});
         
