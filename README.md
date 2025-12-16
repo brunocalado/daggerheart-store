@@ -2,6 +2,13 @@
 
 A dynamic, interactive, and fully configurable store for the **Daggerheart** system in Foundry VTT. Allow your players to purchase weapons, armor, potions, and miscellaneous items directly from an elegant visual interface, while the GM maintains full control over prices and what is displayed.
 
+<video src="https://github.com/user-attachments/assets/d60c3fa5-8a34-4ab9-b58a-e7baf7c1e261" 
+       controls 
+       width="720"
+       autoplay 
+       loop 
+       muted></video>
+
 ## 🌟 Overview & Features
 
 ### 🛍️ For Players
