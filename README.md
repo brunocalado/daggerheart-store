@@ -70,7 +70,7 @@ A dynamic, interactive, and fully configurable store for the **Daggerheart** sys
 
 ### 🛠️ Configuration (GM)
 
-Click the gear button (<i class="fas fa-cog"></i>) in the top-right corner of the store to access advanced settings:
+Click the gear button (⚙️) in the top-right corner of the store to access advanced settings:
 
 1. **General:** * **Global Price Multiplier:** Adjust base prices globally.
 
