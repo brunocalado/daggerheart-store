@@ -207,7 +207,13 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     const docs = await pack.getDocuments();
                     for (const doc of docs) {
                         const isHidden = hiddenItems[doc.name];
-                        if (isHidden && !isGM) continue;
+                        
+                        // --- VISIBILITY & OWNERSHIP CHECK ---
+                        const inventoryItem = hasActor ? userActor.items.find(i => i.name === doc.name) : null;
+                        const canSell = !!inventoryItem;
+
+                        // If item is hidden AND not GM AND user doesn't own it -> Skip
+                        if (isHidden && !isGM && !canSell) continue;
 
                         let basePrice = 0;
                         let isOverridden = false;
@@ -226,16 +232,14 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         let finalPrice = basePrice;
                         if (isSale) finalPrice = Math.ceil(basePrice * (1 - saleDiscount/100));
 
-                        // --- SELL LOGIC START ---
-                        const inventoryItem = hasActor ? userActor.items.find(i => i.name === doc.name) : null;
-                        const canSell = !!inventoryItem;
-                        const sellPrice = Math.floor(finalPrice * sellRatio);
-                        // --- SELL LOGIC END ---
+                        // --- SELL PRICE CALCULATION ---
+                        const sellPrice = Math.floor(basePrice * sellRatio);
 
+                        // --- BUY PERMISSIONS ---
                         const canAffordPersonal = userGold >= finalPrice;
-                        const canBuyPersonal = hasActor && canAffordPersonal;
+                        const canBuyPersonal = hasActor && canAffordPersonal && (!isHidden || isGM);
                         const combinedWealth = partyGold + userGold;
-                        const canBuyParty = hasPartyActor && hasActor && (combinedWealth >= finalPrice);
+                        const canBuyParty = hasPartyActor && hasActor && (combinedWealth >= finalPrice) && (!isHidden || isGM);
 
                         customItems.push({
                             id: doc.id,
@@ -245,12 +249,13 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             price: finalPrice,
                             originalPrice: basePrice,
                             isSale: isSale,
-                            isHidden: isHidden,
+                            // UPDATE: Only report hidden to template if GM. If player owns it, they see it normally.
+                            isHidden: isGM && isHidden,
                             isOverridden: isOverridden,
                             canBuyPersonal: canBuyPersonal,
                             canBuyParty: canBuyParty,
-                            canSell: canSell,   // Passed to template
-                            sellPrice: sellPrice // Passed to template
+                            canSell: canSell,   
+                            sellPrice: sellPrice 
                         });
                     }
                 }
@@ -258,6 +263,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 context.tabs[cat.id] = [{ id: "all", label: "", items: customItems }];
                 continue;
             }
+
+            // --- STANDARD CATEGORIES LOGIC ---
 
             const tierGroups = {
                 1: { id: 1, label: "Tier 1 / Common", items: [] },
@@ -283,7 +290,13 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
                 for (const doc of docs) {
                     const isHidden = hiddenItems[doc.name];
-                    if (isHidden && !isGM) continue; 
+                    
+                    // --- VISIBILITY & OWNERSHIP CHECK ---
+                    const inventoryItem = hasActor ? userActor.items.find(i => i.name === doc.name) : null;
+                    const canSell = !!inventoryItem;
+
+                    // If item is hidden AND not GM AND user doesn't own it -> Skip
+                    if (isHidden && !isGM && !canSell) continue;
 
                     let basePrice = 0;
                     let tier = 1;
@@ -319,16 +332,14 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     let finalPrice = basePrice;
                     if (isSale) finalPrice = Math.ceil(basePrice * (1 - saleDiscount/100));
 
-                    // --- SELL LOGIC START ---
-                    const inventoryItem = hasActor ? userActor.items.find(i => i.name === doc.name) : null;
-                    const canSell = !!inventoryItem;
-                    const sellPrice = Math.floor(finalPrice * sellRatio);
-                    // --- SELL LOGIC END ---
+                    // --- SELL PRICE CALCULATION ---
+                    const sellPrice = Math.floor(basePrice * sellRatio);
 
+                    // --- BUY PERMISSIONS ---
                     const canAffordPersonal = userGold >= finalPrice;
-                    const canBuyPersonal = hasActor && canAffordPersonal;
+                    const canBuyPersonal = hasActor && canAffordPersonal && (!isHidden || isGM);
                     const combinedWealth = partyGold + userGold;
-                    const canBuyParty = hasPartyActor && hasActor && (combinedWealth >= finalPrice);
+                    const canBuyParty = hasPartyActor && hasActor && (combinedWealth >= finalPrice) && (!isHidden || isGM);
 
                     if (tierGroups[tier]) {
                         tierGroups[tier].items.push({
@@ -339,7 +350,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             price: finalPrice,
                             originalPrice: basePrice,
                             isSale: isSale,
-                            isHidden: isHidden,
+                            // UPDATE: Only report hidden to template if GM. If player owns it, they see it normally.
+                            isHidden: isGM && isHidden,
                             isOverridden: isOverridden,
                             canBuyPersonal: canBuyPersonal,
                             canBuyParty: canBuyParty,
@@ -508,9 +520,10 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         await userActor.update({ "system.gold.coins": newTotal });
 
         const currency = game.settings.get(MODULE_ID, "currencyName");
+        // UPDATED: Styling matches standard chat cards (Gold #C9A060), but with RED title (#ff9999).
         const rawContent = `
-        <div class="chat-card" style="border: 2px solid #8b3333; border-radius: 8px; overflow: hidden;">
-            <header class="card-header flexrow" style="background: #191919 !important; padding: 8px; border-bottom: 2px solid #8b3333;">
+        <div class="chat-card" style="border: 2px solid #C9A060; border-radius: 8px; overflow: hidden;">
+            <header class="card-header flexrow" style="background: #191919 !important; padding: 8px; border-bottom: 2px solid #C9A060;">
                 <h3 class="noborder" style="margin: 0; font-weight: bold; color: #ff9999 !important; font-family: 'Aleo', serif; text-align: center; text-transform: uppercase; letter-spacing: 1px; width: 100%;">
                     Item Sold
                 </h3>
@@ -534,7 +547,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             AudioHelper.play({ src: "modules/daggerheart-store/assets/audio/coins.mp3", volume: 0.8, loop: false }, false);
         }
 
-        ui.notifications.info(`Sold ${itemName} for ${sellPrice} ${currency}.`);
+        // Notification Removed
         this.render();
     }
 
@@ -679,7 +692,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             }, false); 
         }
 
-        ui.notifications.info(`Bought ${itemName}.`);
+        // Notification Removed
         this.render();
     }
 

@@ -1,6 +1,4 @@
 <div class="daggerheart-store-config">
-    <!-- Title Removed as requested -->
-    
     <!-- Config Tabs -->
     <nav class="sheet-tabs tabs">
         <a class="item {{#if (eq activeTab 'general')}}active{{/if}}" data-tab="general"><i class="fas fa-cogs"></i> General</a>
@@ -33,10 +31,14 @@
 
         <hr>
 
+        <!-- Global Price Multiplier Slider (Updated) -->
         <div class="form-group">
-            <label>Global Price Multiplier (%)</label>
-            <input type="number" name="priceModifier" value="{{priceModifier}}" min="1" step="1">
-            <p class="notes">100 = Normal Price. Example: 110 = +10% cost.</p>
+            <label>Global Price Multiplier</label>
+            <div class="form-fields">
+                <input type="range" name="priceModifier" value="{{priceModifier}}" min="50" max="300" step="1">
+                <span class="range-value">{{priceModifier}}%</span>
+            </div>
+            <p class="notes">Adjusts all prices globally (50% to 300%). 100% = Normal.</p>
         </div>
 
         <!-- Sale Discount Slider -->
@@ -67,7 +69,6 @@
         <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             {{#each categories}}
             <label>
-                <!-- Updated Logic: name="visibility", checked if isVisible -->
                 <input type="checkbox" name="visibility.{{this.key}}" {{checked this.isVisible}}>
                 Show {{this.label}}
             </label>
@@ -80,7 +81,7 @@
         <p class="notes">Select which tiers are available for purchase in each category.</p>
         <div class="tiers-config">
             {{#each categories}}
-            <!-- Only show tiers for standard categories, not the Custom Tab (unless you implemented tiers there) -->
+            <!-- Only show tiers for standard categories -->
             {{#if (ne this.key "CustomTab")}}
                 <div class="category-row">
                     <h4>{{this.label}}</h4>
