@@ -28,6 +28,20 @@ function getSystemCurrency() {
 }
 
 /**
+ * Helper to get Whisper recipients based on privacy settings
+ * @returns {Array<string>|null} Array of User IDs to whisper to, or null if public
+ */
+function getChatWhisperRecipients() {
+    const privacy = game.settings.get(MODULE_ID, "chatPrivacy");
+    if (privacy === "private") {
+        const recipients = ChatMessage.getWhisperRecipients("GM").map(u => u.id);
+        if (!recipients.includes(game.user.id)) recipients.push(game.user.id);
+        return recipients;
+    }
+    return null;
+}
+
+/**
  * Main Store Application (Application V2)
  */
 export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) {
@@ -255,12 +269,20 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             </div>
         `;
 
-        await ChatMessage.create({
+        const chatData = {
             user: game.user.id,
             speaker: ChatMessage.getSpeaker({ actor }),
             content: messageContent,
             sound: "sounds/dice.wav"
-        });
+        };
+
+        // --- PRIVACY LOGIC (Conversion is private to player) ---
+        const whisperTo = getChatWhisperRecipients();
+        if (whisperTo) {
+            chatData.whisper = whisperTo;
+        }
+
+        await ChatMessage.create(chatData);
         
         ui.notifications.info(`Store: Converted treasure to ${totalAdded} coins for ${actor.name}.`);
     }
@@ -733,7 +755,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const rawContent = `
         <div class="chat-card" style="border: 2px solid #C9A060; border-radius: 8px; overflow: hidden;">
             <header class="card-header flexrow" style="background: #191919 !important; padding: 8px; border-bottom: 2px solid #C9A060;">
-                <h3 class="noborder" style="margin: 0; font-weight: bold; color: #ff9999 !important; font-family: 'Aleo', serif; text-align: center; text-transform: uppercase; letter-spacing: 1px; width: 100%;">
+                <h3 class="noborder" style="margin: 0; font-weight: bold; color: #C9A060 !important; font-family: 'Aleo', serif; text-align: center; text-transform: uppercase; letter-spacing: 1px; width: 100%;">
                     Item Sold
                 </h3>
             </header>
@@ -747,10 +769,18 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             </div>
         </div>`;
 
-        await ChatMessage.create({
+        const chatData = {
             content: rawContent,
             speaker: ChatMessage.getSpeaker({ actor: userActor })
-        });
+        };
+
+        // --- PRIVACY LOGIC (Selling is private to player) ---
+        const whisperTo = getChatWhisperRecipients();
+        if (whisperTo) {
+            chatData.whisper = whisperTo;
+        }
+
+        await ChatMessage.create(chatData);
 
         if (game.audio) {
             AudioHelper.play({ src: "modules/daggerheart-store/assets/audio/coins.mp3", volume: 0.8, loop: false }, false);
@@ -889,10 +919,24 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
         const enrichedContent = await TextEditor.enrichHTML(rawContent, { async: true });
 
-        ChatMessage.create({
+        const chatData = {
             content: enrichedContent,
             speaker: ChatMessage.getSpeaker({ actor: recipient })
-        });
+        };
+
+        // --- PRIVACY LOGIC (Purchase) ---
+        // Exception: If party funds are used, message stays public.
+        // We detect party usage if "Party Funds" is present in payer names or if the Party Actor was a payer.
+        const usedPartyFunds = payers.some(p => p.name === "Party Funds");
+        
+        if (!usedPartyFunds) {
+            const whisperTo = getChatWhisperRecipients();
+            if (whisperTo) {
+                chatData.whisper = whisperTo;
+            }
+        }
+
+        ChatMessage.create(chatData);
 
         if (game.audio) {
             AudioHelper.play({ 

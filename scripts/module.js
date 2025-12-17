@@ -80,6 +80,20 @@ Hooks.once("init", () => {
         default: "Default"
     });
 
+    // --- CHAT PRIVACY SETTING (NEW) ---
+    game.settings.register(MODULE_ID, "chatPrivacy", {
+        name: "Chat Privacy",
+        hint: "Control visibility of store transaction messages.",
+        scope: "world",
+        config: true, // Exposed in Module Settings
+        type: String,
+        choices: {
+            "public": "Public (Visible to everyone)",
+            "private": "Private (Visible only to Player & GM)"
+        },
+        default: "public"
+    });
+
     // --- WELCOME SCREEN SETTING ---
     game.settings.register(MODULE_ID, "welcomeScreenShown", {
         name: "Hide Welcome Screen",
