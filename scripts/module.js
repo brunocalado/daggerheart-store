@@ -1,4 +1,5 @@
 import { DaggerheartStore } from "./store-app.js";
+import { StoreWelcome } from "./store-welcome.js";
 
 const MODULE_ID = "daggerheart-store";
 const { DialogV2 } = foundry.applications.api;
@@ -79,6 +80,16 @@ Hooks.once("init", () => {
         default: "Default"
     });
 
+    // --- WELCOME SCREEN SETTING ---
+    game.settings.register(MODULE_ID, "welcomeScreenShown", {
+        name: "Hide Welcome Screen",
+        hint: "If checked, the Daggerheart Store welcome screen will not appear on startup.",
+        scope: "client", // User-specific preference
+        config: true,    // exposed in Module Settings so users can reset it
+        type: Boolean,
+        default: false
+    });
+
     // Communication Channel Setting
     // Acts as a socket trigger. Changes to this setting fire the 'onChange' callback on all clients.
     game.settings.register(MODULE_ID, "openStoreRequest", {
@@ -152,6 +163,15 @@ Hooks.once("ready", () => {
             ui.notifications.info(`Store sent to: ${username || "Everyone"}`);
         }
     };
+
+    // --- SHOW WELCOME SCREEN ---
+    // Only for GM, and only if not previously suppressed
+    if (game.user.isGM) {
+        const welcomeHidden = game.settings.get(MODULE_ID, "welcomeScreenShown");
+        if (!welcomeHidden) {
+            new StoreWelcome().render(true);
+        }
+    }
 });
 
 // React to Config Settings Changes (Price, Tiers, etc.)

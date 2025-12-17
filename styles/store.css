@@ -650,3 +650,127 @@
     50% { transform: scale(1.15); opacity: 1; }
     100% { transform: scale(1); opacity: 0.9; }
 }
+
+/* ==================================================== */
+/* WELCOME SCREEN */
+/* ==================================================== */
+
+.daggerheart-store-welcome .window-content {
+    background: #191919;
+    background-image: radial-gradient(circle at center, #2a2a2a 0%, #191919 100%);
+    color: #e0e0e0;
+    padding: 20px;
+    border-radius: 5px;
+    border: 1px solid #d4af37;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.welcome-container {
+    text-align: center;
+    width: 100%;
+}
+
+.welcome-title {
+    font-family: "Aleo", serif;
+    color: #d4af37;
+    font-size: 2.2em;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-bottom: 2px solid #d4af37;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.welcome-description {
+    font-family: "Lato", sans-serif;
+    font-size: 1.1em;
+    line-height: 1.5;
+    color: #ccc;
+    margin-bottom: 25px;
+    background: rgba(0,0,0,0.3);
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #444;
+}
+
+.welcome-action {
+    margin-bottom: 20px;
+}
+
+.journal-btn {
+    background: #7a1d1d; /* Red warning style */
+    color: #fff;
+    font-family: "Aleo", serif;
+    font-weight: bold;
+    font-size: 1.2em;
+    padding: 12px 24px;
+    border: 1px solid #ff5555;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 0 10px rgba(122, 29, 29, 0.5);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.journal-btn:hover {
+    background: #a32424;
+    transform: scale(1.02);
+    box-shadow: 0 0 15px rgba(255, 85, 85, 0.5);
+}
+
+.welcome-divider {
+    border: 0;
+    height: 1px;
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(212, 175, 55, 0.75), rgba(0, 0, 0, 0));
+    margin: 20px 0;
+    width: 100%;
+}
+
+.welcome-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95em;
+    color: #aaa;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    accent-color: #d4af37;
+    width: 16px;
+    height: 16px;
+}
+
+.close-btn {
+    background: #1a5c1a;
+    color: #fff;
+    border: 1px solid #27ae60;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-family: "Lato", sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.close-btn:hover {
+    background: #227a22;
+    box-shadow: 0 0 8px rgba(39, 174, 96, 0.5);
+}

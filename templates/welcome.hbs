@@ -1,0 +1,31 @@
+<div class="welcome-container">
+    <!-- Title -->
+    <h1 class="welcome-title">Daggerheart: Store</h1>
+    
+    <!-- Description -->
+    <p class="welcome-description">
+        A dynamic, interactive, and fully configurable store. Allow your players to purchase weapons, armor, potions, and miscellaneous items directly from an elegant visual interface, while the GM maintains full control over prices and what is displayed.
+    </p>
+
+    <!-- Important Action -->
+    <div class="welcome-action">
+        <button type="button" class="journal-btn" data-action="openJournal" data-uuid="{{journalUuid}}">
+            <i class="fas fa-book-open"></i> ⚠️ READ ME! ⚠️
+        </button>
+        <p class="notes" style="text-align: center; margin-top: 5px; color: #aaa;">Click above to view setup instructions.</p>
+    </div>
+
+    <hr class="welcome-divider">
+
+    <!-- Footer / Checkbox -->
+    <footer class="welcome-footer">
+        <label class="checkbox-label">
+            <input type="checkbox" name="doNotShow" checked>
+            Don't show this screen again
+        </label>
+        
+        <button type="button" class="close-btn" data-action="closeWelcome">
+            <i class="fas fa-check"></i> Enter
+        </button>
+    </footer>
+</div>
