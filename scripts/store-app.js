@@ -604,15 +604,22 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
         if (this.window) this.window.title = this.options.window.title;
 
-        const searchInput = html.querySelector(".store-search");
-        if (searchInput) {
+        // --- CORREÇÃO DE BUSCA (SEARCH FIX) ---
+        // Anteriormente, usava querySelector que pegava apenas o PRIMEIRO input de busca.
+        // Como o HTML cria um input por aba (dentro do loop), os inputs das outras abas
+        // não recebiam o event listener. Agora iteramos sobre TODOS os inputs.
+        const searchInputs = html.querySelectorAll(".store-search");
+        searchInputs.forEach(searchInput => {
+            // Sincroniza o valor visual com o estado atual da busca
             searchInput.value = this.searchQuery;
             this._applySearch(searchInput);
+
             searchInput.addEventListener("input", (e) => {
                 this.searchQuery = e.target.value;
+                // Aplica a busca apenas no input atual (que está visível na aba ativa)
                 this._applySearch(e.target);
             });
-        }
+        });
         
         // --- Slider Logic ---
         // Find all range inputs and add listeners to update their neighbor span

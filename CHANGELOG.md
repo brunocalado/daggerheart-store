@@ -6,6 +6,10 @@ Text Editor API: Fixed "TextEditor is deprecated" error during purchases. Replac
 
 Purchase Logic: Cleaned up _executePurchase to remove legacy API calls and improve performance when generating transaction logs.
 
+Search fix
+
+better style for save config button 
+
 Changed
 Refactored store-app.js to adhere to Version 13 namespacing standards.
 Optimized chat message enrichment for better compatibility with future Foundry versions.
