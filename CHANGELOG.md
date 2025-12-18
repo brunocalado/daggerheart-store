@@ -4,6 +4,7 @@
 - better style for save config button 
 - transfer feature
 - elurian now shows (system typo)
+- alert with chat message if the player don't have a linked actor
 
 # 0.0.9
 - journal with docs

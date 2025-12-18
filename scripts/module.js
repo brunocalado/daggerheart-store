@@ -151,8 +151,45 @@ function _handleOpenStoreRequest(value) {
 Hooks.once("ready", () => {
     // Expose global API
     globalThis.Store = {
-        Open: () => {
+        Open: async () => {
             const app = getStoreInstance();
+            
+            // --- NEW: LINKED ACTOR CHECK ---
+            // If user is NOT a GM and has NO character assigned
+            if (!game.user.isGM && !game.user.character) {
+                const journalUUID = "Compendium.daggerheart-store.journals.JournalEntry.fIXCeXWeDbAu3uFg";
+                const link = `@UUID[${journalUUID}]{here}`;
+                
+                // Construct styled chat message (matching store-app styles)
+                const messageContent = `
+                <div class="chat-card" style="border: 2px solid #C9A060; border-radius: 8px; overflow: hidden;">
+                    <header class="card-header flexrow" style="background: #191919 !important; padding: 8px; border-bottom: 2px solid #C9A060;">
+                        <h3 class="noborder" style="margin: 0; font-weight: bold; color: #C9A060 !important; font-family: 'Aleo', serif; text-align: center; text-transform: uppercase; letter-spacing: 1px; width: 100%;">
+                            Store Access Issue
+                        </h3>
+                    </header>
+                    <div class="card-content" style="background: #2a2a2a; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #eee;">
+                        <p style="margin-bottom: 10px; font-family: 'Lato', sans-serif;">
+                            The player <strong>${game.user.name}</strong> can’t use the store without a linked actor.
+                        </p>
+                        <p style="font-size: 0.9em; color: #ccc;">
+                            Read the full instructions ${link}
+                        </p>
+                    </div>
+                </div>`;
+
+                // Determine recipients: GM + The current user (so they know it was sent)
+                const recipients = ChatMessage.getWhisperRecipients("GM").map(u => u.id);
+                if (!recipients.includes(game.user.id)) recipients.push(game.user.id);
+
+                await ChatMessage.create({
+                    content: messageContent,
+                    speaker: { alias: "Store System" },
+                    whisper: recipients
+                });
+            }
+            // ---------------------------------
+
             app.render({ force: true });
         },
         Show: async (username = null) => {
