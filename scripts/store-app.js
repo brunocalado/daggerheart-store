@@ -782,8 +782,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
         await ChatMessage.create(chatData);
 
+        // FIX: Use foundry.audio.AudioHelper
         if (game.audio) {
-            AudioHelper.play({ src: "modules/daggerheart-store/assets/audio/coins.mp3", volume: 0.8, loop: false }, false);
+            foundry.audio.AudioHelper.play({ src: "modules/daggerheart-store/assets/audio/coins.mp3", volume: 0.8, loop: false }, false);
         }
 
         this.render();
@@ -896,6 +897,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             .filter(p => p.amount > 0)
             .map(p => `<strong>${p.name}</strong> (${p.amount})`)
             .join(" & ");
+        
+        // FIX: Get the link directly from the item document instead of using TextEditor.enrichHTML
+        const itemLink = itemFromPack.link;
 
         const rawContent = `
         <div class="chat-card" style="border: 2px solid #C9A060; border-radius: 8px; overflow: hidden;">
@@ -906,7 +910,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             </header>
             <div class="card-content" style="background: #2a2a2a; padding: 20px; min-height: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; position: relative;">
                 <span style="color: #ffffff !important; font-size: 1.1em; font-weight: bold; font-family: 'Lato', sans-serif; line-height: 1.4;">
-                    <strong>${recipient.name}</strong> purchased @UUID[${itemUuid}]{${itemName}}
+                    <strong>${recipient.name}</strong> purchased ${itemLink}
                 </span>
                 <span style="color: #bbb; font-size: 0.9em; margin-top: 5px;">
                     Paid by: ${payerText}
@@ -917,10 +921,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             </div>
         </div>`;
 
-        const enrichedContent = await TextEditor.enrichHTML(rawContent, { async: true });
-
+        // We use rawContent directly because itemLink is already an HTML anchor tag
         const chatData = {
-            content: enrichedContent,
+            content: rawContent, 
             speaker: ChatMessage.getSpeaker({ actor: recipient })
         };
 
@@ -938,8 +941,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
         ChatMessage.create(chatData);
 
+        // FIX: Use foundry.audio.AudioHelper
         if (game.audio) {
-            AudioHelper.play({ 
+            foundry.audio.AudioHelper.play({ 
                 src: "modules/daggerheart-store/assets/audio/coins.mp3", 
                 volume: 0.8,
                 loop: false 
