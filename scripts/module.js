@@ -62,7 +62,6 @@ Hooks.once("init", () => {
     });
 
     // --- PROFILES SETTINGS ---
-    // Stores all saved profiles, e.g., { "Default": { ... }, "Cheap Mode": { ... } }
     game.settings.register(MODULE_ID, "storeProfiles", {
         name: "Store Profiles",
         scope: "world",
@@ -71,7 +70,6 @@ Hooks.once("init", () => {
         default: { "Default": {} } 
     });
 
-    // Tracks which profile is currently active in the UI
     game.settings.register(MODULE_ID, "currentProfile", {
         name: "Current Profile",
         scope: "world",
@@ -80,12 +78,12 @@ Hooks.once("init", () => {
         default: "Default"
     });
 
-    // --- CHAT PRIVACY SETTING (NEW) ---
+    // --- CHAT SETTINGS ---
     game.settings.register(MODULE_ID, "chatPrivacy", {
         name: "Chat Privacy",
         hint: "Control visibility of store transaction messages.",
         scope: "world",
-        config: true, // Exposed in Module Settings
+        config: true, 
         type: String,
         choices: {
             "public": "Public (Visible to everyone)",
@@ -94,24 +92,37 @@ Hooks.once("init", () => {
         default: "public"
     });
 
+    // NEW: Chat Message Color Style
+    game.settings.register(MODULE_ID, "chatMessageStyle", {
+        name: "Chat Message Style",
+        hint: "Choose between the classic gold theme or color-coded borders based on the action (Buy=Red, Sell=Green, etc).",
+        scope: "world", // Using world so everyone sees the same style, but could be client
+        config: true,
+        type: String,
+        choices: {
+            "default": "Default (Gold)",
+            "colored": "Color Coded (Action Based)"
+        },
+        default: "colored"
+    });
+
     // --- WELCOME SCREEN SETTING ---
     game.settings.register(MODULE_ID, "welcomeScreenShown", {
         name: "Hide Welcome Screen",
         hint: "If checked, the Daggerheart Store welcome screen will not appear on startup.",
-        scope: "client", // User-specific preference
-        config: true,    // exposed in Module Settings so users can reset it
+        scope: "client", 
+        config: true,    
         type: Boolean,
         default: false
     });
 
     // Communication Channel Setting
-    // Acts as a socket trigger. Changes to this setting fire the 'onChange' callback on all clients.
     game.settings.register(MODULE_ID, "openStoreRequest", {
         scope: "world",
         config: false,
         type: Object,
         default: { target: "none", time: 0 },
-        onChange: _handleOpenStoreRequest // Trigger logic directly on change
+        onChange: _handleOpenStoreRequest
     });
 });
 
@@ -133,34 +144,25 @@ function _handleOpenStoreRequest(value) {
     const targetUser = value.target;
     const currentUser = game.user.id;
 
-    // Check if this client is the intended target
     if (targetUser === "all" || targetUser === currentUser) {
-        
         console.log(`${MODULE_ID} | Received Open Request for: ${targetUser}`);
         const app = getStoreInstance();
-        
-        // Force render and maximize
         app.render({ force: true, window: { display: "block" } });
         if (app.minimized) app.maximize();
-        
-        // Brings the application window to the top of the stack
         app.bringToFront(); 
     }
 }
 
 Hooks.once("ready", () => {
-    // Expose global API
     globalThis.Store = {
         Open: async () => {
             const app = getStoreInstance();
             
-            // --- NEW: LINKED ACTOR CHECK ---
-            // If user is NOT a GM and has NO character assigned
+            // LINKED ACTOR CHECK
             if (!game.user.isGM && !game.user.character) {
                 const journalUUID = "Compendium.daggerheart-store.journals.JournalEntry.fIXCeXWeDbAu3uFg";
                 const link = `@UUID[${journalUUID}]{here}`;
                 
-                // Construct styled chat message (matching store-app styles)
                 const messageContent = `
                 <div class="chat-card" style="border: 2px solid #C9A060; border-radius: 8px; overflow: hidden;">
                     <header class="card-header flexrow" style="background: #191919 !important; padding: 8px; border-bottom: 2px solid #C9A060;">
@@ -178,7 +180,6 @@ Hooks.once("ready", () => {
                     </div>
                 </div>`;
 
-                // Determine recipients: GM + The current user (so they know it was sent)
                 const recipients = ChatMessage.getWhisperRecipients("GM").map(u => u.id);
                 if (!recipients.includes(game.user.id)) recipients.push(game.user.id);
 
@@ -188,7 +189,6 @@ Hooks.once("ready", () => {
                     whisper: recipients
                 });
             }
-            // ---------------------------------
 
             app.render({ force: true });
         },
@@ -204,19 +204,14 @@ Hooks.once("ready", () => {
             }
 
             console.log(`${MODULE_ID} | Triggering Store Open for:`, targetId);
-            
-            // Update the setting with a new timestamp to ensure onChange fires even if target is the same
             await game.settings.set(MODULE_ID, "openStoreRequest", {
                 target: targetId,
                 time: Date.now()
             });
-            
             ui.notifications.info(`Store sent to: ${username || "Everyone"}`);
         }
     };
 
-    // --- SHOW WELCOME SCREEN ---
-    // Only for GM, and only if not previously suppressed
     if (game.user.isGM) {
         const welcomeHidden = game.settings.get(MODULE_ID, "welcomeScreenShown");
         if (!welcomeHidden) {
@@ -225,66 +220,42 @@ Hooks.once("ready", () => {
     }
 });
 
-// React to Config Settings Changes (Price, Tiers, etc.)
 Hooks.on("updateSetting", (setting) => {
-    // Filter out the trigger setting because it is handled by 'onChange' in register
     if (setting.key.startsWith(MODULE_ID) && setting.key !== `${MODULE_ID}.openStoreRequest`) {
         if (storeInstance && storeInstance.rendered) {
             console.log(`${MODULE_ID} | Configuration updated, refreshing UI.`);
-            
-            // If the store name changed, update the window title dynamically and immediately
             if (setting.key === `${MODULE_ID}.storeName`) {
                 const newTitle = game.settings.get(MODULE_ID, "storeName");
                 storeInstance.options.window.title = newTitle;
-                
-                // Directly update the window title if the window exists
-                if (storeInstance.window) {
-                    storeInstance.window.title = newTitle;
-                }
+                if (storeInstance.window) storeInstance.window.title = newTitle;
             }
-            
             storeInstance.render();
         }
     }
 });
 
-// --------------------------------------------------------------------------
-// Daggerheart Menu Integration
-// --------------------------------------------------------------------------
 Hooks.on("renderDaggerheartMenu", (app, html, data) => {
-    // Normalize the HTML element to ensure compatibility with jQuery or raw DOM objects
     const element = (html instanceof jQuery) ? html[0] : html;
-
-    // 1. Create the button
     const myButton = document.createElement("button");
     myButton.type = "button";
     myButton.innerHTML = `<i class="fas fa-balance-scale"></i> Open Store`;
     myButton.classList.add("dh-custom-btn"); 
-    
     myButton.style.marginTop = "10px";
     myButton.style.width = "100%";
 
-    // 2. Define click behavior
     myButton.onclick = (event) => {
         event.preventDefault();
-        if (globalThis.Store) {
-            globalThis.Store.Open();
-        } else {
-            ui.notifications.warn("Store module is not ready yet.");
-        }
+        if (globalThis.Store) globalThis.Store.Open();
+        else ui.notifications.warn("Store module is not ready yet.");
     };
 
-    // 3. Insert the button into the DOM
     const fieldset = element.querySelector("fieldset");
-    
     if (fieldset) {
         const newFieldset = document.createElement("fieldset");
         const legend = document.createElement("legend");
         legend.innerText = "Store";
-        
         newFieldset.appendChild(legend);
         newFieldset.appendChild(myButton);
-        
         fieldset.after(newFieldset);
     } else {
         element.appendChild(myButton);

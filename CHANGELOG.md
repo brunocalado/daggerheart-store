@@ -5,6 +5,7 @@
 - transfer feature
 - elurian now shows (system typo)
 - alert with chat message if the player don't have a linked actor
+- color code for chat messages
 
 # 0.0.9
 - journal with docs

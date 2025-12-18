@@ -29,7 +29,6 @@ function getSystemCurrency() {
 
 /**
  * Helper to get Whisper recipients based on privacy settings
- * @returns {Array<string>|null} Array of User IDs to whisper to, or null if public
  */
 function getChatWhisperRecipients() {
     const privacy = game.settings.get(MODULE_ID, "chatPrivacy");
@@ -86,6 +85,26 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         }
     };
 
+    /**
+     * Determines the border color for chat messages based on settings.
+     * @param {string} type - The type of action: 'buy', 'sell', 'party', 'transfer'
+     * @returns {string} Hex color code
+     */
+    _getBorderColor(type) {
+        const style = game.settings.get(MODULE_ID, "chatMessageStyle");
+        const defaultColor = "#C9A060"; // Gold
+
+        if (style !== "colored") return defaultColor;
+
+        switch (type) {
+            case "buy": return "#c0392b";      // Red
+            case "sell": return "#27ae60";     // Green
+            case "party": return "#2980b9";    // Blue
+            case "transfer": return "#8e44ad"; // Purple
+            default: return defaultColor;
+        }
+    }
+
     async render(options, _options) {
         if (!game.user.isGM && game.user.character) {
              await this._handleCurrencyConversion(game.user.character);
@@ -95,7 +114,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
     /**
      * Generates the weapon summary string based on updated rules.
-     * Pattern: Trait - Range - Damage+Bonus(Type) - Burden
      */
     _getWeaponSummary(doc) {
         try {
@@ -104,11 +122,11 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             const system = doc.system;
             if (!system.attack) return "";
 
-            // 1. Weapon Trait (First 3 letters, Uppercase)
+            // 1. Weapon Trait
             const traitRaw = String(system.attack.roll?.trait || "");
             const weaponTrait = traitRaw.length >= 3 ? traitRaw.substring(0, 3).toUpperCase() : traitRaw.toUpperCase();
 
-            // 2. Weapon Range (Formatted)
+            // 2. Weapon Range
             const rangeRaw = system.attack.range || "";
             const rangeMap = {
                 "melee": "Melee",
@@ -122,10 +140,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             // 3. Damage Processing
             const part0 = system.attack.damage?.parts?.[0] || {};
             const val = part0.value || {};
-            
-            // Custom Check
             const weaponCustom = val.custom?.enabled === true;
-            
             let damageSection = "";
 
             if (weaponCustom) {
@@ -134,8 +149,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 const weaponDamage = val.dice || ""; 
                 const typeRaw = part0.type;
                 let damageType = "";
-
-                // Robust handling for typeRaw (Array, Set, String, or Object)
                 let typesList = [];
                 
                 if (Array.isArray(typeRaw)) {
@@ -143,38 +156,33 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 } else if (typeRaw instanceof Set) {
                     typesList = Array.from(typeRaw);
                 } else if (typeof typeRaw === "string") {
-                    // Sometimes comma separated strings appear in legacy data
                     typesList = typeRaw.includes(",") ? typeRaw.split(",") : [typeRaw];
                 } else if (typeRaw && typeof typeRaw === "object") {
-                    // Fallback for object-based lists (e.g. {0: 'physical'})
                     typesList = Object.values(typeRaw);
                 }
 
-                // Process list: convert to string -> trim -> uppercase 3 letters
                 damageType = typesList
                     .map(t => {
                         const s = String(t || "").trim();
                         if (!s) return "";
                         return s.length >= 3 ? s.substring(0, 3).toUpperCase() : s.toUpperCase();
                     })
-                    .filter(t => t) // Remove empty entries
-                    .join("/"); // Join with slash
+                    .filter(t => t) 
+                    .join("/");
                 
-                // Weapon Bonus
                 const bonusVal = val.bonus;
                 let weaponBonus = "";
                 if (bonusVal !== null && bonusVal !== undefined && String(bonusVal).trim() !== "") {
                     weaponBonus = `+${bonusVal}`;
                 }
 
-                // Compose: Damage+Bonus(Type) -> e.g., d8+2(PHY)
                 damageSection = `${weaponDamage}${weaponBonus}`;
                 if (damageType) {
                     damageSection += `(${damageType})`;
                 }
             }
 
-            // 4. Burden (One-Handed / Two-Handed)
+            // 4. Burden
             const burdenRaw = String(system.burden || "");
             const burdenMap = {
                 "1": "One-Handed",
@@ -182,12 +190,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 "oneHanded": "One-Handed",
                 "twoHanded": "Two-Handed"
             };
-            const weaponBurden = burdenMap[burdenRaw] || burdenRaw; // Fallback to raw if not in map
+            const weaponBurden = burdenMap[burdenRaw] || burdenRaw; 
 
-            // Final Composition
             const parts = [weaponTrait, weaponRange, damageSection, weaponBurden];
-            
-            // Filter out empty strings to avoid " - - "
             return parts.filter(p => p && String(p).trim() !== "").join(" - ");
 
         } catch (err) {
@@ -196,21 +201,13 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         }
     }
 
-    /**
-     * Generates the armor summary string.
-     * Pattern: Score: [baseScore] - Thresholds: [major]/[severe]
-     */
     _getArmorSummary(doc) {
         try {
             if (doc.type !== "armor") return "";
-            
             const system = doc.system;
-            // Ensure values exist or default to 0/empty
             const baseScore = system.baseScore ?? 0;
             const baseThresholdsMajor = system.baseThresholds?.major ?? 0;
             const baseThresholdsSevere = system.baseThresholds?.severe ?? 0;
-
-            // UPDATED: Added hyphen separator
             return `Score: ${baseScore} - Thresholds: ${baseThresholdsMajor}/${baseThresholdsSevere}`;
         } catch (err) {
             console.error(`${MODULE_ID} | Error generating armor summary for ${doc.name}:`, err);
@@ -243,10 +240,13 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             "system.gold.coins": newCoins
         });
 
+        // Use standard Gold for conversion messages (neutral system event)
+        const borderColor = "#C9A060"; 
+
         const messageContent = `
-            <div class="chat-card" style="border: 2px solid #C9A060; border-radius: 8px; overflow: hidden;">
-                <header class="card-header flexrow" style="background: #191919 !important; padding: 8px; border-bottom: 2px solid #C9A060;">
-                    <h3 class="noborder" style="margin: 0; font-weight: bold; color: #C9A060 !important; font-family: 'Aleo', serif; text-align: center; text-transform: uppercase; letter-spacing: 1px; width: 100%;">
+            <div class="chat-card" style="border: 2px solid ${borderColor}; border-radius: 8px; overflow: hidden;">
+                <header class="card-header flexrow" style="background: #191919 !important; padding: 8px; border-bottom: 2px solid ${borderColor};">
+                    <h3 class="noborder" style="margin: 0; font-weight: bold; color: ${borderColor} !important; font-family: 'Aleo', serif; text-align: center; text-transform: uppercase; letter-spacing: 1px; width: 100%;">
                         Currency Exchange
                     </h3>
                 </header>
@@ -277,14 +277,12 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             sound: "sounds/dice.wav"
         };
 
-        // --- PRIVACY LOGIC (Conversion is private to player) ---
         const whisperTo = getChatWhisperRecipients();
         if (whisperTo) {
             chatData.whisper = whisperTo;
         }
 
         await ChatMessage.create(chatData);
-        
         ui.notifications.info(`Store: Converted treasure to ${totalAdded} coins for ${actor.name}.`);
     }
 
@@ -309,24 +307,18 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const profileKeys = Object.keys(storeProfiles);
         if (!profileKeys.includes("Default")) profileKeys.unshift("Default");
         
-        // Fetch currency from system
         const currencyName = getSystemCurrency();
 
-        // -------------------------------------------------------------
-        // NEW LOGIC: Calculate Highest Traits for Recommendations
-        // -------------------------------------------------------------
         let bestTraits = [];
         if (hasActor && !isGM) {
             const traitKeys = ["agility", "strength", "finesse", "instinct", "presence", "knowledge"];
             let maxVal = -Infinity;
             
-            // 1. Find Max Value
             traitKeys.forEach(t => {
                 const val = foundry.utils.getProperty(userActor, `system.traits.${t}.value`) || 0;
                 if (val > maxVal) maxVal = val;
             });
 
-            // 2. Identify all traits that match this max value
             if (maxVal > -Infinity) {
                 bestTraits = traitKeys.filter(t => {
                     const val = foundry.utils.getProperty(userActor, `system.traits.${t}.value`) || 0;
@@ -334,7 +326,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 });
             }
         }
-        // -------------------------------------------------------------
 
         const context = {
             isGM: isGM,
@@ -347,7 +338,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             tabs: {},
             categories: [],
             searchQuery: this.searchQuery,
-            activeTab: this.activeTab, // Ensures template receives current state
+            activeTab: this.activeTab, 
             presets: profileKeys,
             currentProfile: currentProfile 
         };
@@ -379,7 +370,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         context.categories = categories;
 
         if (categories.length > 0) {
-            // Validate if activeTab still exists in visible categories
             const currentTabExists = categories.find(c => c.id === this.activeTab);
             if (!currentTabExists) {
                 this.activeTab = categories[0].id;
@@ -396,12 +386,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     const docs = await pack.getDocuments();
                     for (const doc of docs) {
                         const isHidden = hiddenItems[doc.name];
-                        
-                        // --- Visibility & Ownership Check ---
                         const inventoryItem = hasActor ? userActor.items.find(i => i.name === doc.name) : null;
                         const canSell = !!inventoryItem;
 
-                        // If item is hidden AND not GM AND user doesn't own it -> Skip
                         if (isHidden && !isGM && !canSell) continue;
 
                         let basePrice = 0;
@@ -421,16 +408,13 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         let finalPrice = basePrice;
                         if (isSale) finalPrice = Math.ceil(basePrice * (1 - saleDiscount/100));
 
-                        // --- Sell Price Calculation ---
                         const sellPrice = Math.floor(basePrice * sellRatio);
 
-                        // --- Buy Permissions ---
                         const canAffordPersonal = userGold >= finalPrice;
                         const canBuyPersonal = hasActor && canAffordPersonal && (!isHidden || isGM);
                         const combinedWealth = partyGold + userGold;
                         const canBuyParty = hasPartyActor && hasActor && (combinedWealth >= finalPrice) && (!isHidden || isGM);
 
-                        // --- GENERATE ITEM SUMMARY (Weapon or Armor) ---
                         let itemSummary = "";
                         if (doc.type === "weapon") {
                             itemSummary = this._getWeaponSummary(doc);
@@ -438,7 +422,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             itemSummary = this._getArmorSummary(doc);
                         }
 
-                        // --- CHECK RECOMMENDATION ---
                         let isRecommended = false;
                         if (hasActor && !isGM && doc.type === "weapon") {
                             const itemTrait = String(foundry.utils.getProperty(doc, "system.attack.roll.trait") || "").toLowerCase();
@@ -462,7 +445,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             canSell: canSell,   
                             sellPrice: sellPrice,
                             itemSummary: itemSummary,
-                            isRecommended: isRecommended // New Flag
+                            isRecommended: isRecommended 
                         });
                     }
                 }
@@ -470,8 +453,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 context.tabs[cat.id] = [{ id: "all", label: "", items: customItems }];
                 continue;
             }
-
-            // --- Standard Categories Logic ---
 
             const tierGroups = {
                 1: { id: 1, label: "Tier 1 / Common", items: [] },
@@ -497,12 +478,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
                 for (const doc of docs) {
                     const isHidden = hiddenItems[doc.name];
-                    
-                    // --- Visibility & Ownership Check ---
                     const inventoryItem = hasActor ? userActor.items.find(i => i.name === doc.name) : null;
                     const canSell = !!inventoryItem;
 
-                    // If item is hidden AND not GM AND user doesn't own it -> Skip
                     if (isHidden && !isGM && !canSell) continue;
 
                     let basePrice = 0;
@@ -539,16 +517,13 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     let finalPrice = basePrice;
                     if (isSale) finalPrice = Math.ceil(basePrice * (1 - saleDiscount/100));
 
-                    // --- Sell Price Calculation ---
                     const sellPrice = Math.floor(basePrice * sellRatio);
 
-                    // --- Buy Permissions ---
                     const canAffordPersonal = userGold >= finalPrice;
                     const canBuyPersonal = hasActor && canAffordPersonal && (!isHidden || isGM);
                     const combinedWealth = partyGold + userGold;
                     const canBuyParty = hasPartyActor && hasActor && (combinedWealth >= finalPrice) && (!isHidden || isGM);
 
-                    // --- GENERATE ITEM SUMMARY (Weapon or Armor) ---
                     let itemSummary = "";
                     if (doc.type === "weapon") {
                         itemSummary = this._getWeaponSummary(doc);
@@ -556,7 +531,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         itemSummary = this._getArmorSummary(doc);
                     }
 
-                    // --- CHECK RECOMMENDATION ---
                     let isRecommended = false;
                     if (hasActor && !isGM && doc.type === "weapon") {
                         const itemTrait = String(foundry.utils.getProperty(doc, "system.attack.roll.trait") || "").toLowerCase();
@@ -574,7 +548,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             price: finalPrice,
                             originalPrice: basePrice,
                             isSale: isSale,
-                            // Only report hidden to template if GM. If player owns it, they see it normally.
                             isHidden: isGM && isHidden,
                             isOverridden: isOverridden,
                             canBuyPersonal: canBuyPersonal,
@@ -582,7 +555,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             canSell: canSell,
                             sellPrice: sellPrice,
                             itemSummary: itemSummary,
-                            isRecommended: isRecommended // New Flag
+                            isRecommended: isRecommended 
                         });
                     }
                 }
@@ -605,35 +578,26 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
         if (this.window) this.window.title = this.options.window.title;
 
-        // --- CORREÇÃO DE BUSCA (SEARCH FIX) ---
-        // Anteriormente, usava querySelector que pegava apenas o PRIMEIRO input de busca.
-        // Como o HTML cria um input por aba (dentro do loop), os inputs das outras abas
-        // não recebiam o event listener. Agora iteramos sobre TODOS os inputs.
         const searchInputs = html.querySelectorAll(".store-search");
         searchInputs.forEach(searchInput => {
-            // Sincroniza o valor visual com o estado atual da busca
             searchInput.value = this.searchQuery;
             this._applySearch(searchInput);
 
             searchInput.addEventListener("input", (e) => {
                 this.searchQuery = e.target.value;
-                // Aplica a busca apenas no input atual (que está visível na aba ativa)
                 this._applySearch(e.target);
             });
         });
         
-        // --- Slider Logic ---
-        // Find all range inputs and add listeners to update their neighbor span
         const sliders = html.querySelectorAll("input[type='range']");
         sliders.forEach(range => {
-            const display = range.nextElementSibling; // The <span> next to the input
+            const display = range.nextElementSibling; 
             if (display && display.classList.contains("range-value")) {
                 range.addEventListener("input", (e) => {
                     display.innerText = `${e.target.value}%`;
                 });
             }
         });
-        // --------------------
 
         const priceInputs = html.querySelectorAll(".gm-price-input");
         priceInputs.forEach(input => {
@@ -650,14 +614,11 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             });
         });
 
-        // --- FIX IS HERE ---
         const tabs = html.querySelectorAll(".sheet-tabs .item");
         tabs.forEach(tab => {
             tab.addEventListener("click", (e) => {
                 e.preventDefault(); 
                 const tabId = e.currentTarget.dataset.tab; 
-                
-                // FIX: Update this.activeTab instead of this.currentTab
                 this.activeTab = tabId;
 
                 tabs.forEach(t => t.classList.remove("active"));
@@ -677,7 +638,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             });
         });
 
-        // Ensure active tab logic is respected visually if Handlebars didn't catch it
         if (!html.querySelector(".sheet-tabs .item.active")) {
             let targetTab = html.querySelector(`.sheet-tabs .item[data-tab="${this.activeTab}"]`);
             let targetContent = html.querySelector(`.content .tab[data-tab="${this.activeTab}"]`);
@@ -756,14 +716,15 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const newTotal = currentCoins + sellPrice;
         await userActor.update({ "system.gold.coins": newTotal });
 
-        // Fetch currency
         const currency = getSystemCurrency();
+        
+        // GET BORDER COLOR (GREEN)
+        const borderColor = this._getBorderColor("sell");
 
-        // Chat card styling for item sales
         const rawContent = `
-        <div class="chat-card" style="border: 2px solid #C9A060; border-radius: 8px; overflow: hidden;">
-            <header class="card-header flexrow" style="background: #191919 !important; padding: 8px; border-bottom: 2px solid #C9A060;">
-                <h3 class="noborder" style="margin: 0; font-weight: bold; color: #C9A060 !important; font-family: 'Aleo', serif; text-align: center; text-transform: uppercase; letter-spacing: 1px; width: 100%;">
+        <div class="chat-card" style="border: 2px solid ${borderColor}; border-radius: 8px; overflow: hidden;">
+            <header class="card-header flexrow" style="background: #191919 !important; padding: 8px; border-bottom: 2px solid ${borderColor};">
+                <h3 class="noborder" style="margin: 0; font-weight: bold; color: ${borderColor} !important; font-family: 'Aleo', serif; text-align: center; text-transform: uppercase; letter-spacing: 1px; width: 100%;">
                     Item Sold
                 </h3>
             </header>
@@ -782,7 +743,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             speaker: ChatMessage.getSpeaker({ actor: userActor })
         };
 
-        // --- PRIVACY LOGIC (Selling is private to player) ---
         const whisperTo = getChatWhisperRecipients();
         if (whisperTo) {
             chatData.whisper = whisperTo;
@@ -790,7 +750,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
         await ChatMessage.create(chatData);
 
-        // FIX: Use foundry.audio.AudioHelper
         if (game.audio) {
             foundry.audio.AudioHelper.play({ src: "modules/daggerheart-store/assets/audio/coins.mp3", volume: 0.8, loop: false }, false);
         }
@@ -841,7 +800,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         if (direction === "deposit") {
                             if (amount > userGold) return ui.notifications.warn("Insufficient funds.");
                             
-                            // User -> Party
                             await userActor.update({ "system.gold.coins": userGold - amount });
                             await partyActor.update({ "system.gold.coins": partyGold + amount });
                             
@@ -850,7 +808,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         } else {
                             if (amount > partyGold) return ui.notifications.warn("Insufficient party funds.");
                             
-                            // Party -> User
                             await partyActor.update({ "system.gold.coins": partyGold - amount });
                             await userActor.update({ "system.gold.coins": userGold + amount });
 
@@ -871,12 +828,13 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             ? `<strong>${userActor.name}</strong> deposited funds to <strong>${partyActor.name}</strong>.`
             : `<strong>${userActor.name}</strong> withdrew funds from <strong>${partyActor.name}</strong>.`;
         
-        const sign = type === "deposit" ? "+" : "-"; // This visual is tricky, sticking to neutral display or amount transfer
+        // GET BORDER COLOR (PURPLE)
+        const borderColor = this._getBorderColor("transfer");
 
         const rawContent = `
-        <div class="chat-card" style="border: 2px solid #C9A060; border-radius: 8px; overflow: hidden;">
-            <header class="card-header flexrow" style="background: #191919 !important; padding: 8px; border-bottom: 2px solid #C9A060;">
-                <h3 class="noborder" style="margin: 0; font-weight: bold; color: #C9A060 !important; font-family: 'Aleo', serif; text-align: center; text-transform: uppercase; letter-spacing: 1px; width: 100%;">
+        <div class="chat-card" style="border: 2px solid ${borderColor}; border-radius: 8px; overflow: hidden;">
+            <header class="card-header flexrow" style="background: #191919 !important; padding: 8px; border-bottom: 2px solid ${borderColor};">
+                <h3 class="noborder" style="margin: 0; font-weight: bold; color: ${borderColor} !important; font-family: 'Aleo', serif; text-align: center; text-transform: uppercase; letter-spacing: 1px; width: 100%;">
                     ${title}
                 </h3>
             </header>
@@ -895,10 +853,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             speaker: ChatMessage.getSpeaker({ actor: userActor })
         };
 
-        // Transfer messages are generally public so everyone knows about Party Funds changes, 
-        // but we respect the privacy setting if strictly enforced.
-        // However, usually party fund movements should be public log. 
-        // Based on previous logic, we use standard privacy check.
         const whisperTo = getChatWhisperRecipients();
         if (whisperTo) {
             chatData.whisper = whisperTo;
@@ -914,7 +868,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
     async _handleSplitPurchase(itemUuid, itemName, price, userActor, partyActor) {
         const userGold = foundry.utils.getProperty(userActor, "system.gold.coins") || 0;
         const partyGold = foundry.utils.getProperty(partyActor, "system.gold.coins") || 0;
-        // Fetch currency
         const currency = getSystemCurrency();
 
         let defaultPartyPay = Math.min(partyGold, price);
@@ -1001,7 +954,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const itemFromPack = await fromUuid(itemUuid);
         if (!itemFromPack) return ui.notifications.error("Item data not found.");
 
-        // Fetch currency
         const currency = getSystemCurrency();
 
         for (const payer of payers) {
@@ -1019,13 +971,16 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             .map(p => `<strong>${p.name}</strong> (${p.amount})`)
             .join(" & ");
         
-        // FIX: Get the link directly from the item document instead of using TextEditor.enrichHTML
         const itemLink = itemFromPack.link;
 
+        // GET BORDER COLOR (RED or BLUE)
+        const usedPartyFunds = payers.some(p => p.name === "Party Funds");
+        const borderColor = this._getBorderColor(usedPartyFunds ? "party" : "buy");
+
         const rawContent = `
-        <div class="chat-card" style="border: 2px solid #C9A060; border-radius: 8px; overflow: hidden;">
-            <header class="card-header flexrow" style="background: #191919 !important; padding: 8px; border-bottom: 2px solid #C9A060;">
-                <h3 class="noborder" style="margin: 0; font-weight: bold; color: #C9A060 !important; font-family: 'Aleo', serif; text-align: center; text-transform: uppercase; letter-spacing: 1px; width: 100%;">
+        <div class="chat-card" style="border: 2px solid ${borderColor}; border-radius: 8px; overflow: hidden;">
+            <header class="card-header flexrow" style="background: #191919 !important; padding: 8px; border-bottom: 2px solid ${borderColor};">
+                <h3 class="noborder" style="margin: 0; font-weight: bold; color: ${borderColor} !important; font-family: 'Aleo', serif; text-align: center; text-transform: uppercase; letter-spacing: 1px; width: 100%;">
                     Store Purchase
                 </h3>
             </header>
@@ -1042,17 +997,11 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             </div>
         </div>`;
 
-        // We use rawContent directly because itemLink is already an HTML anchor tag
         const chatData = {
             content: rawContent, 
             speaker: ChatMessage.getSpeaker({ actor: recipient })
         };
 
-        // --- PRIVACY LOGIC (Purchase) ---
-        // Exception: If party funds are used, message stays public.
-        // We detect party usage if "Party Funds" is present in payer names or if the Party Actor was a payer.
-        const usedPartyFunds = payers.some(p => p.name === "Party Funds");
-        
         if (!usedPartyFunds) {
             const whisperTo = getChatWhisperRecipients();
             if (whisperTo) {
@@ -1062,7 +1011,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
         ChatMessage.create(chatData);
 
-        // FIX: Use foundry.audio.AudioHelper
         if (game.audio) {
             foundry.audio.AudioHelper.play({ 
                 src: "modules/daggerheart-store/assets/audio/coins.mp3", 
@@ -1276,7 +1224,6 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
     async _prepareContext(options) {
         const priceMod = game.settings.get(MODULE_ID, "priceModifier");
         const saleDiscount = game.settings.get(MODULE_ID, "saleDiscount");
-        // Get Sell Ratio
         const sellRatio = game.settings.get(MODULE_ID, "sellRatio");
         
         const allowedTiers = game.settings.get(MODULE_ID, "allowedTiers");
