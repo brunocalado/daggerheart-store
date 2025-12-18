@@ -3,6 +3,7 @@
 - Search fix
 - better style for save config button 
 - transfer feature
+- elurian now shows (system typo)
 
 # 0.0.9
 - journal with docs

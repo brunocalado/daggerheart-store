@@ -231,6 +231,7 @@ export const PRICE_DATA = {
         "Runetan Floating Armor": { price: 180, tier: 2 },
         "Harrowbone Armor": { price: 180, tier: 2 },
         "Elundrian Chain Armor": { price: 190, tier: 2 },
+        "Elundrian Chain Mail": { price: 190, tier: 2 },
         "Rosewild Armor": { price: 200, tier: 2 },
         "Improved Full Plate Armor": { price: 200, tier: 2 },
         // Tier 3
