@@ -74,7 +74,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             showToPlayer: DaggerheartStore.prototype._onShowToPlayer,
             savePreset: DaggerheartStore.prototype._onSavePreset,
             loadPreset: DaggerheartStore.prototype._onLoadPreset,
-            deletePreset: DaggerheartStore.prototype._onDeletePreset
+            deletePreset: DaggerheartStore.prototype._onDeletePreset,
+            transferFunds: DaggerheartStore.prototype._onTransferFunds // NEW ACTION
         }
     };
 
@@ -795,6 +796,119 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         }
 
         this.render();
+    }
+
+    async _onTransferFunds(event, target) {
+        const userActor = game.user.character;
+        if (!userActor) return ui.notifications.error("You need an assigned character.");
+
+        const partyActorId = game.settings.get(MODULE_ID, "partyActorId");
+        const partyActor = game.actors.get(partyActorId);
+        if (!partyActor) return ui.notifications.error("Party actor not configured.");
+
+        const currency = getSystemCurrency();
+        const userGold = foundry.utils.getProperty(userActor, "system.gold.coins") || 0;
+        const partyGold = foundry.utils.getProperty(partyActor, "system.gold.coins") || 0;
+
+        const content = `
+            <div class="form-group" style="margin-bottom: 10px;">
+                <label style="display:block; margin-bottom:5px;"><strong>Transfer Direction:</strong></label>
+                <select name="direction" style="width: 100%;">
+                    <option value="deposit">Deposit to Party (My Gold: ${userGold})</option>
+                    <option value="withdraw">Withdraw from Party (Party Gold: ${partyGold})</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label style="display:block; margin-bottom:5px;"><strong>Amount (${currency}):</strong></label>
+                <input type="number" name="amount" min="1" step="1" placeholder="0" style="width: 100%;">
+            </div>
+        `;
+
+        new DialogV2({
+            window: { title: "Transfer Funds", icon: "fas fa-exchange-alt", resizable: false },
+            content: content,
+            buttons: [
+                {
+                    action: "confirm",
+                    label: "Transfer",
+                    icon: "fas fa-check",
+                    callback: async (event, button, dialog) => {
+                        const direction = button.form.elements.direction.value;
+                        const amount = parseInt(button.form.elements.amount.value) || 0;
+
+                        if (amount <= 0) return ui.notifications.warn("Invalid amount.");
+
+                        if (direction === "deposit") {
+                            if (amount > userGold) return ui.notifications.warn("Insufficient funds.");
+                            
+                            // User -> Party
+                            await userActor.update({ "system.gold.coins": userGold - amount });
+                            await partyActor.update({ "system.gold.coins": partyGold + amount });
+                            
+                            this._createTransferChatMessage(userActor, partyActor, amount, "deposit", currency);
+
+                        } else {
+                            if (amount > partyGold) return ui.notifications.warn("Insufficient party funds.");
+                            
+                            // Party -> User
+                            await partyActor.update({ "system.gold.coins": partyGold - amount });
+                            await userActor.update({ "system.gold.coins": userGold + amount });
+
+                            this._createTransferChatMessage(userActor, partyActor, amount, "withdraw", currency);
+                        }
+                        
+                        this.render();
+                    }
+                },
+                { action: "cancel", label: "Cancel", icon: "fas fa-times" }
+            ]
+        }).render(true);
+    }
+
+    async _createTransferChatMessage(userActor, partyActor, amount, type, currency) {
+        const title = type === "deposit" ? "Funds Deposited" : "Funds Withdrawn";
+        const message = type === "deposit" 
+            ? `<strong>${userActor.name}</strong> deposited funds to <strong>${partyActor.name}</strong>.`
+            : `<strong>${userActor.name}</strong> withdrew funds from <strong>${partyActor.name}</strong>.`;
+        
+        const sign = type === "deposit" ? "+" : "-"; // This visual is tricky, sticking to neutral display or amount transfer
+
+        const rawContent = `
+        <div class="chat-card" style="border: 2px solid #C9A060; border-radius: 8px; overflow: hidden;">
+            <header class="card-header flexrow" style="background: #191919 !important; padding: 8px; border-bottom: 2px solid #C9A060;">
+                <h3 class="noborder" style="margin: 0; font-weight: bold; color: #C9A060 !important; font-family: 'Aleo', serif; text-align: center; text-transform: uppercase; letter-spacing: 1px; width: 100%;">
+                    ${title}
+                </h3>
+            </header>
+            <div class="card-content" style="background: #2a2a2a; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+                <span style="color: #ffffff; font-size: 1.1em; font-family: 'Lato', sans-serif;">
+                    ${message}
+                </span>
+                <span style="color: #d4af37; font-size: 1.3em; font-weight: bold; margin-top: 10px;">
+                    ${amount} ${currency}
+                </span>
+            </div>
+        </div>`;
+
+        const chatData = {
+            content: rawContent,
+            speaker: ChatMessage.getSpeaker({ actor: userActor })
+        };
+
+        // Transfer messages are generally public so everyone knows about Party Funds changes, 
+        // but we respect the privacy setting if strictly enforced.
+        // However, usually party fund movements should be public log. 
+        // Based on previous logic, we use standard privacy check.
+        const whisperTo = getChatWhisperRecipients();
+        if (whisperTo) {
+            chatData.whisper = whisperTo;
+        }
+
+        await ChatMessage.create(chatData);
+
+        if (game.audio) {
+            foundry.audio.AudioHelper.play({ src: "modules/daggerheart-store/assets/audio/coins.mp3", volume: 0.8, loop: false }, false);
+        }
     }
 
     async _handleSplitPurchase(itemUuid, itemName, price, userActor, partyActor) {
