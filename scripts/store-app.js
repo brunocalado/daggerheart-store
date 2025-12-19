@@ -653,17 +653,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 targetContent.style.display = "block";
             }
         }
-
-        // --- PERFORMANCE TEST END ---
-        // Calculates and logs the time elapsed since Store.Open() was called
-        if (globalThis.__storePerformanceStart) {
-            const duration = performance.now() - globalThis.__storePerformanceStart;
-            console.log(`%c[Performance] Store Render took ${duration.toFixed(2)}ms`, "color: #27ae60; font-weight: bold;");
-            
-            // Clear the marker so simple re-renders (like switching tabs) don't trigger the log
-            globalThis.__storePerformanceStart = null; 
-        }
-        // ----------------------------
     }
 
     _applySearch(input) {

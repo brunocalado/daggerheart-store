@@ -156,15 +156,6 @@ function _handleOpenStoreRequest(value) {
 Hooks.once("ready", () => {
     globalThis.Store = {
         Open: async () => {
-            // --- PERFORMANCE TEST START ---
-            // Logs the start time when the function is called
-            const timestamp = new Date().toISOString();
-            console.log(`%c[Performance] Store.Open() called at ${timestamp}`, "color: #D4AF37; font-weight: bold;");
-            
-            // Set a global performance mark to be read by the app's _onRender
-            globalThis.__storePerformanceStart = performance.now();
-            // ------------------------------
-
             const app = getStoreInstance();
             
             // LINKED ACTOR CHECK
