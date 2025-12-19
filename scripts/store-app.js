@@ -378,6 +378,15 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         }
 
         for (const cat of categories) {
+            // OPTIMIZATION: PERFORMANCE FIX
+            // If this category is NOT the active tab, skip all processing.
+            // This prevents loading thousands of items into DOM hidden by CSS.
+            if (cat.id !== this.activeTab) {
+                // Return empty list for this tab to prevent HBS errors, but data is empty
+                context.tabs[cat.id] = [];
+                continue;
+            }
+
             if (cat.id === "custom-tab") {
                 const pack = game.packs.get(customTabCompendium);
                 const customItems = [];
@@ -614,26 +623,17 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             });
         });
 
+        // OPTIMIZATION: Tab Switching now triggers a full Re-Render
         const tabs = html.querySelectorAll(".sheet-tabs .item");
         tabs.forEach(tab => {
             tab.addEventListener("click", (e) => {
                 e.preventDefault(); 
                 const tabId = e.currentTarget.dataset.tab; 
-                this.activeTab = tabId;
-
-                tabs.forEach(t => t.classList.remove("active"));
-                e.currentTarget.classList.add("active"); 
                 
-                const contents = html.querySelectorAll(".content .tab");
-                contents.forEach(c => {
-                    c.classList.remove("active");
-                    c.style.display = "none"; 
-                });
-                
-                const target = html.querySelector(`.content .tab[data-tab="${tabId}"]`); 
-                if (target) {
-                    target.classList.add("active");
-                    target.style.display = "block";
+                // If clicking a different tab, update state and re-render
+                if (this.activeTab !== tabId) {
+                    this.activeTab = tabId;
+                    this.render(); // This triggers _prepareContext again, fetching ONLY the new tab's data
                 }
             });
         });
@@ -653,6 +653,17 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 targetContent.style.display = "block";
             }
         }
+
+        // --- PERFORMANCE TEST END ---
+        // Calculates and logs the time elapsed since Store.Open() was called
+        if (globalThis.__storePerformanceStart) {
+            const duration = performance.now() - globalThis.__storePerformanceStart;
+            console.log(`%c[Performance] Store Render took ${duration.toFixed(2)}ms`, "color: #27ae60; font-weight: bold;");
+            
+            // Clear the marker so simple re-renders (like switching tabs) don't trigger the log
+            globalThis.__storePerformanceStart = null; 
+        }
+        // ----------------------------
     }
 
     _applySearch(input) {

@@ -1,3 +1,10 @@
+# 0.1.1
+- Performance fix: the store loads 3,04 faster.
+Before update
+[Performance] Store Render took 930.00ms
+After update
+[Performance] Store Render took 306.10ms
+
 # 0.1.0
 - Audio API and Text Editor API: Resolved deprecation warning 
 - Search fix
