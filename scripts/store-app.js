@@ -106,10 +106,46 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
     }
 
     async render(options, _options) {
-        if (!game.user.isGM && game.user.character) {
+        // Only trigger automatic conversion if the mode is set to "update_all"
+        const currencyMode = game.settings.get(MODULE_ID, "currencyMode");
+        
+        if (currencyMode === "update_all" && !game.user.isGM && game.user.character) {
              await this._handleCurrencyConversion(game.user.character);
         }
         return super.render(options, _options);
+    }
+
+    /**
+     * Helper: Calculates total wealth in coins (Smart Mode)
+     */
+    _calculateTotalWealth(actor) {
+        const gold = actor.system.gold || {};
+        const handfuls = gold.handfuls || 0;
+        const bags = gold.bags || 0;
+        const chests = gold.chests || 0;
+        const coins = gold.coins || 0;
+
+        return (chests * 1000) + (bags * 100) + (handfuls * 10) + coins;
+    }
+
+    /**
+     * Helper: Optimizes currency into Chests > Bags > Handfuls > Coins (Smart Mode)
+     */
+    _optimizeCurrency(totalCoins) {
+        let remainder = totalCoins;
+
+        const chests = Math.floor(remainder / 1000);
+        remainder %= 1000;
+
+        const bags = Math.floor(remainder / 100);
+        remainder %= 100;
+
+        const handfuls = Math.floor(remainder / 10);
+        remainder %= 10;
+
+        const coins = remainder;
+
+        return { chests, bags, handfuls, coins };
     }
 
     /**
@@ -288,6 +324,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
     async _prepareContext(options) {
         this.options.window.title = game.settings.get(MODULE_ID, "storeName");
+        const currencyMode = game.settings.get(MODULE_ID, "currencyMode");
 
         const userActor = game.user.character;
         const isGM = game.user.isGM;
@@ -298,8 +335,25 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         if (partyActorId) partyActor = game.actors.get(partyActorId);
         const hasPartyActor = !!partyActor;
 
-        const userGold = userActor ? (foundry.utils.getProperty(userActor, "system.gold.coins") || 0) : 0;
-        const partyGold = partyActor ? (foundry.utils.getProperty(partyActor, "system.gold.coins") || 0) : 0;
+        let userGold = 0;
+        let partyGold = 0;
+
+        // CALCULATE GOLD BASED ON MODE
+        if (userActor) {
+            if (currencyMode === "smart") {
+                userGold = this._calculateTotalWealth(userActor);
+            } else {
+                userGold = foundry.utils.getProperty(userActor, "system.gold.coins") || 0;
+            }
+        }
+
+        if (partyActor) {
+            if (currencyMode === "smart") {
+                partyGold = this._calculateTotalWealth(partyActor);
+            } else {
+                partyGold = foundry.utils.getProperty(partyActor, "system.gold.coins") || 0;
+            }
+        }
         
         const storeProfiles = game.settings.get(MODULE_ID, "storeProfiles") || { "Default": {} };
         const currentProfile = game.settings.get(MODULE_ID, "currentProfile") || "Default";
@@ -686,8 +740,17 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             return this._handleSplitPurchase(itemUuid, itemName, itemPrice, userActor, partyActor);
         }
 
-        const userGold = foundry.utils.getProperty(userActor, "system.gold.coins") || 0;
-        if (userGold < itemPrice) {
+        // Check funds (respecting Smart Mode for calculation)
+        const currencyMode = game.settings.get(MODULE_ID, "currencyMode");
+        let userWealth = 0;
+        
+        if (currencyMode === "smart") {
+            userWealth = this._calculateTotalWealth(userActor);
+        } else {
+            userWealth = foundry.utils.getProperty(userActor, "system.gold.coins") || 0;
+        }
+
+        if (userWealth < itemPrice) {
             return ui.notifications.warn(`Insufficient funds.`);
         }
 
@@ -712,9 +775,25 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
         await itemToDelete.delete();
 
-        const currentCoins = foundry.utils.getProperty(userActor, "system.gold.coins") || 0;
-        const newTotal = currentCoins + sellPrice;
-        await userActor.update({ "system.gold.coins": newTotal });
+        // Handle Currency Update (Smart vs Default)
+        const currencyMode = game.settings.get(MODULE_ID, "currencyMode");
+
+        if (currencyMode === "smart") {
+            const currentTotal = this._calculateTotalWealth(userActor);
+            const newTotal = currentTotal + sellPrice;
+            const optimized = this._optimizeCurrency(newTotal);
+
+            await userActor.update({
+                "system.gold.chests": optimized.chests,
+                "system.gold.bags": optimized.bags,
+                "system.gold.handfuls": optimized.handfuls,
+                "system.gold.coins": optimized.coins
+            });
+        } else {
+            const currentCoins = foundry.utils.getProperty(userActor, "system.gold.coins") || 0;
+            const newTotal = currentCoins + sellPrice;
+            await userActor.update({ "system.gold.coins": newTotal });
+        }
 
         const currency = getSystemCurrency();
         
@@ -766,15 +845,25 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         if (!partyActor) return ui.notifications.error("Party actor not configured.");
 
         const currency = getSystemCurrency();
-        const userGold = foundry.utils.getProperty(userActor, "system.gold.coins") || 0;
-        const partyGold = foundry.utils.getProperty(partyActor, "system.gold.coins") || 0;
+        const currencyMode = game.settings.get(MODULE_ID, "currencyMode");
+        
+        let userWealth = 0;
+        let partyWealth = 0;
+
+        if (currencyMode === "smart") {
+            userWealth = this._calculateTotalWealth(userActor);
+            partyWealth = this._calculateTotalWealth(partyActor);
+        } else {
+            userWealth = foundry.utils.getProperty(userActor, "system.gold.coins") || 0;
+            partyWealth = foundry.utils.getProperty(partyActor, "system.gold.coins") || 0;
+        }
 
         const content = `
             <div class="form-group" style="margin-bottom: 10px;">
                 <label style="display:block; margin-bottom:5px;"><strong>Transfer Direction:</strong></label>
                 <select name="direction" style="width: 100%;">
-                    <option value="deposit">Deposit to Party (My Gold: ${userGold})</option>
-                    <option value="withdraw">Withdraw from Party (Party Gold: ${partyGold})</option>
+                    <option value="deposit">Deposit to Party (My Gold: ${userWealth})</option>
+                    <option value="withdraw">Withdraw from Party (Party Gold: ${partyWealth})</option>
                 </select>
             </div>
             <div class="form-group">
@@ -798,18 +887,50 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         if (amount <= 0) return ui.notifications.warn("Invalid amount.");
 
                         if (direction === "deposit") {
-                            if (amount > userGold) return ui.notifications.warn("Insufficient funds.");
+                            if (amount > userWealth) return ui.notifications.warn("Insufficient funds.");
                             
-                            await userActor.update({ "system.gold.coins": userGold - amount });
-                            await partyActor.update({ "system.gold.coins": partyGold + amount });
+                            if (currencyMode === "smart") {
+                                const newUserTotal = userWealth - amount;
+                                const newPartyTotal = partyWealth + amount;
+                                const optUser = this._optimizeCurrency(newUserTotal);
+                                const optParty = this._optimizeCurrency(newPartyTotal);
+
+                                await userActor.update({
+                                    "system.gold.chests": optUser.chests, "system.gold.bags": optUser.bags,
+                                    "system.gold.handfuls": optUser.handfuls, "system.gold.coins": optUser.coins
+                                });
+                                await partyActor.update({
+                                    "system.gold.chests": optParty.chests, "system.gold.bags": optParty.bags,
+                                    "system.gold.handfuls": optParty.handfuls, "system.gold.coins": optParty.coins
+                                });
+                            } else {
+                                await userActor.update({ "system.gold.coins": userWealth - amount });
+                                await partyActor.update({ "system.gold.coins": partyWealth + amount });
+                            }
                             
                             this._createTransferChatMessage(userActor, partyActor, amount, "deposit", currency);
 
                         } else {
-                            if (amount > partyGold) return ui.notifications.warn("Insufficient party funds.");
+                            if (amount > partyWealth) return ui.notifications.warn("Insufficient party funds.");
                             
-                            await partyActor.update({ "system.gold.coins": partyGold - amount });
-                            await userActor.update({ "system.gold.coins": userGold + amount });
+                            if (currencyMode === "smart") {
+                                const newPartyTotal = partyWealth - amount;
+                                const newUserTotal = userWealth + amount;
+                                const optParty = this._optimizeCurrency(newPartyTotal);
+                                const optUser = this._optimizeCurrency(newUserTotal);
+
+                                await partyActor.update({
+                                    "system.gold.chests": optParty.chests, "system.gold.bags": optParty.bags,
+                                    "system.gold.handfuls": optParty.handfuls, "system.gold.coins": optParty.coins
+                                });
+                                await userActor.update({
+                                    "system.gold.chests": optUser.chests, "system.gold.bags": optUser.bags,
+                                    "system.gold.handfuls": optUser.handfuls, "system.gold.coins": optUser.coins
+                                });
+                            } else {
+                                await partyActor.update({ "system.gold.coins": partyWealth - amount });
+                                await userActor.update({ "system.gold.coins": userWealth + amount });
+                            }
 
                             this._createTransferChatMessage(userActor, partyActor, amount, "withdraw", currency);
                         }
@@ -866,9 +987,19 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
     }
 
     async _handleSplitPurchase(itemUuid, itemName, price, userActor, partyActor) {
-        const userGold = foundry.utils.getProperty(userActor, "system.gold.coins") || 0;
-        const partyGold = foundry.utils.getProperty(partyActor, "system.gold.coins") || 0;
+        const currencyMode = game.settings.get(MODULE_ID, "currencyMode");
         const currency = getSystemCurrency();
+        
+        let userGold = 0;
+        let partyGold = 0;
+
+        if (currencyMode === "smart") {
+            userGold = this._calculateTotalWealth(userActor);
+            partyGold = this._calculateTotalWealth(partyActor);
+        } else {
+            userGold = foundry.utils.getProperty(userActor, "system.gold.coins") || 0;
+            partyGold = foundry.utils.getProperty(partyActor, "system.gold.coins") || 0;
+        }
 
         let defaultPartyPay = Math.min(partyGold, price);
         let defaultUserPay = price - defaultPartyPay;
@@ -955,11 +1086,25 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         if (!itemFromPack) return ui.notifications.error("Item data not found.");
 
         const currency = getSystemCurrency();
+        const currencyMode = game.settings.get(MODULE_ID, "currencyMode");
 
         for (const payer of payers) {
             if (payer.amount > 0) {
-                const current = foundry.utils.getProperty(payer.actor, "system.gold.coins") || 0;
-                await payer.actor.update({ "system.gold.coins": current - payer.amount });
+                if (currencyMode === "smart") {
+                    const currentTotal = this._calculateTotalWealth(payer.actor);
+                    const newTotal = currentTotal - payer.amount;
+                    const optimized = this._optimizeCurrency(newTotal);
+
+                    await payer.actor.update({
+                        "system.gold.chests": optimized.chests,
+                        "system.gold.bags": optimized.bags,
+                        "system.gold.handfuls": optimized.handfuls,
+                        "system.gold.coins": optimized.coins
+                    });
+                } else {
+                    const current = foundry.utils.getProperty(payer.actor, "system.gold.coins") || 0;
+                    await payer.actor.update({ "system.gold.coins": current - payer.amount });
+                }
             }
         }
 

@@ -16,6 +16,21 @@ Hooks.once("init", () => {
         name: "Price Multiplier (%)", scope: "world", config: false, type: Number, default: 100
     });
     
+    // Currency Mode Setting
+    game.settings.register(MODULE_ID, "currencyMode", {
+        name: "Currency Mode",
+        hint: "Define how the store handles character currency.",
+        scope: "world",
+        config: true,
+        type: String,
+        choices: {
+            "disabled": "Disabled (Manual Only)",
+            "update_all": "Update All (Convert to Coins)",
+            "smart": "Smart (Auto-Optimize Currency)"
+        },
+        default: "update_all"
+    });
+    
     // Sell Ratio: Hidden from sidebar settings; managed within the Store Config UI
     game.settings.register(MODULE_ID, "sellRatio", {
         name: "Sell Ratio", 

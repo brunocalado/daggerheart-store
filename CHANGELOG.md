@@ -4,6 +4,8 @@ Before update
 [Performance] Store Render took 930.00ms
 After update
 [Performance] Store Render took 306.10ms
+- welcome screen improve
+- currency mode setting: choose how the actor coins should be handled
 
 # 0.1.0
 - Audio API and Text Editor API: Resolved deprecation warning 

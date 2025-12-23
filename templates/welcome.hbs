@@ -1,23 +1,23 @@
 <div class="welcome-container">
-    <!-- Title -->
     <h1 class="welcome-title">Daggerheart: Store</h1>
     
-    <!-- Description -->
     <p class="welcome-description">
         A dynamic, interactive, and fully configurable store. Allow your players to purchase weapons, armor, potions, and miscellaneous items directly from an elegant visual interface, while the GM maintains full control over prices and what is displayed.
     </p>
 
-    <!-- Important Action -->
-    <div class="welcome-action">
+    <div style="text-align: center; position: relative; z-index: 0; margin-bottom: -25px;">
+        <img src="modules/daggerheart-store/assets/images/avatar.webp" alt="Store Avatar" style="width: 75px; height: auto; display: block; margin: 0 auto; border: none;">
+    </div>
+
+    <div class="welcome-action" style="position: relative; z-index: 10;">
         <button type="button" class="journal-btn" data-action="openJournal" data-uuid="{{journalUuid}}">
-            <i class="fas fa-book-open"></i> ⚠️ READ ME! ⚠️
+            ⚠️ READ ME! ⚠️
         </button>
         <p class="notes" style="text-align: center; margin-top: 5px; color: #aaa;">Click above to view setup instructions.</p>
     </div>
 
     <hr class="welcome-divider">
 
-    <!-- Footer / Checkbox -->
     <footer class="welcome-footer">
         <label class="checkbox-label">
             <input type="checkbox" name="doNotShow" checked>
