@@ -110,38 +110,22 @@ Install via the Foundry VTT Module browser or use this manifest link:
 
 **Disclaimer:** This module is an independent creation and is not affiliated with Darrington Press.
 
-## 🧰 My Daggerheart Modules
+# 🧰 My Daggerheart Modules
 
-### 📦 [daggerheart-extra-content](https://github.com/brunocalado/daggerheart-extra-content)
+| Module | Description |
+| :--- | :--- |
+| 💀 [**Adversary Manager**](https://github.com/brunocalado/daggerheart-advmanager) | Scale adversaries instantly and build balanced encounters in Foundry VTT. |
+| ☠️ [**Death Moves**](https://github.com/brunocalado/daggerheart-death-moves) | Enhances the Death Move moment with immersive audio and visual effects. |
+| 📏 [**Distances**](https://github.com/brunocalado/daggerheart-distances) | Visualizes combat ranges with customizable rings and hover calculations. |
+| 🤖 [**Fear Macros**](https://github.com/brunocalado/daggerheart-fear-macros) | Automatically executes macros when the Fear resource is changed. |
+| 😱 [**Fear Tracker**](https://github.com/brunocalado/daggerheart-fear-tracker) | Adds an animated slider bar with configurable fear tokens to the UI. |
+| 🛒 [**Store**](https://github.com/brunocalado/daggerheart-store) | A dynamic, interactive, and fully configurable store for Foundry VTT. |
+| 📦 [**Extra Content**](https://github.com/brunocalado/daggerheart-extra-content) | Additional resources and materials for Daggerheart. |
+| 📜 [**Quick Rules**](https://github.com/brunocalado/daggerheart-quickrules) | Fast and accessible reference guide for the core rules. |
 
-> Resources for Daggerheart
+# 🗺️ Adventures
 
-### 📏 [daggerheart-distances](https://github.com/brunocalado/daggerheart-distances)
-
-> Visualizes Daggerheart combat ranges with customizable rings and hover distance calculations.
-
-### 🛒 [daggerheart-store](https://github.com/brunocalado/daggerheart-store)
-
-> A dynamic, interactive, and fully configurable store for the Daggerheart system in Foundry VTT.
-
-### 😱 [daggerheart-fear-tracker](https://github.com/brunocalado/daggerheart-fear-tracker)
-
-> Adds an animated slider bar with configurable fear tokens to the UI.
-
-### 💀 [daggerheart-death-moves](https://github.com/brunocalado/daggerheart-death-moves)
-
-> Enhances the Death Move moment with immersive audio and visual effects.
-
-### 🤖 [daggerheart-fear-macros](https://github.com/brunocalado/daggerheart-fear-macros)
-
-> Automatically executes macros when the Daggerheart Fear resource is changed.
-
-## 🗺️ Adventures
-
-### 💣 [suicide-squad-daggerheart-adventure](https://github.com/brunocalado/suicide-squad-daggerheart-adventure)
-
-> Torn from your past lives, you are a squad of criminals forced to serve a ruthless master in a land on the brink of war.
-
-### ✨ [i-wish-daggerheart-adventure](https://github.com/brunocalado/i-wish-daggerheart-adventure)
-
-> A wealthy merchant is cursed and running out of time. One final expedition may be the only hope.
+| Adventure | Description |
+| :--- | :--- |
+| ✨ [**I Wish**](https://github.com/brunocalado/i-wish-daggerheart-adventure) | A wealthy merchant is cursed; one final expedition may be the only hope. |
+| 💣 [**Suicide Squad**](https://github.com/brunocalado/suicide-squad-daggerheart-adventure) | Criminals forced to serve a ruthless master in a land on the brink of war. |
