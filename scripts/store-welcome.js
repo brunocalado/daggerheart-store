@@ -63,7 +63,6 @@ export class StoreWelcome extends HandlebarsApplicationMixin(ApplicationV2) {
         
         if (checkbox && checkbox.checked) {
             await game.settings.set(MODULE_ID, "welcomeScreenShown", true);
-            ui.notifications.info("Daggerheart Store: Welcome screen hidden for future sessions.");
         }
         
         this.close();

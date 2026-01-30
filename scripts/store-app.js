@@ -278,8 +278,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const currentCoins = gold.coins || 0;
         const newCoins = currentCoins + totalAdded;
 
-        console.log(`${MODULE_ID} | Converting currency for ${actor.name}: +${totalAdded} Coins`);
-
         await actor.update({
             "system.gold.handfuls": 0,
             "system.gold.bags": 0,
@@ -330,7 +328,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         }
 
         await ChatMessage.create(chatData);
-        ui.notifications.info(`Store: Converted treasure to ${totalAdded} coins for ${actor.name}.`);
     }
 
     async _prepareContext(options) {
@@ -1324,8 +1321,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         
                         await game.settings.set(MODULE_ID, "storeProfiles", profiles);
                         await game.settings.set(MODULE_ID, "currentProfile", name);
-                        
-                        ui.notifications.info(`Profile "${name}" saved successfully.`);
+
                         this.render();
                     }
                 },
@@ -1381,9 +1377,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
         await game.settings.set(MODULE_ID, "currentProfile", profileName);
 
-        const msg = profileName === "Default" ? "Factory Defaults restored." : `Profile "${profileName}" loaded.`;
-        ui.notifications.info(msg);
-        
         this.render();
     }
     
@@ -1409,10 +1402,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         if (profiles[profileName]) {
                             delete profiles[profileName];
                             await game.settings.set(MODULE_ID, "storeProfiles", profiles);
-                            
+
                             await game.settings.set(MODULE_ID, "currentProfile", "Default");
-                            
-                            ui.notifications.info(`Profile "${profileName}" deleted.`);
+
                             this.render();
                         }
                     }
@@ -1673,12 +1665,10 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         await game.settings.set(MODULE_ID, "hiddenCategories", finalHiddenMap);
         await game.settings.set(MODULE_ID, "partyActorId", expanded.partyActorId);
         
-        if (expanded.customCompendiums) { 
-            const compendiumArray = Object.values(expanded.customCompendiums); 
-            await game.settings.set(MODULE_ID, "customCompendiums", compendiumArray); 
+        if (expanded.customCompendiums) {
+            const compendiumArray = Object.values(expanded.customCompendiums);
+            await game.settings.set(MODULE_ID, "customCompendiums", compendiumArray);
         }
-        
-        ui.notifications.info("Store Configuration Saved.");
     }
 }
 

@@ -5,8 +5,6 @@ const MODULE_ID = "daggerheart-store";
 const { DialogV2 } = foundry.applications.api;
 
 Hooks.once("init", () => {
-    console.log(`${MODULE_ID} | Initializing Daggerheart Store Module (App V2)`);
-
     // Settings Configuration
     game.settings.register(MODULE_ID, "storeName", {
         name: "Store Name", scope: "world", config: false, type: String, default: "Daggerheart: Store"
@@ -166,7 +164,6 @@ function _handleOpenStoreRequest(value) {
     const currentUser = game.user.id;
 
     if (targetUser === "all" || targetUser === currentUser) {
-        console.log(`${MODULE_ID} | Received Open Request for: ${targetUser}`);
         const app = getStoreInstance();
         app.render({ force: true, window: { display: "block" } });
         if (app.minimized) app.maximize();
@@ -224,12 +221,10 @@ Hooks.once("ready", () => {
                 targetId = targetUser.id;
             }
 
-            console.log(`${MODULE_ID} | Triggering Store Open for:`, targetId);
             await game.settings.set(MODULE_ID, "openStoreRequest", {
                 target: targetId,
                 time: Date.now()
             });
-            ui.notifications.info(`Store sent to: ${username || "Everyone"}`);
         }
     };
 
@@ -244,7 +239,6 @@ Hooks.once("ready", () => {
 Hooks.on("updateSetting", (setting) => {
     if (setting.key.startsWith(MODULE_ID) && setting.key !== `${MODULE_ID}.openStoreRequest`) {
         if (storeInstance && storeInstance.rendered) {
-            console.log(`${MODULE_ID} | Configuration updated, refreshing UI.`);
             if (setting.key === `${MODULE_ID}.storeName`) {
                 const newTitle = game.settings.get(MODULE_ID, "storeName");
                 storeInstance.options.window.title = newTitle;

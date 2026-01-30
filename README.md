@@ -44,6 +44,8 @@ A dynamic, interactive, and fully configurable store for the **Daggerheart** sys
 
 * **Total Control:** Open the store for all players or a specific one with a single click using the header buttons.
 
+* **Bulk Actions:** Quickly manage inventory with one-click buttons to: **Mark all items as On Sale or remove them from sale**, **Show all items or hide them across the entire store**, **Enable or disable purchases for all items** and **Enable or disable sales for all items**
+
 * **Dynamic Pricing:**
 
   * **Global Multiplier:** Adjust world inflation (e.g., 50% to 300%) using a slider.
@@ -52,7 +54,7 @@ A dynamic, interactive, and fully configurable store for the **Daggerheart** sys
 
 * **Inventory Management:**
 
-  * **Hide Items:** Click the "eye" icon to hide items that shouldn't be available in the current region.
+  * **Visibility Toggle, Block Sales and Block Purchases:** You can set up the store the way you want.
 
   * **Promotions (Sale):** Mark items as "On Sale" to apply a configurable automatic discount.
 
@@ -67,6 +69,10 @@ A dynamic, interactive, and fully configurable store for the **Daggerheart** sys
   * **Custom Tab:** Configure a dedicated tab linked to a specific compendium for special merchant inventories.
 
   * **System Integration:** Automatically detects the Currency Name defined in your Daggerheart system settings.
+
+* **Store Randomizer:**
+
+  * **Random Merchant:** Generate dynamic inventory.
 
 ## ⚙️ Instructions & Usage
 
@@ -95,6 +101,8 @@ Price controls, hide toggles, sale buttons, and profile management.
 <p align="center"><img width="700" src="docs/gm-view.webp"></p>
 
 <p align="center"><img width="700" src="docs/settings.webp"></p>
+
+<p align="center"><img width="700" src="docs/randomizer.webp"></p>
 
 ## 🚀 Installation
 
