@@ -119,17 +119,17 @@
                 <div class="item-list">
                     {{#each group.items}}
                     <div class="store-row {{#if this.isHidden}}gm-hidden-item{{/if}} {{#if this.isSale}}sale-pulse{{/if}}">
-                        
+
                         <!-- Left Side: Icon, Name AND Sale Text -->
                         <div class="row-left">
                             <img src="{{this.img}}" title="Click to view details" class="item-image" data-uuid="{{this.uuid}}" width="36" height="36"/>
-                            
+
                             <!-- NEW: Recommendation Crown -->
                             {{#if this.isRecommended}}
                                 <i class="fas fa-crown recommended-icon" title="Recommended for your highest Trait"></i>
                             {{/if}}
 
-                            <span class="store-item-name">{{this.name}}</span>
+                            <span class="store-item-name" {{#if this.description}}data-item-desc="{{this.description}}"{{/if}}>{{this.name}}</span>
 
                             {{#unless ../../../isGM}}
                                 {{#if this.isSale}}

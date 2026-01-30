@@ -487,6 +487,12 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         const combinedWealth = partyGold + userGold;
                         const canBuyParty = hasPartyActor && hasActor && (combinedWealth >= finalPrice) && !isPurchaseBlocked;
 
+                        // Clean description: remove {{{x}}} tags and HTML
+                        const cleanedDescription = descString
+                            .replace(/\{\{\{\d+\}\}\}/g, '')
+                            .replace(/<[^>]*>/g, '')
+                            .trim();
+
                         let itemSummary = "";
                         if (doc.type === "weapon") {
                             itemSummary = this._getWeaponSummary(doc);
@@ -519,7 +525,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             canSell: canSell,
                             sellPrice: sellPrice,
                             itemSummary: itemSummary,
-                            isRecommended: isRecommended
+                            isRecommended: isRecommended,
+                            description: cleanedDescription
                         });
                     }
                 }
@@ -602,6 +609,14 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     const combinedWealth = partyGold + userGold;
                     const canBuyParty = hasPartyActor && hasActor && (combinedWealth >= finalPrice) && !isPurchaseBlocked;
 
+                    // Get and clean description: remove {{{x}}} tags and HTML
+                    const desc = foundry.utils.getProperty(doc, "system.description.value") ||
+                                 foundry.utils.getProperty(doc, "system.description") || "";
+                    const cleanedDescription = String(desc)
+                        .replace(/\{\{\{\d+\}\}\}/g, '')
+                        .replace(/<[^>]*>/g, '')
+                        .trim();
+
                     let itemSummary = "";
                     if (doc.type === "weapon") {
                         itemSummary = this._getWeaponSummary(doc);
@@ -635,7 +650,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             canSell: canSell,
                             sellPrice: sellPrice,
                             itemSummary: itemSummary,
-                            isRecommended: isRecommended
+                            isRecommended: isRecommended,
+                            description: cleanedDescription
                         });
                     }
                 }
@@ -691,6 +707,58 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 if (!uuid) return;
                 const doc = await fromUuid(uuid);
                 if (doc && doc.sheet) doc.sheet.render(true);
+            });
+        });
+
+        // Custom Tooltip for Item Descriptions (with delay)
+        const itemNames = html.querySelectorAll(".store-item-name[data-item-desc]");
+        let tooltipTimeout = null;
+
+        itemNames.forEach(nameEl => {
+            nameEl.addEventListener("mouseenter", (e) => {
+                const text = e.currentTarget.dataset.itemDesc;
+                if (!text) return;
+
+                const target = e.currentTarget;
+
+                // Clear any existing timeout
+                if (tooltipTimeout) clearTimeout(tooltipTimeout);
+
+                // Delay before showing tooltip (600ms)
+                tooltipTimeout = setTimeout(() => {
+                    // Remove any existing tooltip
+                    document.querySelectorAll(".daggerheart-store-tooltip").forEach(t => t.remove());
+
+                    // Create tooltip element
+                    const tooltip = document.createElement("div");
+                    tooltip.className = "daggerheart-store-tooltip";
+                    tooltip.textContent = text;
+                    document.body.appendChild(tooltip);
+
+                    // Position tooltip near the element
+                    const rect = target.getBoundingClientRect();
+                    tooltip.style.left = `${rect.left}px`;
+                    tooltip.style.top = `${rect.bottom + 8}px`;
+
+                    // Adjust if tooltip goes off-screen
+                    const tooltipRect = tooltip.getBoundingClientRect();
+                    if (tooltipRect.right > window.innerWidth - 10) {
+                        tooltip.style.left = `${window.innerWidth - tooltipRect.width - 10}px`;
+                    }
+                    if (tooltipRect.bottom > window.innerHeight - 10) {
+                        tooltip.style.top = `${rect.top - tooltipRect.height - 8}px`;
+                    }
+                }, 600);
+            });
+
+            nameEl.addEventListener("mouseleave", () => {
+                // Cancel pending tooltip
+                if (tooltipTimeout) {
+                    clearTimeout(tooltipTimeout);
+                    tooltipTimeout = null;
+                }
+                // Remove any visible tooltip
+                document.querySelectorAll(".daggerheart-store-tooltip").forEach(t => t.remove());
             });
         });
 
