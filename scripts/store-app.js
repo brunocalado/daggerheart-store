@@ -474,8 +474,21 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                                      foundry.utils.getProperty(doc, "system.description") || "";
                         const descString = String(desc);
                         const priceMatch = descString.match(/\{\{\{(\d+)\}\}\}/);
-                        
+
                         if (priceMatch) basePrice = parseInt(priceMatch[1], 10);
+
+                        // Check for header tag (non-numeric content in {{{...}}})
+                        let itemHeader = null;
+                        const allTags = descString.match(/\{\{\{([^}]+)\}\}\}/g);
+                        if (allTags) {
+                            for (const tag of allTags) {
+                                const content = tag.replace(/\{\{\{|\}\}\}/g, '').trim();
+                                if (!/^\d+$/.test(content)) {
+                                    itemHeader = content;
+                                    break;
+                                }
+                            }
+                        }
                         if (priceOverrides.hasOwnProperty(doc.name)) {
                             basePrice = priceOverrides[doc.name];
                             isOverridden = true;
@@ -492,9 +505,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         const combinedWealth = partyGold + userGold;
                         const canBuyParty = hasPartyActor && hasActor && (combinedWealth >= finalPrice) && !isPurchaseBlocked;
 
-                        // Clean description: remove {{{x}}} tags and HTML
+                        // Clean description: remove all {{{...}}} tags (price and header) and HTML
                         const cleanedDescription = descString
-                            .replace(/\{\{\{\d+\}\}\}/g, '')
+                            .replace(/\{\{\{[^}]+\}\}\}/g, '')
                             .replace(/<[^>]*>/g, '')
                             .trim();
 
@@ -531,12 +544,40 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             sellPrice: sellPrice,
                             itemSummary: itemSummary,
                             isRecommended: isRecommended,
-                            description: cleanedDescription
+                            description: cleanedDescription,
+                            header: itemHeader
                         });
                     }
                 }
-                customItems.sort((a, b) => a.name.localeCompare(b.name));
-                context.tabs[cat.id] = [{ id: "all", label: "", items: customItems }];
+
+                // Group items by header: items without header go first, then header groups
+                const headerGroups = {};
+                const noHeaderItems = [];
+
+                for (const item of customItems) {
+                    if (item.header) {
+                        if (!headerGroups[item.header]) {
+                            headerGroups[item.header] = [];
+                        }
+                        headerGroups[item.header].push(item);
+                    } else {
+                        noHeaderItems.push(item);
+                    }
+                }
+
+                const groups = [];
+                if (noHeaderItems.length > 0) {
+                    noHeaderItems.sort((a, b) => a.name.localeCompare(b.name));
+                    groups.push({ id: "no-header", label: "", items: noHeaderItems });
+                }
+
+                // Sort headers alphabetically and add their groups
+                Object.keys(headerGroups).sort().forEach(header => {
+                    headerGroups[header].sort((a, b) => a.name.localeCompare(b.name));
+                    groups.push({ id: header, label: header, items: headerGroups[header] });
+                });
+
+                context.tabs[cat.id] = groups.length > 0 ? groups : [{ id: "all", label: "", items: [] }];
                 continue;
             }
 

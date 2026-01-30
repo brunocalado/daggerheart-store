@@ -144,7 +144,7 @@
 
             {{#each (lookup ../tabs cat.id) as |group|}}
                 {{#if group.label}}
-                <div class="tier-separator">{{group.label}}</div>
+                <div class="tier-separator">{{{group.label}}}</div>
                 {{/if}}
                 
                 <div class="item-list">
