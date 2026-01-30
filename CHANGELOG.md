@@ -6,6 +6,7 @@
   - Block Purchase button (NEW): prevents players from buying the item
   - Block Sale button: prevents players from selling the item
 - The Store Randomizer allows the GM to dynamically generate the store's inventory. Instead of manually hiding or pricing items, you can set parameters for each category and let the module "roll" the stock for you.
+- Store Randomizer will use Fisher-Yates
 - Items with description will have an tooltip 
 - Bug fix: Add compendiums to merged compendiums will trigger an scroll
 - New batch actions for GM: Mark All as On Sale, Remove All from Sale, Show All, Hide All, Make All Purchasable, Disable Purchase for All, Set All as Saleable, Remove All from Sale

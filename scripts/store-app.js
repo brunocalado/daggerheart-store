@@ -1952,6 +1952,20 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     /**
+     * Fisher-Yates shuffle algorithm
+     * Provides uniform distribution and O(n) performance
+     * @param {Array} array - Array to shuffle (modified in-place)
+     * @returns {Array} - The shuffled array
+     */
+    _fisherYatesShuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    /**
      * Randomize a single category
      */
     async _onRandomizeCategory(event, target) {
@@ -1988,7 +2002,7 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
         const numVisible = Math.floor(Math.random() * (effectiveMax - effectiveMin + 1)) + effectiveMin;
 
         // Shuffle items and pick visible ones
-        const shuffled = [...items].sort(() => Math.random() - 0.5);
+        const shuffled = this._fisherYatesShuffle([...items]);
         const visibleItems = shuffled.slice(0, numVisible);
         const hiddenItemNames = shuffled.slice(numVisible).map(i => i.name);
 
@@ -2014,7 +2028,7 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
         const effectiveSalesMin = Math.min(salesMin, effectiveSalesMax);
         const numSales = Math.floor(Math.random() * (effectiveSalesMax - effectiveSalesMin + 1)) + effectiveSalesMin;
 
-        const saleShuffled = [...visibleItems].sort(() => Math.random() - 0.5);
+        const saleShuffled = this._fisherYatesShuffle([...visibleItems]);
         const itemsOnSale = saleShuffled.slice(0, numSales);
 
         for (const item of itemsOnSale) {
