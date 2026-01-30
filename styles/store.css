@@ -284,10 +284,13 @@
 /* Search Bar */
 .daggerheart-store .search-container {
     margin-bottom: 5px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
 }
 
 .daggerheart-store .store-search {
-    width: 100%;
+    flex: 1;
     padding: 6px 8px;
     background: #1a1a1a;
     color: #fff;
@@ -301,6 +304,43 @@
     border-color: #d4af37;
     outline: none;
     background: #252525;
+}
+
+/* Bulk Action Buttons */
+.daggerheart-store .bulk-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.daggerheart-store .bulk-btn {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    background: #252525;
+    border: 1px solid #555;
+    color: #aaa;
+    cursor: pointer;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 0.85em;
+}
+
+.daggerheart-store .bulk-btn:hover {
+    background: #3a3015;
+    border-color: #d4af37;
+    color: #d4af37;
+}
+
+.daggerheart-store .bulk-separator {
+    width: 1px;
+    height: 20px;
+    background: #444;
+    margin: 0 4px;
 }
 
 /* ==================================================== */

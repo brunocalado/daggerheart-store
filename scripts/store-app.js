@@ -72,6 +72,14 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             toggleHidden: DaggerheartStore.prototype._onToggleHidden,
             toggleBlockSale: DaggerheartStore.prototype._onToggleBlockSale,
             toggleBlockPurchase: DaggerheartStore.prototype._onToggleBlockPurchase,
+            markAllOnSale: DaggerheartStore.prototype._onMarkAllOnSale,
+            removeAllFromSale: DaggerheartStore.prototype._onRemoveAllFromSale,
+            showAllItems: DaggerheartStore.prototype._onShowAllItems,
+            hideAllItems: DaggerheartStore.prototype._onHideAllItems,
+            makeAllPurchasable: DaggerheartStore.prototype._onMakeAllPurchasable,
+            disableAllPurchase: DaggerheartStore.prototype._onDisableAllPurchase,
+            makeAllSellable: DaggerheartStore.prototype._onMakeAllSellable,
+            disableAllSale: DaggerheartStore.prototype._onDisableAllSale,
             showToAll: DaggerheartStore.prototype._onShowToAll,
             showToPlayer: DaggerheartStore.prototype._onShowToPlayer,
             savePreset: DaggerheartStore.prototype._onSavePreset,
@@ -1443,6 +1451,72 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const itemName = target.dataset.name; const blockedPurchaseItems = foundry.utils.deepClone(game.settings.get(MODULE_ID, "blockedPurchaseItems"));
         if (blockedPurchaseItems[itemName]) { delete blockedPurchaseItems[itemName]; } else { blockedPurchaseItems[itemName] = true; }
         await game.settings.set(MODULE_ID, "blockedPurchaseItems", blockedPurchaseItems);
+    }
+
+    async _getCurrentTabItemNames() {
+        const itemNames = [];
+        const rows = this.element.querySelectorAll(`.tab[data-tab="${this.activeTab}"] .store-row`);
+        rows.forEach(row => {
+            const btn = row.querySelector("[data-name]");
+            if (btn) itemNames.push(btn.dataset.name);
+        });
+        return itemNames;
+    }
+
+    async _onMarkAllOnSale(event, target) {
+        const itemNames = await this._getCurrentTabItemNames();
+        const saleItems = foundry.utils.deepClone(game.settings.get(MODULE_ID, "saleItems"));
+        itemNames.forEach(name => saleItems[name] = true);
+        await game.settings.set(MODULE_ID, "saleItems", saleItems);
+    }
+
+    async _onRemoveAllFromSale(event, target) {
+        const itemNames = await this._getCurrentTabItemNames();
+        const saleItems = foundry.utils.deepClone(game.settings.get(MODULE_ID, "saleItems"));
+        itemNames.forEach(name => delete saleItems[name]);
+        await game.settings.set(MODULE_ID, "saleItems", saleItems);
+    }
+
+    async _onShowAllItems(event, target) {
+        const itemNames = await this._getCurrentTabItemNames();
+        const hiddenItems = foundry.utils.deepClone(game.settings.get(MODULE_ID, "hiddenItems"));
+        itemNames.forEach(name => delete hiddenItems[name]);
+        await game.settings.set(MODULE_ID, "hiddenItems", hiddenItems);
+    }
+
+    async _onHideAllItems(event, target) {
+        const itemNames = await this._getCurrentTabItemNames();
+        const hiddenItems = foundry.utils.deepClone(game.settings.get(MODULE_ID, "hiddenItems"));
+        itemNames.forEach(name => hiddenItems[name] = true);
+        await game.settings.set(MODULE_ID, "hiddenItems", hiddenItems);
+    }
+
+    async _onMakeAllPurchasable(event, target) {
+        const itemNames = await this._getCurrentTabItemNames();
+        const blockedPurchaseItems = foundry.utils.deepClone(game.settings.get(MODULE_ID, "blockedPurchaseItems"));
+        itemNames.forEach(name => delete blockedPurchaseItems[name]);
+        await game.settings.set(MODULE_ID, "blockedPurchaseItems", blockedPurchaseItems);
+    }
+
+    async _onDisableAllPurchase(event, target) {
+        const itemNames = await this._getCurrentTabItemNames();
+        const blockedPurchaseItems = foundry.utils.deepClone(game.settings.get(MODULE_ID, "blockedPurchaseItems"));
+        itemNames.forEach(name => blockedPurchaseItems[name] = true);
+        await game.settings.set(MODULE_ID, "blockedPurchaseItems", blockedPurchaseItems);
+    }
+
+    async _onMakeAllSellable(event, target) {
+        const itemNames = await this._getCurrentTabItemNames();
+        const blockedSaleItems = foundry.utils.deepClone(game.settings.get(MODULE_ID, "blockedSaleItems"));
+        itemNames.forEach(name => delete blockedSaleItems[name]);
+        await game.settings.set(MODULE_ID, "blockedSaleItems", blockedSaleItems);
+    }
+
+    async _onDisableAllSale(event, target) {
+        const itemNames = await this._getCurrentTabItemNames();
+        const blockedSaleItems = foundry.utils.deepClone(game.settings.get(MODULE_ID, "blockedSaleItems"));
+        itemNames.forEach(name => blockedSaleItems[name] = true);
+        await game.settings.set(MODULE_ID, "blockedSaleItems", blockedSaleItems);
     }
 }
 
