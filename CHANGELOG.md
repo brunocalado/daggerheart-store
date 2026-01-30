@@ -1,3 +1,7 @@
+# 0.1.2
+- Removed transparency.
+- Improved CSS isolation to prevent the module from affecting unintended elements.
+
 # 0.1.1
 - Performance fix: the store loads 3,04 faster.
 Before update

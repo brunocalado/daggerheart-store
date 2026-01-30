@@ -4,21 +4,20 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    background: transparent;
+    background: #1a1a1a;
 }
 
-.daggerheart-store-container {
+.daggerheart-store .daggerheart-store-container {
     display: flex;
     flex-direction: column;
     height: 100%;
-    
-    /* Foundryborne-blur & background treatment */
-    background: var(--background);
-    backdrop-filter: blur(10px);
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+
+    /* Solid dark background */
+    background: #1e1e1e;
+    box-shadow: inset 0 0 20px #000000;
     border-radius: 0 0 5px 5px;
-    
-    overflow: hidden; 
+
+    overflow: hidden;
 }
 
 /* ==================================================== */
@@ -26,23 +25,18 @@
 /* ==================================================== */
 
 .daggerheart-store {
-    background-color: transparent; 
-    color: var(--color-text-light-1);
-    
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+
     /* Minimum width enforcement */
     min-width: 870px !important;
 }
 
-/* Fallback color */
-.daggerheart-store {
-    color: #e0e0e0; 
-}
-
 .daggerheart-store .store-header {
-    background: rgba(0, 0, 0, 0.4);
+    background: #141414;
     color: #d4af37;
-    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
-    padding: 6px 15px; 
+    border-bottom: 1px solid #4a3d1a;
+    padding: 6px 15px;
 }
 
 /* ==================================================== */
@@ -52,15 +46,15 @@
 .daggerheart-store .sheet-tabs {
     display: flex;
     flex-wrap: wrap;
-    
-    background: transparent; 
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
-    
-    padding-top: 6px; 
+
+    background: #1a1a1a;
+    border-bottom: 1px solid #333333;
+
+    padding-top: 6px;
     padding-bottom: 0;
     margin-bottom: 2px;
-    
-    gap: 4px; 
+
+    gap: 4px;
 }
 
 /* ==================================================== */
@@ -68,81 +62,81 @@
 /* ==================================================== */
 
 .daggerheart-store .sheet-tabs .item {
-    flex: 1; 
+    flex: 1;
     text-align: center;
-    
-    background: transparent;
+
+    background: #1a1a1a;
     background-image: none;
     border: none;
-    border-radius: 4px 4px 0 0; 
-    
-    color: var(--color-text-light-2, #aaa);
-    font-family: "Aleo", "Modesto Condensed", serif; 
+    border-radius: 4px 4px 0 0;
+
+    color: #aaaaaa;
+    font-family: "Aleo", "Modesto Condensed", serif;
     font-weight: bold;
     font-size: 1.1em;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     text-shadow: none;
-    
-    padding: 6px 14px; 
+
+    padding: 6px 14px;
     margin: 0;
-    border-bottom: 3px solid transparent;
-    
+    border-bottom: 3px solid #1a1a1a;
+
     opacity: 0.8;
     transition: all 0.2s ease;
-    white-space: nowrap; 
+    white-space: nowrap;
 }
 
 .daggerheart-store .sheet-tabs .item:hover {
     opacity: 1;
-    color: #D4AF37; 
-    background: rgba(255, 255, 255, 0.05);
-    text-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+    color: #D4AF37;
+    background: #252525;
+    text-shadow: 0 0 8px #6b582a;
     filter: none;
 }
 
 .daggerheart-store .sheet-tabs .item.active {
-    background: linear-gradient(to bottom, rgba(45, 35, 10, 0.9), rgba(30, 20, 5, 0.8));
-    
+    background: linear-gradient(to bottom, #2d230a, #1e1405);
+
     opacity: 1;
-    color: #FFD700; 
-    border: 1px solid rgba(212, 175, 55, 0.3);
+    color: #FFD700;
+    border: 1px solid #4a3d1a;
     border-bottom: 3px solid #D4AF37;
-    
-    text-shadow: 0 0 10px rgba(212, 175, 55, 0.6);
+
+    text-shadow: 0 0 10px #6b582a;
     filter: none;
 }
 
 /* Scrolling */
 .daggerheart-store .content {
-    background: transparent; 
-    flex: 1; 
-    overflow-y: auto; 
-    padding: 5px 10px; 
-    scrollbar-width: thin; 
-    scrollbar-color: #d4af37 rgba(0,0,0,0.3);
+    background: #1e1e1e;
+    flex: 1;
+    overflow-y: auto;
+    padding: 5px 10px;
+    scrollbar-width: thin;
+    scrollbar-color: #d4af37 #1a1a1a;
 }
 
 /* Tier Separators */
 .daggerheart-store .tier-separator {
-    background: linear-gradient(to right, rgba(45, 35, 10, 0.7), rgba(0, 0, 0, 0.2));
-    
-    border: 1px solid rgba(212, 175, 55, 0.3);
+    background: linear-gradient(to right, #2d230a, #1a1a1a);
+
+    border: 1px solid #4a3d1a;
     border-left: 4px solid #d4af37;
     border-radius: 2px;
-    
+
     color: #d4af37;
     font-family: "Aleo", serif;
     font-size: 1.1em;
     font-weight: bold;
-    
+
     text-transform: uppercase;
     letter-spacing: 1px;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    
+    text-shadow: 0 2px 4px #000000;
+
     padding: 6px 10px;
     text-align: left;
-    
+
     margin-top: 10px;
     margin-bottom: 5px;
 }
@@ -171,14 +165,14 @@
 /* Common Styles */
 /* ==================================================== */
 
-.store-header {
+.daggerheart-store .store-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex: 0 0 auto;
 }
 
-.header-left {
+.daggerheart-store .header-left {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -187,17 +181,17 @@
     color: #D4AF37;
 }
 
-.header-right {
+.daggerheart-store .header-right {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
 /* Preset Select Styling */
-.preset-select {
-    width: 200px; 
+.daggerheart-store .preset-select {
+    width: 200px;
     height: 30px;
-    background: rgba(0, 0, 0, 0.5);
+    background: #1a1a1a;
     color: #fff;
     border: 1px solid #555;
     border-radius: 4px;
@@ -206,7 +200,7 @@
     transition: border-color 0.2s;
 }
 
-.preset-select:focus {
+.daggerheart-store .preset-select:focus {
     border-color: #d4af37;
     outline: none;
 }
@@ -215,10 +209,10 @@
 /* HEADER BUTTONS */
 /* ==================================================== */
 
-.config-btn {
+.daggerheart-store .config-btn {
     background-image: none;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid #555; 
+    background: #252525;
+    border: 1px solid #555;
     color: #ccc;
     font-weight: bold;
     font-size: 0.9em;
@@ -234,44 +228,45 @@
     gap: 5px;
 }
 
-.config-btn.icon-only {
+.daggerheart-store .config-btn.icon-only {
     padding: 5px 10px;
     min-width: 32px;
 }
 
-.config-btn:hover { 
-    background: rgba(212, 175, 55, 0.1);
+.daggerheart-store .config-btn:hover {
+    background: #3a3015;
     border-color: #d4af37;
     color: #d4af37;
-    box-shadow: 0 0 5px rgba(212, 175, 55, 0.2);
+    box-shadow: 0 0 5px #3a3015;
     filter: none;
 }
 
-.header-separator {
+.daggerheart-store .header-separator {
     margin: 0 5px;
     color: #555;
     font-weight: 100;
 }
 
 /* Wealth Display */
-.wealth-label {
+.daggerheart-store .wealth-label {
     font-size: 0.8em;
     color: #aaa;
     margin-right: 5px;
     text-transform: uppercase;
 }
 
-.gold-display {
+.daggerheart-store .gold-display {
     font-size: 1.1em;
     font-weight: bold;
     color: #fff;
 }
-.gold-display i {
+
+.daggerheart-store .gold-display i {
     color: #FFD700;
 }
 
-.error-banner {
-    background: rgba(122, 29, 29, 0.8);
+.daggerheart-store .error-banner {
+    background: #6a1d1d;
     border: 1px solid #ff5555;
     color: white;
     padding: 5px;
@@ -282,89 +277,92 @@
 }
 
 /* Search Bar */
-.search-container {
-    margin-bottom: 5px; 
+.daggerheart-store .search-container {
+    margin-bottom: 5px;
 }
-.store-search {
+
+.daggerheart-store .store-search {
     width: 100%;
-    padding: 6px 8px; 
-    background: rgba(0, 0, 0, 0.2);
+    padding: 6px 8px;
+    background: #1a1a1a;
     color: #fff;
     border: 1px solid #555;
     border-radius: 4px;
-    box-sizing: border-box; 
+    box-sizing: border-box;
     transition: border-color 0.2s;
 }
-.store-search:focus {
+
+.daggerheart-store .store-search:focus {
     border-color: #d4af37;
     outline: none;
-    background: rgba(0, 0, 0, 0.4);
+    background: #252525;
 }
 
 /* ==================================================== */
 /* LIST LAYOUT */
 /* ==================================================== */
 
-.item-list {
+.daggerheart-store .item-list {
     display: flex;
     flex-direction: column;
-    gap: 4px; 
+    gap: 4px;
 }
 
-.store-row {
+.daggerheart-store .store-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: rgba(255, 255, 255, 0.85); 
-    border: 1px solid #999; 
+    background: #e8e8e8;
+    border: 1px solid #999;
     border-radius: 3px;
     padding: 0;
     transition: all 0.2s ease-in-out;
-    position: relative; 
-    min-height: 42px; 
+    position: relative;
+    min-height: 42px;
 }
 
-.store-row:hover {
-    border: 1px solid #d4af37; 
+.daggerheart-store .store-row:hover {
+    border: 1px solid #d4af37;
     background: #ffffff;
-    box-shadow: 0 0 8px rgba(212, 175, 55, 0.6), inset 0 0 10px rgba(212, 175, 55, 0.1);
+    box-shadow: 0 0 8px #6b582a, inset 0 0 10px #f5f0e0;
     z-index: 5;
 }
 
-.store-row.gm-hidden-item {
+.daggerheart-store .store-row.gm-hidden-item {
     opacity: 0.6;
     border: 1px dashed #7a1d1d !important;
-    background: rgba(255, 220, 220, 0.8);
+    background: #f0d8d8;
 }
 
 @keyframes saleGreenPulse {
-    0% { box-shadow: 0 0 2px rgba(0, 100, 0, 0.2); border-color: rgba(0, 100, 0, 0.4); }
-    50% { box-shadow: 0 0 8px rgba(0, 100, 0, 0.6); border-color: #006400; }
-    100% { box-shadow: 0 0 2px rgba(0, 100, 0, 0.2); border-color: rgba(0, 100, 0, 0.4); }
+    0% { box-shadow: 0 0 2px #1a3a1a; border-color: #2a5a2a; }
+    50% { box-shadow: 0 0 8px #3a7a3a; border-color: #006400; }
+    100% { box-shadow: 0 0 2px #1a3a1a; border-color: #2a5a2a; }
 }
 
-.store-row.sale-pulse {
+.daggerheart-store .store-row.sale-pulse {
     animation: saleGreenPulse 3s infinite ease-in-out;
     border: 1px solid #006400;
 }
 
-.row-left {
+.daggerheart-store .row-left {
     display: flex;
     align-items: center;
     gap: 10px;
     flex: 1;
-    overflow: hidden; 
+    overflow: hidden;
     padding: 4px 8px;
 }
 
-.item-image {
+.daggerheart-store .item-image {
     cursor: pointer;
     border: 1px solid #555;
     border-radius: 4px;
     transition: box-shadow 0.2s;
     background: #000;
 }
-.item-image:hover {
+
+.daggerheart-store .item-image:hover {
     box-shadow: 0 0 6px #d4af37;
 }
 
@@ -372,29 +370,29 @@
 /* CONTROLS & BUTTONS */
 /* ==================================================== */
 
-.row-right {
+.daggerheart-store .row-right {
     display: flex;
     align-items: center;
     gap: 10px;
-    flex: 0 0 auto; 
+    flex: 0 0 auto;
     padding: 4px 8px;
-    z-index: 2; 
+    z-index: 2;
 }
 
 /* GM Controls */
-.gm-controls {
+.daggerheart-store .gm-controls {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-.gm-buttons {
+.daggerheart-store .gm-buttons {
     display: flex;
     align-items: center;
     gap: 4px;
 }
 
-.gm-price-input {
+.daggerheart-store .gm-price-input {
     width: 60px;
     text-align: center;
     border: 1px solid #777;
@@ -404,21 +402,21 @@
     padding: 4px;
 }
 
-.player-controls {
+.daggerheart-store .player-controls {
     display: flex;
     align-items: center;
     gap: 15px;
 }
 
-.price-display {
-    display: flex; 
+.daggerheart-store .price-display {
+    display: flex;
     align-items: center;
     justify-content: flex-end;
     min-width: 60px;
 }
 
 /* Creates the pulsing text "(SALE)" for the badge */
-.sale-badge {
+.daggerheart-store .sale-badge {
     color: #27ae60;
     font-family: "Aleo", serif;
     font-weight: bold;
@@ -427,16 +425,16 @@
     letter-spacing: 1px;
     animation: saleTextPulse 2s infinite ease-in-out;
     display: inline-block;
-    text-shadow: 0 0 1px rgba(39, 174, 96, 0.2);
+    text-shadow: 0 0 1px #1a5a3a;
 }
 
 @keyframes saleTextPulse {
-    0% { opacity: 0.7; transform: scale(1); text-shadow: 0 0 2px rgba(39, 174, 96, 0.2); }
-    50% { opacity: 1; transform: scale(1.1); text-shadow: 0 0 8px rgba(39, 174, 96, 0.6); }
-    100% { opacity: 0.7; transform: scale(1); text-shadow: 0 0 2px rgba(39, 174, 96, 0.2); }
+    0% { opacity: 0.7; transform: scale(1); text-shadow: 0 0 2px #1a5a3a; }
+    50% { opacity: 1; transform: scale(1.1); text-shadow: 0 0 8px #3a8a5a; }
+    100% { opacity: 0.7; transform: scale(1); text-shadow: 0 0 2px #1a5a3a; }
 }
 
-.icon-btn {
+.daggerheart-store .icon-btn {
     background: #f0f0f0;
     border: 1px solid #ccc;
     color: #555;
@@ -448,41 +446,44 @@
     align-items: center;
     justify-content: center;
 }
-.icon-btn:hover { background: #fff; color: #000; border-color: #999; }
-.icon-btn.active-sale { background: #27ae60; color: white; border-color: #27ae60; }
-.icon-btn.active-hidden { background: #7a1d1d; color: white; border-color: #7a1d1d; }
 
-.reset-price-btn {
+.daggerheart-store .icon-btn:hover { background: #fff; color: #000; border-color: #999; }
+.daggerheart-store .icon-btn.active-sale { background: #27ae60; color: white; border-color: #27ae60; }
+.daggerheart-store .icon-btn.active-hidden { background: #7a1d1d; color: white; border-color: #7a1d1d; }
+
+.daggerheart-store .reset-price-btn {
     background: none;
     border: none;
     color: #c00;
     cursor: pointer;
     padding: 4px;
 }
-.reset-price-btn:hover { color: #f00; }
 
-.item-price {
+.daggerheart-store .reset-price-btn:hover { color: #f00; }
+
+.daggerheart-store .item-price {
     font-size: 1em;
     color: #333;
-    background: rgba(0,0,0,0.05);
-    border: 1px solid rgba(0,0,0,0.1);
+    background: #f0f0f0;
+    border: 1px solid #d0d0d0;
     border-radius: 4px;
     padding: 4px 8px;
     font-weight: bold;
 }
 
-.item-price.sale {
-    background: rgba(39, 174, 96, 0.1);
+.daggerheart-store .item-price.sale {
+    background: #d8f0e0;
     color: #27ae60;
     border: 1px solid #27ae60;
 }
-.item-price.sale .original {
+
+.daggerheart-store .item-price.sale .original {
     color: #888;
     font-weight: normal;
 }
 
 /* Buy Button */
-.buy-btn {
+.daggerheart-store .buy-btn {
     background: #1a5c1a;
     color: white;
     border: 1px solid #144014;
@@ -499,33 +500,33 @@
     transition: all 0.2s;
 }
 
-.buy-btn:hover:not(:disabled) {
+.daggerheart-store .buy-btn:hover:not(:disabled) {
     background: #227a22;
-    box-shadow: 0 0 5px rgba(34, 122, 34, 0.5);
-    border-color: #d4af37; 
+    box-shadow: 0 0 5px #1a5a1a;
+    border-color: #d4af37;
 }
 
-.buy-btn:disabled {
+.daggerheart-store .buy-btn:disabled {
     background: #777;
     border-color: #555;
     opacity: 0.7;
     cursor: not-allowed;
 }
 
-.buy-btn.party-btn {
+.daggerheart-store .buy-btn.party-btn {
     background: #1a3c7a;
     border-color: #122a55;
 }
 
-.buy-btn.party-btn:hover:not(:disabled) {
+.daggerheart-store .buy-btn.party-btn:hover:not(:disabled) {
     background: #224ea3;
-    box-shadow: 0 0 5px rgba(34, 78, 163, 0.5);
+    box-shadow: 0 0 5px #1a3a6a;
     border-color: #d4af37;
 }
 
 /* Sell Button */
-.sell-btn {
-    background: #8b3333; /* Dark Red/Orange */
+.daggerheart-store .sell-btn {
+    background: #8b3333;
     color: white;
     border: 1px solid #5a1e1e;
     padding: 6px 14px;
@@ -541,9 +542,9 @@
     transition: all 0.2s;
 }
 
-.sell-btn:hover {
+.daggerheart-store .sell-btn:hover {
     background: #b54545;
-    box-shadow: 0 0 5px rgba(181, 69, 69, 0.5);
+    box-shadow: 0 0 5px #7a3030;
     border-color: #ff9999;
 }
 
@@ -560,17 +561,17 @@
 }
 
 /* General Config Titles (H3) */
-.daggerheart-store-config h3 { 
-    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
-    color: #d4af37; 
+.daggerheart-store-config h3 {
+    border-bottom: 1px solid #4a3d1a;
+    color: #d4af37;
     font-family: "Aleo", serif;
-    font-size: 1.2em; /* Reduced size */
+    font-size: 1.2em;
     margin-top: 15px;
     margin-bottom: 10px;
     padding-bottom: 5px;
 }
 
-.daggerheart-store-config .sheet-tabs .item { color: #aaa; border: none; background: transparent; }
+.daggerheart-store-config .sheet-tabs .item { color: #aaa; border: none; background: #222222; }
 .daggerheart-store-config .sheet-tabs .item.active { color: #d4af37; border-bottom: 2px solid #d4af37; }
 
 .daggerheart-store-config .tab-content {
@@ -598,15 +599,15 @@
 
 /* Tiers Tab (Spacing between categories) */
 .daggerheart-store-config .tiers-config .category-row {
-    margin-bottom: 20px; /* More space before next title */
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Optional subtle divider */
+    margin-bottom: 20px;
+    border-bottom: 1px solid #2a2a2a;
     padding-bottom: 5px;
 }
 
 .daggerheart-store-config .checkbox-group {
     display: flex;
     gap: 15px;
-    margin-bottom: 0; /* Remove extra margin for control via category-row */
+    margin-bottom: 0;
 }
 
 /* Slider Styles */
@@ -614,7 +615,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    flex: 2; 
+    flex: 2;
 }
 
 .daggerheart-store-config input[type="range"] {
@@ -622,7 +623,7 @@
     cursor: pointer;
 }
 
-.range-value {
+.daggerheart-store-config .range-value {
     min-width: 40px;
     text-align: right;
     font-weight: bold;
@@ -630,18 +631,18 @@
     font-family: "Aleo", serif;
 }
 
-/* RECOMMENDED ITEM ICON (NEW) */
-.recommended-icon {
-    color: #ffd700; /* Gold */
+/* RECOMMENDED ITEM ICON */
+.daggerheart-store .recommended-icon {
+    color: #ffd700;
     margin-left: 5px;
     margin-right: 5px;
     /* Black outline using text-shadow for better visibility on light backgrounds */
-    text-shadow: 
-        -1px -1px 0 #000,  
+    text-shadow:
+        -1px -1px 0 #000,
          1px -1px 0 #000,
         -1px  1px 0 #000,
          1px  1px 0 #000,
-         0 0 5px rgba(255, 215, 0, 0.6); /* Gold Glow behind black border */
+         0 0 5px #8a7020;
     animation: pulseCrown 2s infinite ease-in-out;
 }
 
@@ -662,18 +663,18 @@
     padding: 20px;
     border-radius: 5px;
     border: 1px solid #d4af37;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 0 15px #000000;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-.welcome-container {
+.daggerheart-store-welcome .welcome-container {
     text-align: center;
     width: 100%;
 }
 
-.welcome-title {
+.daggerheart-store-welcome .welcome-title {
     font-family: "Aleo", serif;
     color: #d4af37;
     font-size: 2.2em;
@@ -682,27 +683,27 @@
     border-bottom: 2px solid #d4af37;
     padding-bottom: 10px;
     margin-bottom: 15px;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    text-shadow: 0 2px 4px #000000;
 }
 
-.welcome-description {
+.daggerheart-store-welcome .welcome-description {
     font-family: "Lato", sans-serif;
     font-size: 1.1em;
     line-height: 1.5;
     color: #ccc;
     margin-bottom: 25px;
-    background: rgba(0,0,0,0.3);
+    background: #121212;
     padding: 10px;
     border-radius: 5px;
     border: 1px solid #444;
 }
 
-.welcome-action {
+.daggerheart-store-welcome .welcome-action {
     margin-bottom: 20px;
 }
 
-.journal-btn {
-    background: #7a1d1d; /* Red warning style */
+.daggerheart-store-welcome .journal-btn {
+    background: #7a1d1d;
     color: #fff;
     font-family: "Aleo", serif;
     font-weight: bold;
@@ -712,27 +713,27 @@
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.2s;
-    box-shadow: 0 0 10px rgba(122, 29, 29, 0.5);
+    box-shadow: 0 0 10px #4a1010;
     display: inline-flex;
     align-items: center;
     gap: 10px;
 }
 
-.journal-btn:hover {
+.daggerheart-store-welcome .journal-btn:hover {
     background: #a32424;
     transform: scale(1.02);
-    box-shadow: 0 0 15px rgba(255, 85, 85, 0.5);
+    box-shadow: 0 0 15px #8a3030;
 }
 
-.welcome-divider {
+.daggerheart-store-welcome .welcome-divider {
     border: 0;
     height: 1px;
-    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(212, 175, 55, 0.75), rgba(0, 0, 0, 0));
+    background-image: linear-gradient(to right, #191919, #d4af37, #191919);
     margin: 20px 0;
     width: 100%;
 }
 
-.welcome-footer {
+.daggerheart-store-welcome .welcome-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -740,7 +741,7 @@
     margin-top: 10px;
 }
 
-.checkbox-label {
+.daggerheart-store-welcome .checkbox-label {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -749,13 +750,13 @@
     cursor: pointer;
 }
 
-.checkbox-label input[type="checkbox"] {
+.daggerheart-store-welcome .checkbox-label input[type="checkbox"] {
     accent-color: #d4af37;
     width: 16px;
     height: 16px;
 }
 
-.close-btn {
+.daggerheart-store-welcome .close-btn {
     background: #1a5c1a;
     color: #fff;
     border: 1px solid #27ae60;
@@ -770,7 +771,7 @@
     gap: 6px;
 }
 
-.close-btn:hover {
+.daggerheart-store-welcome .close-btn:hover {
     background: #227a22;
-    box-shadow: 0 0 8px rgba(39, 174, 96, 0.5);
+    box-shadow: 0 0 8px #2a7a3a;
 }
