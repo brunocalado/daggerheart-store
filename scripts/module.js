@@ -62,6 +62,12 @@ Hooks.once("init", () => {
     game.settings.register(MODULE_ID, "hiddenItems", {
         name: "Hidden Items", scope: "world", config: false, type: Object, default: {}
     });
+    game.settings.register(MODULE_ID, "blockedSaleItems", {
+        name: "Blocked Sale Items", scope: "world", config: false, type: Object, default: {}
+    });
+    game.settings.register(MODULE_ID, "blockedPurchaseItems", {
+        name: "Blocked Purchase Items", scope: "world", config: false, type: Object, default: {}
+    });
 
     // Party Configuration Setting
     game.settings.register(MODULE_ID, "partyActorId", {

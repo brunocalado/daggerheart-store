@@ -450,6 +450,8 @@
 .daggerheart-store .icon-btn:hover { background: #fff; color: #000; border-color: #999; }
 .daggerheart-store .icon-btn.active-sale { background: #27ae60; color: white; border-color: #27ae60; }
 .daggerheart-store .icon-btn.active-hidden { background: #7a1d1d; color: white; border-color: #7a1d1d; }
+.daggerheart-store .icon-btn.active-block-sale { background: #b8860b; color: white; border-color: #b8860b; }
+.daggerheart-store .icon-btn.active-block-purchase { background: #8b0000; color: white; border-color: #8b0000; }
 
 .daggerheart-store .reset-price-btn {
     background: none;

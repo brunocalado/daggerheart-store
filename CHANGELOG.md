@@ -1,6 +1,10 @@
 # 0.1.2
 - Removed transparency.
 - Improved CSS isolation to prevent the module from affecting unintended elements.
+- Restructured GM toggle buttons:
+  - Visibility button: hides items completely from players
+  - Block Purchase button (NEW): prevents players from buying the item
+  - Block Sale button: prevents players from selling the item
 
 # 0.1.1
 - Performance fix: the store loads 3,04 faster.
