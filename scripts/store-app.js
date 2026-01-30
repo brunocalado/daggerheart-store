@@ -1899,9 +1899,12 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
      */
     async _onOpenInstructions(event, target) {
         const uuid = "Compendium.daggerheart-store.journals.JournalEntry.fIXCeXWeDbAu3uFg.JournalEntryPage.SqoXdZ1yaCPsXA9v";
-        const doc = await fromUuid(uuid);
-        if (doc) {
-            doc.sheet.render(true);
+        const page = await fromUuid(uuid);
+        if (page) {
+            const journal = page.parent;
+            if (journal) {
+                journal.sheet.render(true, { pageId: page.id });
+            }
         } else {
             ui.notifications.warn("Instructions journal not found in the compendium.");
         }
