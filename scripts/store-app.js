@@ -1459,7 +1459,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         id: "daggerheart-store-config",
         tag: "form",
         window: { title: "Store Configuration (GM)", icon: "fas fa-cogs", resizable: true },
-        position: { width: 700, height: "auto" },
+        position: { width: 700, height: 740 },
         form: { handler: StoreConfig.prototype._updateSettings, closeOnSubmit: true },
         actions: { addCompendium: StoreConfig.prototype._onAddCompendium, removeCompendium: StoreConfig.prototype._onRemoveCompendium }
     };

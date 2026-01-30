@@ -122,7 +122,8 @@
 
         <h3>Merged Compendiums</h3>
         <p class="notes">Add additional compendiums to be merged into the standard categories (e.g. Loot, Weapons).</p>
-        
+        <button type="button" data-action="addCompendium" class="add-compendium" style="margin: 10px 0;"><i class="fas fa-plus"></i> Add Compendium</button>
+
         <div class="compendiums-list">
             {{#each customCompendiums}}
             <div class="compendium-row form-group" style="display:flex; gap:10px; align-items:center; margin-bottom:5px;">
@@ -137,16 +138,15 @@
                     <option value="{{this}}" {{#if (eq this ../category)}}selected{{/if}}>{{this}}</option>
                     {{/each}}
                 </select>
-                <button type="button" 
-                        data-action="removeCompendium" 
-                        data-index="{{@index}}" 
+                <button type="button"
+                        data-action="removeCompendium"
+                        data-index="{{@index}}"
                         style="width: 30px; height: 30px; color: red;">
                     <i class="fas fa-trash"></i>
                 </button>
             </div>
             {{/each}}
         </div>
-        <button type="button" data-action="addCompendium" class="add-compendium"><i class="fas fa-plus"></i> Add Compendium</button>
     </div>
 
     <!-- UPDATED FOOTER -->

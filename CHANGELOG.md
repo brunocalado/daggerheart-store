@@ -7,6 +7,7 @@
   - Block Sale button: prevents players from selling the item
 - The Store Randomizer allows the GM to dynamically generate the store's inventory. Instead of manually hiding or pricing items, you can set parameters for each category and let the module "roll" the stock for you.
 - Items with description will have an tooltip 
+- Bug fix: Add compendiums to merged compendiums will trigger an scroll
 
 # 0.1.1
 - Performance fix: the store loads 3,04 faster.
