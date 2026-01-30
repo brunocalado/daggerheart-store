@@ -1557,11 +1557,13 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
             icon: "fas fa-dice",
             resizable: true
         },
-        position: { width: 900, height: 500 },
+        position: { width: 900, height: 700 }, // Updated height to 700px
         actions: {
             randomizeCategory: StoreRandomizer.prototype._onRandomizeCategory,
             randomizeAll: StoreRandomizer.prototype._onRandomizeAll,
-            resetAll: StoreRandomizer.prototype._onResetAll
+            resetAll: StoreRandomizer.prototype._onResetAll,
+            resetCategoryDefaults: StoreRandomizer.prototype._onResetCategoryDefaults, // New action
+            openInstructions: StoreRandomizer.prototype._onOpenInstructions // New action for Instructions
         }
     };
 
@@ -1730,6 +1732,47 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
         }
 
         return items;
+    }
+
+    /**
+     * Resets input fields for a specific category to default values
+     */
+    _onResetCategoryDefaults(event, target) {
+        const categoryKey = target.dataset.category;
+        const itemCount = parseInt(target.dataset.itemCount) || 0;
+        
+        // Find the specific row for this category
+        const row = this.element.querySelector(`.category-randomizer-row[data-category="${categoryKey}"]`);
+        
+        if (!row) return;
+
+        // Reset values: Min=0, Max=ItemCount, Sales=0, Variation=0
+        const minInput = row.querySelector(".rand-min-items");
+        const maxInput = row.querySelector(".rand-max-items");
+        const salesMinInput = row.querySelector(".rand-sales-min");
+        const salesMaxInput = row.querySelector(".rand-sales-max");
+        const varMinInput = row.querySelector(".rand-var-min");
+        const varMaxInput = row.querySelector(".rand-var-max");
+
+        if (minInput) minInput.value = 0;
+        if (maxInput) maxInput.value = itemCount;
+        if (salesMinInput) salesMinInput.value = 0;
+        if (salesMaxInput) salesMaxInput.value = 0;
+        if (varMinInput) varMinInput.value = 0;
+        if (varMaxInput) varMaxInput.value = 0;
+    }
+
+    /**
+     * Handles opening the instructions journal
+     */
+    async _onOpenInstructions(event, target) {
+        const uuid = "Compendium.daggerheart-store.journals.JournalEntry.fIXCeXWeDbAu3uFg.JournalEntryPage.SqoXdZ1yaCPsXA9v";
+        const doc = await fromUuid(uuid);
+        if (doc) {
+            doc.sheet.render(true);
+        } else {
+            ui.notifications.warn("Instructions journal not found in the compendium.");
+        }
     }
 
     /**

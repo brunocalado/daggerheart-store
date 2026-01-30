@@ -2,47 +2,61 @@
     <header class="randomizer-header">
         <h2><i class="fas fa-dice"></i> Store Randomizer</h2>
         <p class="notes">Configure and randomize which items are available in each category.</p>
+        
+        <!-- Instructions Button -->
+        <button type="button" class="instructions-btn" data-action="openInstructions" title="Open randomization instructions">
+            <i class="fas fa-book-open"></i> Instructions
+        </button>
     </header>
 
     <div class="randomizer-content">
         {{#each categories}}
         <div class="category-randomizer-row" data-category="{{this.key}}">
-            <div class="category-name">
-                <strong>{{this.label}}</strong>
-                <span class="item-count">({{this.itemCount}} items available)</span>
+            <!-- Left Column: Name and Inputs -->
+            <div class="randomizer-config-col">
+                <div class="category-name">
+                    <strong>{{this.label}}</strong>
+                    <span class="item-count">({{this.itemCount}} items available)</span>
+                </div>
+
+                <div class="randomizer-inputs-row">
+                    <div class="control-group" title="Minimum number of items that will be visible after randomization">
+                        <label>Stock Min</label>
+                        <input type="number" class="rand-min-items" data-category="{{this.key}}" value="0" min="0" max="999">
+                    </div>
+
+                    <div class="control-group" title="Maximum number of items that will be visible after randomization">
+                        <label>Stock Max</label>
+                        <input type="number" class="rand-max-items" data-category="{{this.key}}" value="{{this.itemCount}}" min="0" max="999">
+                    </div>
+
+                    <div class="control-group" title="Minimum number of visible items that will be marked as on sale">
+                        <label>Sale Selection Min</label>
+                        <input type="number" class="rand-sales-min" data-category="{{this.key}}" value="0" min="0" max="999">
+                    </div>
+
+                    <div class="control-group" title="Maximum number of visible items that will be marked as on sale">
+                        <label>Sale Selection Max</label>
+                        <input type="number" class="rand-sales-max" data-category="{{this.key}}" value="0" min="0" max="999">
+                    </div>
+
+                    <div class="control-group" title="Maximum percentage to DECREASE the price (e.g., 10 means prices can go down by up to 10%)">
+                        <label>Min Offset %</label>
+                        <input type="number" class="rand-var-min" data-category="{{this.key}}" value="0" min="0" max="100">
+                    </div>
+
+                    <div class="control-group" title="Maximum percentage to INCREASE the price (e.g., 15 means prices can go up by up to 15%)">
+                        <label>Max Offset %</label>
+                        <input type="number" class="rand-var-max" data-category="{{this.key}}" value="0" min="0" max="100">
+                    </div>
+                </div>
             </div>
 
-            <div class="randomizer-controls">
-                <div class="control-group" title="Minimum number of items that will be visible after randomization">
-                    <label>Min Items</label>
-                    <input type="number" class="rand-min-items" data-category="{{this.key}}" value="0" min="0" max="999">
-                </div>
-
-                <div class="control-group" title="Maximum number of items that will be visible after randomization">
-                    <label>Max Items</label>
-                    <input type="number" class="rand-max-items" data-category="{{this.key}}" value="{{this.itemCount}}" min="0" max="999">
-                </div>
-
-                <div class="control-group" title="Minimum number of visible items that will be marked as on sale">
-                    <label>Sales Min</label>
-                    <input type="number" class="rand-sales-min" data-category="{{this.key}}" value="0" min="0" max="999">
-                </div>
-
-                <div class="control-group" title="Maximum number of visible items that will be marked as on sale">
-                    <label>Sales Max</label>
-                    <input type="number" class="rand-sales-max" data-category="{{this.key}}" value="0" min="0" max="999">
-                </div>
-
-                <div class="control-group" title="Maximum percentage to DECREASE the price (e.g., 10 means prices can go down by up to 10%)">
-                    <label>Price -%</label>
-                    <input type="number" class="rand-var-min" data-category="{{this.key}}" value="0" min="0" max="100">
-                </div>
-
-                <div class="control-group" title="Maximum percentage to INCREASE the price (e.g., 15 means prices can go up by up to 15%)">
-                    <label>Price +%</label>
-                    <input type="number" class="rand-var-max" data-category="{{this.key}}" value="0" min="0" max="100">
-                </div>
-
+            <!-- Right Column: Buttons (Full Height) -->
+            <div class="randomizer-action-col">
+                <button type="button" class="default-btn" data-action="resetCategoryDefaults" data-category="{{this.key}}" data-item-count="{{this.itemCount}}" title="Reset inputs to defaults">
+                    <i class="fas fa-undo"></i> Default
+                </button>
                 <button type="button" class="randomize-btn" data-action="randomizeCategory" data-category="{{this.key}}" title="Randomize this category with the current settings">
                     <i class="fas fa-dice"></i> Roll
                 </button>
