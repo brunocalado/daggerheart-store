@@ -1557,7 +1557,7 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
             icon: "fas fa-dice",
             resizable: true
         },
-        position: { width: 900, height: 700 }, // Updated height to 700px
+        position: { width: 750, height: 700 }, // Updated width to 750px
         actions: {
             randomizeCategory: StoreRandomizer.prototype._onRandomizeCategory,
             randomizeAll: StoreRandomizer.prototype._onRandomizeAll,
@@ -1792,8 +1792,8 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
         const varMax = parseInt(row.querySelector(".rand-var-max").value) || 0;
 
         await this._randomizeCategory(categoryKey, minItems, maxItems, salesMin, salesMax, varMin, varMax);
-
-        ui.notifications.info(`Randomized ${categoryKey} category.`);
+        
+        // Notification removed
     }
 
     /**
@@ -1870,6 +1870,21 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
      * Randomize all categories at once
      */
     async _onRandomizeAll(event, target) {
+        const confirm = await foundry.applications.api.DialogV2.confirm({
+            window: { title: "Warning!" },
+            content: `
+                <div style="text-align: center;">
+                    <h3 style="color: #D32F2F; margin-bottom: 10px;">DANGER ZONE</h3>
+                    <p>Are you sure you want to <b>RANDOMIZE ALL CATEGORIES</b>?</p>
+                    <p style="font-size: 0.9em; color: #ffffff;">This will overwrite current visibility, sales, and prices for all items.</p>
+                </div>
+            `,
+            rejectClose: false,
+            modal: true
+        });
+
+        if (!confirm) return;
+
         const rows = this.element.querySelectorAll(".category-randomizer-row");
 
         for (const row of rows) {
@@ -1883,18 +1898,29 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
 
             await this._randomizeCategory(categoryKey, minItems, maxItems, salesMin, salesMax, varMin, varMax);
         }
-
-        ui.notifications.info("All categories have been randomized!");
     }
 
     /**
      * Reset all items to visible (clear hidden, sales, and price overrides)
      */
     async _onResetAll(event, target) {
+        const confirm = await foundry.applications.api.DialogV2.confirm({
+            window: { title: "Warning!" },
+            content: `
+                <div style="text-align: center;">
+                    <h3 style="color: #D32F2F; margin-bottom: 10px;">DANGER ZONE</h3>
+                    <p>Are you sure you want to <b>RESET ALL DATA</b>?</p>
+                    <p style="font-size: 0.9em; color: #ffffff;">This action cannot be undone. All items will become visible.</p>
+                </div>
+            `,
+            rejectClose: false,
+            modal: true
+        });
+
+        if (!confirm) return;
+
         await game.settings.set(MODULE_ID, "hiddenItems", {});
         await game.settings.set(MODULE_ID, "saleItems", {});
         await game.settings.set(MODULE_ID, "priceOverrides", {});
-
-        ui.notifications.info("All items are now visible with default prices.");
     }
 }

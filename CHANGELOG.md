@@ -1,10 +1,12 @@
 # 0.1.2
-- Removed transparency.
+- Removed transparency. +Performance
 - Improved CSS isolation to prevent the module from affecting unintended elements.
 - Restructured GM toggle buttons:
   - Visibility button: hides items completely from players
   - Block Purchase button (NEW): prevents players from buying the item
   - Block Sale button: prevents players from selling the item
+- The Store Randomizer allows the GM to dynamically generate the store's inventory. Instead of manually hiding or pricing items, you can set parameters for each category and let the module "roll" the stock for you.
+- 
 
 # 0.1.1
 - Performance fix: the store loads 3,04 faster.
