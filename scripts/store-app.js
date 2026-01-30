@@ -66,6 +66,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             buyItem: DaggerheartStore.prototype._onBuyItem,
             sellItem: DaggerheartStore.prototype._onSellItem,
             openConfig: DaggerheartStore.prototype._onOpenConfig,
+            openRandomizer: DaggerheartStore.prototype._onOpenRandomizer,
             resetPrice: DaggerheartStore.prototype._onResetPrice,
             toggleSale: DaggerheartStore.prototype._onToggleSale,
             toggleHidden: DaggerheartStore.prototype._onToggleHidden,
@@ -1184,6 +1185,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
     }
 
     async _onOpenConfig(event, target) { new StoreConfig().render(true); }
+    async _onOpenRandomizer(event, target) { new StoreRandomizer().render(true); }
     async _onShowToAll(event, target) { globalThis.Store.Show(); }
     async _onShowToPlayer(event, target) {
         const players = game.users.filter(u => !u.isGM && u.active);
@@ -1535,5 +1537,321 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         }
         
         ui.notifications.info("Store Configuration Saved.");
+    }
+}
+
+/**
+ * Store Randomizer Application (Application V2)
+ * Allows GM to randomize which items are visible in each category
+ */
+export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
+    constructor(options) {
+        super(options);
+    }
+
+    static DEFAULT_OPTIONS = {
+        id: "daggerheart-store-randomizer",
+        tag: "div",
+        window: {
+            title: "Store Randomizer",
+            icon: "fas fa-dice",
+            resizable: true
+        },
+        position: { width: 900, height: 500 },
+        actions: {
+            randomizeCategory: StoreRandomizer.prototype._onRandomizeCategory,
+            randomizeAll: StoreRandomizer.prototype._onRandomizeAll,
+            resetAll: StoreRandomizer.prototype._onResetAll
+        }
+    };
+
+    static PARTS = {
+        main: {
+            template: "modules/daggerheart-store/templates/store-randomizer.hbs"
+        }
+    };
+
+    async _prepareContext(options) {
+        const allowedTiers = game.settings.get(MODULE_ID, "allowedTiers");
+        const hiddenCategories = game.settings.get(MODULE_ID, "hiddenCategories");
+        const customTabCompendium = game.settings.get(MODULE_ID, "customTabCompendium");
+        const customTabName = game.settings.get(MODULE_ID, "customTabName");
+        const customCompendiums = game.settings.get(MODULE_ID, "customCompendiums") || [];
+
+        let categories = foundry.utils.deepClone(STANDARD_CATEGORIES);
+
+        if (customTabCompendium && customTabCompendium.trim() !== "") {
+            categories.push({
+                id: "custom-tab",
+                label: customTabName || "General",
+                key: "CustomTab"
+            });
+        }
+
+        // Filter out hidden categories
+        categories = categories.filter(c => !hiddenCategories[c.key]);
+
+        // Count items for each category
+        for (const cat of categories) {
+            let itemCount = 0;
+
+            if (cat.id === "custom-tab") {
+                const pack = game.packs.get(customTabCompendium);
+                if (pack) {
+                    const docs = await pack.getDocuments();
+                    itemCount = docs.length;
+                }
+            } else {
+                const catConfig = allowedTiers[cat.key] || {1:true, 2:true, 3:true, 4:true};
+                const priceList = PRICE_DATA[cat.key] || {};
+
+                // Count items from default pack
+                const defaultPackId = PACK_MAPPING[cat.key];
+                if (defaultPackId) {
+                    const pack = game.packs.get(defaultPackId);
+                    if (pack) {
+                        const docs = await pack.getDocuments();
+                        for (const doc of docs) {
+                            if (priceList.hasOwnProperty(doc.name)) {
+                                const tier = priceList[doc.name].tier;
+                                if (catConfig[tier]) {
+                                    itemCount++;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Count items from custom compendiums
+                for (const custom of customCompendiums) {
+                    if (custom.category === cat.key) {
+                        const pack = game.packs.get(custom.pack);
+                        if (pack) {
+                            const docs = await pack.getDocuments();
+                            for (const doc of docs) {
+                                const sysTier = foundry.utils.getProperty(doc, "system.tier") ||
+                                              foundry.utils.getProperty(doc, "system.rarity") || 1;
+                                const tier = parseInt(sysTier) || 1;
+                                if (catConfig[tier]) {
+                                    itemCount++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            cat.itemCount = itemCount;
+        }
+
+        return {
+            categories: categories
+        };
+    }
+
+    /**
+     * Gets all items for a given category key
+     */
+    async _getCategoryItems(categoryKey) {
+        const allowedTiers = game.settings.get(MODULE_ID, "allowedTiers");
+        const customTabCompendium = game.settings.get(MODULE_ID, "customTabCompendium");
+        const customCompendiums = game.settings.get(MODULE_ID, "customCompendiums") || [];
+        const priceMod = game.settings.get(MODULE_ID, "priceModifier") / 100;
+
+        const items = [];
+
+        if (categoryKey === "CustomTab") {
+            const pack = game.packs.get(customTabCompendium);
+            if (pack) {
+                const docs = await pack.getDocuments();
+                for (const doc of docs) {
+                    let basePrice = 0;
+                    const desc = foundry.utils.getProperty(doc, "system.description.value") ||
+                                 foundry.utils.getProperty(doc, "system.description") || "";
+                    const descString = String(desc);
+                    const priceMatch = descString.match(/\{\{\{(\d+)\}\}\}/);
+                    if (priceMatch) basePrice = parseInt(priceMatch[1], 10);
+
+                    items.push({
+                        name: doc.name,
+                        basePrice: basePrice
+                    });
+                }
+            }
+        } else {
+            const catConfig = allowedTiers[categoryKey] || {1:true, 2:true, 3:true, 4:true};
+            const priceList = PRICE_DATA[categoryKey] || {};
+
+            // Get items from default pack
+            const defaultPackId = PACK_MAPPING[categoryKey];
+            if (defaultPackId) {
+                const pack = game.packs.get(defaultPackId);
+                if (pack) {
+                    const docs = await pack.getDocuments();
+                    for (const doc of docs) {
+                        if (priceList.hasOwnProperty(doc.name)) {
+                            const tier = priceList[doc.name].tier;
+                            if (catConfig[tier]) {
+                                const basePrice = Math.ceil(priceList[doc.name].price * priceMod);
+                                items.push({
+                                    name: doc.name,
+                                    basePrice: basePrice
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Get items from custom compendiums
+            for (const custom of customCompendiums) {
+                if (custom.category === categoryKey) {
+                    const pack = game.packs.get(custom.pack);
+                    if (pack) {
+                        const docs = await pack.getDocuments();
+                        for (const doc of docs) {
+                            const sysTier = foundry.utils.getProperty(doc, "system.tier") ||
+                                          foundry.utils.getProperty(doc, "system.rarity") || 1;
+                            const tier = parseInt(sysTier) || 1;
+                            if (catConfig[tier]) {
+                                let basePrice = 0;
+                                if (priceList.hasOwnProperty(doc.name)) {
+                                    basePrice = Math.ceil(priceList[doc.name].price * priceMod);
+                                }
+                                items.push({
+                                    name: doc.name,
+                                    basePrice: basePrice
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return items;
+    }
+
+    /**
+     * Randomize a single category
+     */
+    async _onRandomizeCategory(event, target) {
+        const categoryKey = target.dataset.category;
+        const row = this.element.querySelector(`.category-randomizer-row[data-category="${categoryKey}"]`);
+
+        if (!row) return;
+
+        const minItems = parseInt(row.querySelector(".rand-min-items").value) || 0;
+        const maxItems = parseInt(row.querySelector(".rand-max-items").value) || 0;
+        const salesMin = parseInt(row.querySelector(".rand-sales-min").value) || 0;
+        const salesMax = parseInt(row.querySelector(".rand-sales-max").value) || 0;
+        const varMin = parseInt(row.querySelector(".rand-var-min").value) || 0;
+        const varMax = parseInt(row.querySelector(".rand-var-max").value) || 0;
+
+        await this._randomizeCategory(categoryKey, minItems, maxItems, salesMin, salesMax, varMin, varMax);
+
+        ui.notifications.info(`Randomized ${categoryKey} category.`);
+    }
+
+    /**
+     * Core randomization logic for a category
+     */
+    async _randomizeCategory(categoryKey, minItems, maxItems, salesMin, salesMax, varMin, varMax) {
+        const items = await this._getCategoryItems(categoryKey);
+
+        if (items.length === 0) return;
+
+        // Clamp values
+        const effectiveMax = Math.min(maxItems, items.length);
+        const effectiveMin = Math.min(minItems, effectiveMax);
+
+        // Random number of visible items between min and max
+        const numVisible = Math.floor(Math.random() * (effectiveMax - effectiveMin + 1)) + effectiveMin;
+
+        // Shuffle items and pick visible ones
+        const shuffled = [...items].sort(() => Math.random() - 0.5);
+        const visibleItems = shuffled.slice(0, numVisible);
+        const hiddenItemNames = shuffled.slice(numVisible).map(i => i.name);
+
+        // Get current settings
+        const hiddenItems = foundry.utils.deepClone(game.settings.get(MODULE_ID, "hiddenItems")) || {};
+        const saleItems = foundry.utils.deepClone(game.settings.get(MODULE_ID, "saleItems")) || {};
+        const priceOverrides = foundry.utils.deepClone(game.settings.get(MODULE_ID, "priceOverrides")) || {};
+
+        // First, clear all items in this category from hidden/sale/overrides
+        for (const item of items) {
+            delete hiddenItems[item.name];
+            delete saleItems[item.name];
+            delete priceOverrides[item.name];
+        }
+
+        // Set hidden items
+        for (const name of hiddenItemNames) {
+            hiddenItems[name] = true;
+        }
+
+        // Determine sale items from visible ones
+        const effectiveSalesMax = Math.min(salesMax, visibleItems.length);
+        const effectiveSalesMin = Math.min(salesMin, effectiveSalesMax);
+        const numSales = Math.floor(Math.random() * (effectiveSalesMax - effectiveSalesMin + 1)) + effectiveSalesMin;
+
+        const saleShuffled = [...visibleItems].sort(() => Math.random() - 0.5);
+        const itemsOnSale = saleShuffled.slice(0, numSales);
+
+        for (const item of itemsOnSale) {
+            saleItems[item.name] = true;
+        }
+
+        // Apply price variation to visible items
+        for (const item of visibleItems) {
+            if (varMin > 0 || varMax > 0) {
+                // Random variation between -varMin% and +varMax%
+                const variationPercent = (Math.random() * (varMin + varMax)) - varMin;
+                const multiplier = 1 + (variationPercent / 100);
+                const newPrice = Math.max(1, Math.round(item.basePrice * multiplier));
+
+                // Only set override if price actually changed
+                if (newPrice !== item.basePrice) {
+                    priceOverrides[item.name] = newPrice;
+                }
+            }
+        }
+
+        // Save settings
+        await game.settings.set(MODULE_ID, "hiddenItems", hiddenItems);
+        await game.settings.set(MODULE_ID, "saleItems", saleItems);
+        await game.settings.set(MODULE_ID, "priceOverrides", priceOverrides);
+    }
+
+    /**
+     * Randomize all categories at once
+     */
+    async _onRandomizeAll(event, target) {
+        const rows = this.element.querySelectorAll(".category-randomizer-row");
+
+        for (const row of rows) {
+            const categoryKey = row.dataset.category;
+            const minItems = parseInt(row.querySelector(".rand-min-items").value) || 0;
+            const maxItems = parseInt(row.querySelector(".rand-max-items").value) || 0;
+            const salesMin = parseInt(row.querySelector(".rand-sales-min").value) || 0;
+            const salesMax = parseInt(row.querySelector(".rand-sales-max").value) || 0;
+            const varMin = parseInt(row.querySelector(".rand-var-min").value) || 0;
+            const varMax = parseInt(row.querySelector(".rand-var-max").value) || 0;
+
+            await this._randomizeCategory(categoryKey, minItems, maxItems, salesMin, salesMax, varMin, varMax);
+        }
+
+        ui.notifications.info("All categories have been randomized!");
+    }
+
+    /**
+     * Reset all items to visible (clear hidden, sales, and price overrides)
+     */
+    async _onResetAll(event, target) {
+        await game.settings.set(MODULE_ID, "hiddenItems", {});
+        await game.settings.set(MODULE_ID, "saleItems", {});
+        await game.settings.set(MODULE_ID, "priceOverrides", {});
+
+        ui.notifications.info("All items are now visible with default prices.");
     }
 }
