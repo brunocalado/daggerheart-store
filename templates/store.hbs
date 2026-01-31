@@ -222,11 +222,29 @@
                                         {{/if}}
                                     </div>
 
-                                    <input type="number" 
-                                           class="gm-price-input" 
-                                           value="{{this.price}}" 
-                                           data-name="{{this.name}}" 
-                                           min="0" step="1">
+                                    <div class="gm-input-group">
+                                        <span class="gm-input-label">Price</span>
+                                        <input type="number"
+                                               class="gm-price-input"
+                                               value="{{this.price}}"
+                                               data-name="{{this.name}}"
+                                               min="0" step="1"
+                                               title="Item Price">
+                                    </div>
+
+                                    {{#if this.stockEnabled}}
+                                        <div class="gm-input-group">
+                                            <span class="gm-input-label">Stock</span>
+                                            <input type="number"
+                                                   class="gm-stock-input"
+                                                   value="{{this.stockQuantity}}"
+                                                   data-name="{{this.name}}"
+                                                   min="0"
+                                                   max="9999"
+                                                   placeholder="∞"
+                                                   title="Stock Quantity (empty = unlimited)">
+                                        </div>
+                                    {{/if}}
                                 </div>
                             {{else}}
                                 <div class="player-controls">
@@ -243,6 +261,23 @@
                                         {{/if}}
                                     </div>
 
+                                    <!-- STOCK DISPLAY (Players) -->
+                                    {{#if this.stockEnabled}}
+                                        <div class="stock-display">
+                                            {{#if this.stockQuantity}}
+                                                <span class="stock-count stock-{{this.stockStatus}}">
+                                                    {{this.stockQuantity}} left
+                                                </span>
+                                            {{else}}
+                                                {{#if (eq this.stockStatus "out")}}
+                                                    <span class="stock-count stock-out">Out of Stock</span>
+                                                {{else}}
+                                                    <span class="stock-count stock-unlimited">∞</span>
+                                                {{/if}}
+                                            {{/if}}
+                                        </div>
+                                    {{/if}}
+
                                     <!-- SELL BUTTON (NEW) -->
                                     <button type="button"
                                             class="sell-btn"
@@ -256,41 +291,41 @@
 
                                     <!-- BUY BUTTONS -->
                                     {{#if ../../../hasPartyActor}}
-                                        <button type="button" 
-                                                class="buy-btn" 
+                                        <button type="button"
+                                                class="buy-btn"
                                                 data-action="buyItem"
                                                 data-source="personal"
-                                                data-id="{{this.id}}" 
-                                                data-uuid="{{this.uuid}}" 
+                                                data-id="{{this.id}}"
+                                                data-uuid="{{this.uuid}}"
                                                 data-price="{{this.price}}"
                                                 data-name="{{this.name}}"
                                                 title="Buy for Yourself"
-                                                {{#unless this.canBuyPersonal}}disabled{{/unless}}>
+                                                {{#if (or (not this.canBuyPersonal) (eq this.stockStatus "out"))}}disabled{{/if}}>
                                             <i class="fas fa-coins"></i>
                                         </button>
 
-                                        <button type="button" 
-                                                class="buy-btn party-btn" 
+                                        <button type="button"
+                                                class="buy-btn party-btn"
                                                 data-action="buyItem"
                                                 data-source="party"
-                                                data-id="{{this.id}}" 
-                                                data-uuid="{{this.uuid}}" 
+                                                data-id="{{this.id}}"
+                                                data-uuid="{{this.uuid}}"
                                                 data-price="{{this.price}}"
                                                 data-name="{{this.name}}"
                                                 title="Split Payment with Party Funds"
-                                                {{#unless this.canBuyParty}}disabled{{/unless}}>
+                                                {{#if (or (not this.canBuyParty) (eq this.stockStatus "out"))}}disabled{{/if}}>
                                             <i class="fas fa-users"></i>
                                         </button>
                                     {{else}}
-                                        <button type="button" 
-                                                class="buy-btn" 
+                                        <button type="button"
+                                                class="buy-btn"
                                                 data-action="buyItem"
                                                 data-source="personal"
-                                                data-id="{{this.id}}" 
-                                                data-uuid="{{this.uuid}}" 
+                                                data-id="{{this.id}}"
+                                                data-uuid="{{this.uuid}}"
                                                 data-price="{{this.price}}"
                                                 data-name="{{this.name}}"
-                                                {{#unless this.canBuyPersonal}}disabled{{/unless}}>
+                                                {{#if (or (not this.canBuyPersonal) (eq this.stockStatus "out"))}}disabled{{/if}}>
                                             <i class="fas fa-coins"></i> Buy
                                         </button>
                                     {{/if}}

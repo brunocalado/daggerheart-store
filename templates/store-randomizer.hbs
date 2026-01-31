@@ -21,32 +21,37 @@
 
                 <div class="randomizer-inputs-row">
                     <div class="control-group" title="Minimum number of items that will be visible after randomization">
-                        <label>Stock Min</label>
+                        <label>Items Min</label>
                         <input type="number" class="rand-min-items" data-category="{{this.key}}" value="0" min="0" max="999">
                     </div>
 
                     <div class="control-group" title="Maximum number of items that will be visible after randomization">
-                        <label>Stock Max</label>
+                        <label>Items Max</label>
                         <input type="number" class="rand-max-items" data-category="{{this.key}}" value="{{this.itemCount}}" min="0" max="999">
                     </div>
 
+                    <div class="control-group" title="Maximum stock quantity for each visible item (0 = unlimited)">
+                        <label>Max Qty</label>
+                        <input type="number" class="rand-max-qty" data-category="{{this.key}}" value="0" min="0" max="999">
+                    </div>
+
                     <div class="control-group" title="Minimum number of visible items that will be marked as on sale">
-                        <label>Sale Selection Min</label>
+                        <label>Sale Min</label>
                         <input type="number" class="rand-sales-min" data-category="{{this.key}}" value="0" min="0" max="999">
                     </div>
 
                     <div class="control-group" title="Maximum number of visible items that will be marked as on sale">
-                        <label>Sale Selection Max</label>
+                        <label>Sale Max</label>
                         <input type="number" class="rand-sales-max" data-category="{{this.key}}" value="0" min="0" max="999">
                     </div>
 
                     <div class="control-group" title="Maximum percentage to DECREASE the price (e.g., 10 means prices can go down by up to 10%)">
-                        <label>Min Offset %</label>
+                        <label>Price -%</label>
                         <input type="number" class="rand-var-min" data-category="{{this.key}}" value="0" min="0" max="100">
                     </div>
 
                     <div class="control-group" title="Maximum percentage to INCREASE the price (e.g., 15 means prices can go up by up to 15%)">
-                        <label>Max Offset %</label>
+                        <label>Price +%</label>
                         <input type="number" class="rand-var-max" data-category="{{this.key}}" value="0" min="0" max="100">
                     </div>
                 </div>

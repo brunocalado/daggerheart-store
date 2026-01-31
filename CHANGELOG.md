@@ -1,3 +1,6 @@
+# 0.1.3
+- css fix
+
 # 0.1.2
 - Removed transparency. +Performance
 - Improved CSS isolation to prevent the module from affecting unintended elements.

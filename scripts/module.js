@@ -1,5 +1,6 @@
 import { DaggerheartStore } from "./store-app.js";
 import { StoreWelcome } from "./store-welcome.js";
+import { StockManager } from "./stock-manager.js";
 
 const MODULE_ID = "daggerheart-store";
 const { DialogV2 } = foundry.applications.api;
@@ -143,6 +144,23 @@ Hooks.once("init", () => {
         default: { target: "none", time: 0 },
         onChange: _handleOpenStoreRequest
     });
+
+    // Limited Stock System Settings
+    game.settings.register(MODULE_ID, "stockEnabled", {
+        name: "Enable Limited Stock",
+        scope: "world",
+        config: false,
+        type: Boolean,
+        default: false
+    });
+
+    game.settings.register(MODULE_ID, "showStockQuantity", {
+        name: "Show Exact Stock Quantities",
+        scope: "world",
+        config: false,
+        type: Boolean,
+        default: true
+    });
 });
 
 // Singleton Instance Holder
@@ -233,6 +251,9 @@ Hooks.once("ready", () => {
         if (!welcomeHidden) {
             new StoreWelcome().render(true);
         }
+
+        // Initialize stock data on party actor if needed
+        StockManager.initializeStockData();
     }
 });
 
@@ -246,6 +267,22 @@ Hooks.on("updateSetting", (setting) => {
             }
             storeInstance.render();
         }
+    }
+});
+
+Hooks.on("updateActor", (actor, changes, options, userId) => {
+    // Check if this is the configured Party Actor (used for stock)
+    const partyActorId = game.settings.get(MODULE_ID, "partyActorId");
+    if (!partyActorId || actor.id !== partyActorId) return;
+
+    // Check if stock data changed
+    const stockChanged = foundry.utils.hasProperty(changes, `flags.${MODULE_ID}.stock`);
+    if (!stockChanged) return;
+
+    // Refresh store if open
+    if (storeInstance && storeInstance.rendered) {
+        console.log(`${MODULE_ID} | Stock updated, refreshing store UI`);
+        storeInstance.render();
     }
 });
 

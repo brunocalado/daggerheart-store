@@ -1,7 +1,7 @@
 {
   "id": "daggerheart-store",
   "title": "Daggerheart: Store",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "compatibility": {
     "minimum": "13",
     "verified": "13"
@@ -31,6 +31,7 @@
     "thumbnail": "modules/daggerheart-store/assets/images/thumbnail.webp"
   }], 
   
+  "socket": true,
   "esmodules": [
     "scripts/module.js"
   ],

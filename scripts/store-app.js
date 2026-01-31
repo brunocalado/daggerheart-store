@@ -1,4 +1,5 @@
 import { PRICE_DATA, PACK_MAPPING } from "./price-data.js";
+import { StockManager } from "./stock-manager.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api;
 const MODULE_ID = "daggerheart-store";
@@ -417,6 +418,10 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const blockedSaleItems = game.settings.get(MODULE_ID, "blockedSaleItems") || {};
         const blockedPurchaseItems = game.settings.get(MODULE_ID, "blockedPurchaseItems") || {};
 
+        // Stock System Validation & Setup (requires Party Actor to be configured)
+        const stockEnabled = game.settings.get(MODULE_ID, "stockEnabled") && hasPartyActor;
+        const showStockQuantity = game.settings.get(MODULE_ID, "showStockQuantity");
+
         let categories = foundry.utils.deepClone(STANDARD_CATEGORIES);
 
         const customTabCompendium = game.settings.get(MODULE_ID, "customTabCompendium");
@@ -526,6 +531,21 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             }
                         }
 
+                        // Stock System: Fetch stock data if enabled
+                        let stockQuantity = null;
+                        let stockStatus = "available";
+                        if (stockEnabled) {
+                            const qty = await StockManager.getStock(doc.name);
+                            if (qty !== null) {
+                                stockQuantity = qty;
+                                if (qty === 0) {
+                                    stockStatus = "out";
+                                } else if (qty <= 5) {
+                                    stockStatus = "low";
+                                }
+                            }
+                        }
+
                         customItems.push({
                             id: doc.id,
                             uuid: doc.uuid,
@@ -545,7 +565,11 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             itemSummary: itemSummary,
                             isRecommended: isRecommended,
                             description: cleanedDescription,
-                            header: itemHeader
+                            header: itemHeader,
+                            stockQuantity: stockQuantity,
+                            stockStatus: stockStatus,
+                            stockEnabled: stockEnabled,
+                            showStockQty: showStockQuantity
                         });
                     }
                 }
@@ -678,6 +702,21 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         }
                     }
 
+                    // Stock System: Fetch stock data if enabled
+                    let stockQuantity = null;
+                    let stockStatus = "available";
+                    if (stockEnabled) {
+                        const qty = await StockManager.getStock(doc.name);
+                        if (qty !== null) {
+                            stockQuantity = qty;
+                            if (qty === 0) {
+                                stockStatus = "out";
+                            } else if (qty <= 5) {
+                                stockStatus = "low";
+                            }
+                        }
+                    }
+
                     if (tierGroups[tier]) {
                         tierGroups[tier].items.push({
                             id: doc.id,
@@ -697,7 +736,11 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             sellPrice: sellPrice,
                             itemSummary: itemSummary,
                             isRecommended: isRecommended,
-                            description: cleanedDescription
+                            description: cleanedDescription,
+                            stockQuantity: stockQuantity,
+                            stockStatus: stockStatus,
+                            stockEnabled: stockEnabled,
+                            showStockQty: showStockQuantity
                         });
                     }
                 }
@@ -744,6 +787,25 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const priceInputs = html.querySelectorAll(".gm-price-input");
         priceInputs.forEach(input => {
             input.addEventListener("change", this._onPriceOverrideChange.bind(this));
+        });
+
+        // Event listener for GM stock inputs
+        const stockInputs = html.querySelectorAll(".gm-stock-input");
+        stockInputs.forEach(input => {
+            input.addEventListener("change", async (e) => {
+                const itemName = e.target.dataset.name;
+                const value = e.target.value.trim();
+
+                if (value === "" || value === "∞") {
+                    // Set to unlimited
+                    await StockManager.setStock(itemName, 0, true);
+                } else {
+                    const qty = parseInt(value);
+                    if (!isNaN(qty) && qty >= 0) {
+                        await StockManager.setStock(itemName, qty, false);
+                    }
+                }
+            });
         });
 
         const itemImages = html.querySelectorAll(".item-image");
@@ -869,6 +931,18 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             if (!partyActor) return ui.notifications.error("Party actor not found.");
 
             return this._handleSplitPurchase(itemUuid, itemName, itemPrice, userActor, partyActor);
+        }
+
+        // Check stock (if enabled and Party Actor is configured)
+        const partyActorId = game.settings.get(MODULE_ID, "partyActorId");
+        const hasPartyActor = !!(partyActorId && game.actors.get(partyActorId));
+        const stockEnabled = game.settings.get(MODULE_ID, "stockEnabled") && hasPartyActor;
+
+        if (stockEnabled) {
+            const stockQty = await StockManager.getStock(itemName);
+            if (stockQty !== null && stockQty < 1) {
+                return ui.notifications.warn(`${itemName} is out of stock.`);
+            }
         }
 
         // Check funds (respecting Smart Mode for calculation)
@@ -1242,6 +1316,20 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const itemData = itemFromPack.toObject();
         await recipient.createEmbeddedDocuments("Item", [itemData]);
 
+        // Decrement stock after successful purchase (if enabled and Party Actor configured)
+        const partyActorId = game.settings.get(MODULE_ID, "partyActorId");
+        const hasPartyActor = !!(partyActorId && game.actors.get(partyActorId));
+        const stockEnabled = game.settings.get(MODULE_ID, "stockEnabled") && hasPartyActor;
+
+        if (stockEnabled) {
+            const success = await StockManager.decrementStock(itemName, 1);
+            if (!success) {
+                ui.notifications.warn(
+                    "Stock depleted during purchase. Item added but stock was not updated."
+                );
+            }
+        }
+
         const payerText = payers
             .filter(p => p.amount > 0)
             .map(p => `<strong>${p.name}</strong> (${p.amount})`)
@@ -1354,7 +1442,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             partyActorId: game.settings.get(MODULE_ID, "partyActorId"),
                             customTabName: game.settings.get(MODULE_ID, "customTabName"),
                             customTabCompendium: game.settings.get(MODULE_ID, "customTabCompendium"),
-                            sellRatio: game.settings.get(MODULE_ID, "sellRatio")
+                            sellRatio: game.settings.get(MODULE_ID, "sellRatio"),
+                            stockEnabled: game.settings.get(MODULE_ID, "stockEnabled"),
+                            showStockQuantity: game.settings.get(MODULE_ID, "showStockQuantity")
                         };
 
                         const profiles = foundry.utils.deepClone(game.settings.get(MODULE_ID, "storeProfiles")) || {};
@@ -1394,12 +1484,14 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 partyActorId: "",
                 customTabName: "General",
                 customTabCompendium: "daggerheart-store.general-items",
-                sellRatio: 0.5
+                sellRatio: 0.5,
+                stockEnabled: false,
+                showStockQuantity: true
             };
         } else {
             const profiles = game.settings.get(MODULE_ID, "storeProfiles");
             profileData = profiles[profileName];
-            
+
             if (!profileData) return ui.notifications.error(`Profile "${profileName}" not found.`);
         }
 
@@ -1407,7 +1499,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             "storeName", "priceModifier", "allowedTiers",
             "hiddenCategories", "customCompendiums", "priceOverrides",
             "saleDiscount", "saleItems", "hiddenItems", "blockedSaleItems",
-            "blockedPurchaseItems", "partyActorId", "customTabName", "customTabCompendium", "sellRatio"
+            "blockedPurchaseItems", "partyActorId", "customTabName", "customTabCompendium", "sellRatio",
+            "stockEnabled", "showStockQuantity"
         ];
 
         for (const key of settingsToUpdate) {
@@ -1568,7 +1661,12 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         window: { title: "Store Configuration (GM)", icon: "fas fa-cogs", resizable: true },
         position: { width: 700, height: 740 },
         form: { handler: StoreConfig.prototype._updateSettings, closeOnSubmit: true },
-        actions: { addCompendium: StoreConfig.prototype._onAddCompendium, removeCompendium: StoreConfig.prototype._onRemoveCompendium }
+        actions: {
+            addCompendium: StoreConfig.prototype._onAddCompendium,
+            removeCompendium: StoreConfig.prototype._onRemoveCompendium,
+            applyStockDefaults: StoreConfig.prototype._onApplyStockDefaults,
+            restockAll: StoreConfig.prototype._onRestockAll
+        }
     };
 
     static PARTS = { form: { template: "modules/daggerheart-store/templates/store-config.hbs" } };
@@ -1577,15 +1675,25 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         const priceMod = game.settings.get(MODULE_ID, "priceModifier");
         const saleDiscount = game.settings.get(MODULE_ID, "saleDiscount");
         const sellRatio = game.settings.get(MODULE_ID, "sellRatio");
-        
+
         const allowedTiers = game.settings.get(MODULE_ID, "allowedTiers");
         const hiddenCategories = game.settings.get(MODULE_ID, "hiddenCategories");
         const customCompendiums = game.settings.get(MODULE_ID, "customCompendiums") || [];
         const selectedPartyActor = game.settings.get(MODULE_ID, "partyActorId");
-        
+
         const storeName = game.settings.get(MODULE_ID, "storeName");
         const customTabName = game.settings.get(MODULE_ID, "customTabName");
         const customTabCompendium = game.settings.get(MODULE_ID, "customTabCompendium");
+
+        // Stock System Data
+        const partyActorId = game.settings.get(MODULE_ID, "partyActorId");
+        const hasPartyActor = !!(partyActorId && game.actors.get(partyActorId));
+        const stockEnabled = game.settings.get(MODULE_ID, "stockEnabled");
+        const showStockQuantity = game.settings.get(MODULE_ID, "showStockQuantity");
+
+        const storeActor = await StockManager.getStoreActor();
+        const categoryDefaults = storeActor?.getFlag(MODULE_ID, "stock.categoryDefaults") ||
+            StockManager._getDefaultCategorySettings();
 
         const partyActors = game.actors.filter(a => a.type === "party").map(a => ({ id: a.id, name: a.name })).sort((a, b) => a.name.localeCompare(b.name));
         const availablePacks = game.packs.filter(p => p.documentName === "Item").map(p => ({ id: p.collection, label: `${p.metadata.label} (${p.collection})` })).sort((a, b) => a.label.localeCompare(b.label));
@@ -1607,20 +1715,34 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             isVisible: !hiddenCategories[cat.key]
         }));
 
-        return { 
+        // Stock Category Defaults for template
+        const stockCategoryDefaults = STANDARD_CATEGORIES.map(cat => ({
+            key: cat.key,
+            label: cat.label,
+            tier1: categoryDefaults[cat.key]?.tier1 || 10,
+            tier2: categoryDefaults[cat.key]?.tier2 || 5,
+            tier3: categoryDefaults[cat.key]?.tier3 || 3,
+            tier4: categoryDefaults[cat.key]?.tier4 || 1
+        }));
+
+        return {
             storeName: storeName,
-            customTabName: customTabName,         
+            customTabName: customTabName,
             customTabCompendium: customTabCompendium,
-            priceModifier: priceMod, 
-            saleDiscount: saleDiscount, 
+            priceModifier: priceMod,
+            saleDiscount: saleDiscount,
             sellRatioPercent: Math.round(sellRatio * 100), // Converted to percent for display
-            categories: categoryConfigList, 
-            customCompendiums: customCompendiums, 
-            availableCategories: STANDARD_CATEGORIES.map(c => c.key), 
-            availablePacks: availablePacks, 
-            partyActors: partyActors, 
+            categories: categoryConfigList,
+            customCompendiums: customCompendiums,
+            availableCategories: STANDARD_CATEGORIES.map(c => c.key),
+            availablePacks: availablePacks,
+            partyActors: partyActors,
             selectedPartyActor: selectedPartyActor,
-            activeTab: this.currentTab 
+            activeTab: this.currentTab,
+            hasPartyActor: hasPartyActor,
+            stockEnabled: stockEnabled,
+            showStockQuantity: showStockQuantity,
+            stockCategoryDefaults: stockCategoryDefaults
         };
     }
 
@@ -1665,13 +1787,69 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
     }
     
     async _onRemoveCompendium(event, target) {
-        const idx = target.dataset.index; 
+        const idx = target.dataset.index;
         const settings = foundry.utils.deepClone(game.settings.get(MODULE_ID, "customCompendiums"));
-        settings.splice(idx, 1); 
-        await game.settings.set(MODULE_ID, "customCompendiums", settings); 
+        settings.splice(idx, 1);
+        await game.settings.set(MODULE_ID, "customCompendiums", settings);
         this.render();
     }
-    
+
+    async _onApplyStockDefaults(event, target) {
+        // Validate Party Actor is configured
+        const partyActorId = game.settings.get(MODULE_ID, "partyActorId");
+        const hasPartyActor = !!(partyActorId && game.actors.get(partyActorId));
+
+        if (!hasPartyActor) {
+            return ui.notifications.error(
+                "Configure a Party Actor before managing stock."
+            );
+        }
+
+        const confirmed = await DialogV2.confirm({
+            window: { title: "Apply Stock Defaults" },
+            content: "<p>This will set quantities for ALL items based on category/tier defaults. Already configured items will be overwritten. Continue?</p>"
+        });
+
+        if (!confirmed) return;
+
+        const storeActor = await StockManager.getStoreActor();
+        const categoryDefaults = storeActor.getFlag(MODULE_ID, "stock.categoryDefaults");
+
+        // Show progress bar
+        SceneNavigation.displayProgressBar({ label: "Preparing stock data...", pct: 0 });
+
+        // Use batch update with progress callback
+        const itemCount = await StockManager.batchApplyDefaults(categoryDefaults, (current, total) => {
+            const pct = Math.round((current / total) * 100);
+            SceneNavigation.displayProgressBar({
+                label: `Processing item ${current} of ${total}...`,
+                pct: pct
+            });
+        });
+
+        // Clear progress bar
+        SceneNavigation.displayProgressBar({ label: null, pct: 0 });
+
+        ui.notifications.info(`Stock defaults applied to ${itemCount} items!`);
+        this.render();
+    }
+
+    async _onRestockAll(event, target) {
+        // Validate Party Actor is configured
+        const partyActorId = game.settings.get(MODULE_ID, "partyActorId");
+        const hasPartyActor = !!(partyActorId && game.actors.get(partyActorId));
+
+        if (!hasPartyActor) {
+            return ui.notifications.error(
+                "Configure a Party Actor before managing stock."
+            );
+        }
+
+        await StockManager.resetAllStock();
+        ui.notifications.info("All items restocked!");
+        this.render();
+    }
+
     async _updateSettings(event, form, formData) {
         const expanded = foundry.utils.expandObject(formData.object);
         
@@ -1705,10 +1883,34 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         
         await game.settings.set(MODULE_ID, "hiddenCategories", finalHiddenMap);
         await game.settings.set(MODULE_ID, "partyActorId", expanded.partyActorId);
-        
+
         if (expanded.customCompendiums) {
             const compendiumArray = Object.values(expanded.customCompendiums);
             await game.settings.set(MODULE_ID, "customCompendiums", compendiumArray);
+        }
+
+        // Stock System Settings - Validate Party Actor before enabling
+        const partyActorId = expanded.partyActorId || game.settings.get(MODULE_ID, "partyActorId");
+        const hasPartyActor = !!(partyActorId && game.actors.get(partyActorId));
+
+        if (expanded.stockEnabled && !hasPartyActor) {
+            ui.notifications.error(
+                "Cannot enable stock system without a Party Actor configured. " +
+                "Configure a Party Actor in the General tab first."
+            );
+            expanded.stockEnabled = false;
+        }
+
+        await game.settings.set(MODULE_ID, "stockEnabled", expanded.stockEnabled || false);
+
+        // Save category defaults to actor
+        if (expanded.stockDefaults) {
+            const actor = await StockManager.getStoreActor();
+            if (actor) {
+                await actor.update({
+                    [`flags.${MODULE_ID}.stock.categoryDefaults`]: expanded.stockDefaults
+                });
+            }
         }
     }
 }
@@ -1919,9 +2121,10 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
         
         if (!row) return;
 
-        // Reset values: Min=0, Max=ItemCount, Sales=0, Variation=0
+        // Reset values: Min=0, Max=ItemCount, MaxQty=0, Sales=0, Variation=0
         const minInput = row.querySelector(".rand-min-items");
         const maxInput = row.querySelector(".rand-max-items");
+        const maxQtyInput = row.querySelector(".rand-max-qty");
         const salesMinInput = row.querySelector(".rand-sales-min");
         const salesMaxInput = row.querySelector(".rand-sales-max");
         const varMinInput = row.querySelector(".rand-var-min");
@@ -1929,6 +2132,7 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
 
         if (minInput) minInput.value = 0;
         if (maxInput) maxInput.value = itemCount;
+        if (maxQtyInput) maxQtyInput.value = 0;
         if (salesMinInput) salesMinInput.value = 0;
         if (salesMaxInput) salesMaxInput.value = 0;
         if (varMinInput) varMinInput.value = 0;
@@ -1976,20 +2180,21 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
 
         const minItems = parseInt(row.querySelector(".rand-min-items").value) || 0;
         const maxItems = parseInt(row.querySelector(".rand-max-items").value) || 0;
+        const maxQty = parseInt(row.querySelector(".rand-max-qty").value) || 0;
         const salesMin = parseInt(row.querySelector(".rand-sales-min").value) || 0;
         const salesMax = parseInt(row.querySelector(".rand-sales-max").value) || 0;
         const varMin = parseInt(row.querySelector(".rand-var-min").value) || 0;
         const varMax = parseInt(row.querySelector(".rand-var-max").value) || 0;
 
-        await this._randomizeCategory(categoryKey, minItems, maxItems, salesMin, salesMax, varMin, varMax);
-        
+        await this._randomizeCategory(categoryKey, minItems, maxItems, maxQty, salesMin, salesMax, varMin, varMax);
+
         // Notification removed
     }
 
     /**
      * Core randomization logic for a category
      */
-    async _randomizeCategory(categoryKey, minItems, maxItems, salesMin, salesMax, varMin, varMax) {
+    async _randomizeCategory(categoryKey, minItems, maxItems, maxQty, salesMin, salesMax, varMin, varMax) {
         const items = await this._getCategoryItems(categoryKey);
 
         if (items.length === 0) return;
@@ -2054,6 +2259,43 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
         await game.settings.set(MODULE_ID, "hiddenItems", hiddenItems);
         await game.settings.set(MODULE_ID, "saleItems", saleItems);
         await game.settings.set(MODULE_ID, "priceOverrides", priceOverrides);
+
+        // Apply stock quantities if maxQty > 0 and stock system is enabled
+        const stockEnabled = game.settings.get(MODULE_ID, "stockEnabled");
+        if (stockEnabled && maxQty > 0) {
+            const actor = StockManager.getStoreActor();
+            if (actor) {
+                const stockItems = actor.getFlag(MODULE_ID, "stock.items") || {};
+
+                // Set random stock quantity (1 to maxQty) for visible items
+                for (const item of visibleItems) {
+                    const qty = Math.floor(Math.random() * maxQty) + 1;
+                    stockItems[item.name] = {
+                        quantity: qty,
+                        unlimited: false,
+                        restockQuantity: qty,
+                        lastRestocked: Date.now()
+                    };
+                }
+
+                // Set stock to 0 for hidden items
+                for (const name of hiddenItemNames) {
+                    stockItems[name] = {
+                        quantity: 0,
+                        unlimited: false,
+                        restockQuantity: 0,
+                        lastRestocked: Date.now()
+                    };
+                }
+
+                // Single update for all stock changes
+                const version = actor.getFlag(MODULE_ID, "stock.version") || 1;
+                await actor.update({
+                    [`flags.${MODULE_ID}.stock.items`]: stockItems,
+                    [`flags.${MODULE_ID}.stock.version`]: version + 1
+                });
+            }
+        }
     }
 
     /**
@@ -2081,12 +2323,13 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
             const categoryKey = row.dataset.category;
             const minItems = parseInt(row.querySelector(".rand-min-items").value) || 0;
             const maxItems = parseInt(row.querySelector(".rand-max-items").value) || 0;
+            const maxQty = parseInt(row.querySelector(".rand-max-qty").value) || 0;
             const salesMin = parseInt(row.querySelector(".rand-sales-min").value) || 0;
             const salesMax = parseInt(row.querySelector(".rand-sales-max").value) || 0;
             const varMin = parseInt(row.querySelector(".rand-var-min").value) || 0;
             const varMax = parseInt(row.querySelector(".rand-var-max").value) || 0;
 
-            await this._randomizeCategory(categoryKey, minItems, maxItems, salesMin, salesMax, varMin, varMax);
+            await this._randomizeCategory(categoryKey, minItems, maxItems, maxQty, salesMin, salesMax, varMin, varMax);
         }
     }
 

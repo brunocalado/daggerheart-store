@@ -223,7 +223,11 @@
     font-size: 0.9em;
     text-shadow: none;
     box-shadow: none;
-    padding: 5px 10px;
+    
+    /* UPDATED: Fixed height to match select box (30px) */
+    height: 30px;
+    padding: 0 10px; /* Vertical padding removed so flex centers it */
+    
     cursor: pointer;
     border-radius: 4px;
     transition: all 0.2s;
@@ -231,10 +235,12 @@
     align-items: center;
     justify-content: center;
     gap: 5px;
+    box-sizing: border-box; /* Ensure padding/border is included in height */
 }
 
 .daggerheart-store .config-btn.icon-only {
-    padding: 5px 10px;
+    /* UPDATED: Adjusted padding for the new height logic */
+    padding: 0 10px;
     min-width: 32px;
 }
 
@@ -437,8 +443,21 @@
     gap: 4px;
 }
 
+.daggerheart-store .gm-input-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.daggerheart-store .gm-input-label {
+    font-size: 0.8em;
+    font-weight: bold;
+    color: #333;
+    white-space: nowrap;
+}
+
 .daggerheart-store .gm-price-input {
-    width: 60px;
+    width: 55px;
     text-align: center;
     border: 1px solid #777;
     background: #eee;
@@ -1135,4 +1154,107 @@
     min-width: 180px;
 
     pointer-events: none;
+}
+
+/* ==================================================== */
+/* STOCK SYSTEM */
+/* ==================================================== */
+
+.daggerheart-store .stock-display {
+    margin-right: 8px;
+    font-size: 0.9em;
+    display: inline-block;
+}
+
+.daggerheart-store .stock-count {
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.daggerheart-store .stock-count.stock-available {
+    color: #4caf50;
+}
+
+.daggerheart-store .stock-count.stock-low {
+    color: #ff9800;
+}
+
+.daggerheart-store .stock-count.stock-out {
+    color: #f44336;
+    text-decoration: line-through;
+}
+
+.daggerheart-store .stock-count.stock-unlimited {
+    color: #2196f3;
+    font-size: 1.1em;
+}
+
+.daggerheart-store .stock-badge {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: bold;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.daggerheart-store .stock-badge.in-stock {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4caf50;
+    border: 1px solid #4caf50;
+}
+
+.daggerheart-store .stock-badge.low-stock {
+    background: rgba(255, 152, 0, 0.2);
+    color: #ff9800;
+    border: 1px solid #ff9800;
+}
+
+.daggerheart-store .stock-badge.out-of-stock {
+    background: rgba(244, 67, 54, 0.2);
+    color: #f44336;
+    border: 1px solid #f44336;
+}
+
+.daggerheart-store .gm-stock-input {
+    width: 55px;
+    padding: 4px;
+    border: 1px solid #777;
+    border-radius: 3px;
+    background: #eee;
+    color: #000;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+.daggerheart-store .gm-stock-input:focus {
+    outline: none;
+    border-color: #d4af37;
+    box-shadow: 0 0 4px rgba(212, 175, 55, 0.5);
+}
+
+.daggerheart-store .gm-price-input:focus {
+    outline: none;
+    border-color: #d4af37;
+    box-shadow: 0 0 4px rgba(212, 175, 55, 0.5);
+}
+
+/* Stock Config Table Inputs */
+.daggerheart-store-config .stock-tier-input {
+    width: 100%;
+    padding: 6px 4px;
+    text-align: center;
+    background: #1a1a1a;
+    border: 1px solid #555;
+    border-radius: 3px;
+    color: #fff;
+    font-size: 0.95em;
+}
+
+.daggerheart-store-config .stock-tier-input:focus {
+    outline: none;
+    border-color: #d4af37;
+    box-shadow: 0 0 4px rgba(212, 175, 55, 0.3);
 }
