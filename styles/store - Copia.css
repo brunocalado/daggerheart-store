@@ -625,11 +625,6 @@
 /* Config Window Styles (GM) */
 /* ==================================================== */
 
-/* Fixed: Use ID selector to specifically target the window content and override core padding */
-#daggerheart-store-config .window-content {
-    padding: 0 !important;
-}
-
 .daggerheart-store-config {
     background: #222;
     color: #eee;
