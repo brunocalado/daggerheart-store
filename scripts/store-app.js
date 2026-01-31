@@ -750,8 +750,10 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         const isHidden = hiddenItems[doc.name];
                         const isSaleBlocked = blockedSaleItems[doc.name];
                         const isPurchaseBlocked = blockedPurchaseItems[doc.name];
-                        const inventoryItem = hasActor ? userActor.items.find(i => i.name === doc.name) : null;
-                        const hasItem = !!inventoryItem;
+                        let hasItem = false;
+                        if (hasActor && userActor.items) {
+                            hasItem = userActor.items.some(i => i.name === doc.name);
+                        }
                         const canSell = hasItem && !isSaleBlocked;
 
                         // Skip if: hidden AND not GM (visibility = completely hide)
@@ -919,8 +921,10 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     const isHidden = hiddenItems[doc.name];
                     const isSaleBlocked = blockedSaleItems[doc.name];
                     const isPurchaseBlocked = blockedPurchaseItems[doc.name];
-                    const inventoryItem = hasActor ? userActor.items.find(i => i.name === doc.name) : null;
-                    const hasItem = !!inventoryItem;
+                    let hasItem = false;
+                    if (hasActor && userActor.items) {
+                        hasItem = userActor.items.some(i => i.name === doc.name);
+                    }
                     const canSell = hasItem && !isSaleBlocked;
 
                     // Skip if: hidden AND not GM (visibility = completely hide)
@@ -1356,11 +1360,18 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
     }
 
     async _onSellItem(event, target) {
+        // Check if button is disabled
+        if (target.disabled) return;
+
         const itemName = target.dataset.name;
         const sellPrice = parseInt(target.dataset.price);
         const userActor = game.user.character;
 
         if (!userActor) return ui.notifications.error("You need an assigned character to sell items.");
+
+        // Check if sale is blocked by GM
+        const blockedSaleItems = game.settings.get(MODULE_ID, "blockedSaleItems") || {};
+        if (blockedSaleItems[itemName]) return ui.notifications.warn("This item cannot be sold.");
 
         const itemToDelete = userActor.items.find(i => i.name === itemName);
         if (!itemToDelete) return ui.notifications.warn(`You do not have a "${itemName}" to sell.`);

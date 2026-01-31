@@ -1,5 +1,7 @@
 # 0.1.3
 - css fix
+- New Feature: Stock
+- New Feature: You can compare the current weapon/armor with a new one.
 
 # 0.1.2
 - Removed transparency. +Performance

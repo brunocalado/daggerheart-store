@@ -608,10 +608,17 @@
     transition: all 0.2s;
 }
 
-.daggerheart-store .sell-btn:hover {
+.daggerheart-store .sell-btn:hover:not(:disabled) {
     background: #b54545;
     box-shadow: 0 0 5px #7a3030;
     border-color: #ff9999;
+}
+
+.daggerheart-store .sell-btn:disabled {
+    background: #777;
+    border-color: #555;
+    opacity: 0.7;
+    cursor: not-allowed;
 }
 
 /* ==================================================== */
