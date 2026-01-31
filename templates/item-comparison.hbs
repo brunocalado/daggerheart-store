@@ -1,0 +1,141 @@
+<div class="comparison-tooltip">
+    <div class="comparison-container">
+        {{!-- Left Column: Equipped Item --}}
+        <div class="comparison-column equipped">
+            <div class="column-header">Currently Equipped</div>
+            {{#if hasEquipped}}
+                <div class="item-card">
+                    <img src="{{equipped.img}}" class="item-img" alt="{{equipped.name}}"/>
+                    <div class="item-name">{{equipped.name}}</div>
+                    <div class="tier-badge tier-{{equipped.tier}}">Tier {{equipped.tier}}</div>
+                    {{#if equipped.description}}
+                        <div class="item-description">{{equipped.description}}</div>
+                    {{/if}}
+                    <div class="item-stats">
+                        {{#if equipped.isWeapon}}
+                            {{#if equipped.trait}}
+                                <div class="stat-row">
+                                    <span class="stat-label">Trait</span>
+                                    <span class="stat-value">{{equipped.trait}}</span>
+                                </div>
+                            {{/if}}
+                            {{#if equipped.range}}
+                                <div class="stat-row">
+                                    <span class="stat-label">Range</span>
+                                    <span class="stat-value">{{equipped.range}}</span>
+                                </div>
+                            {{/if}}
+                            {{#if equipped.damageDisplay}}
+                                <div class="stat-row">
+                                    <span class="stat-label">Damage</span>
+                                    <span class="stat-value">
+                                        {{equipped.damageDisplay}}
+                                        {{#if equipped.isDirect}}<span class="direct-tag">Direct</span>{{/if}}
+                                    </span>
+                                </div>
+                            {{/if}}
+                            {{#if equipped.burden}}
+                                <div class="stat-row">
+                                    <span class="stat-label">Burden</span>
+                                    <span class="stat-value">{{equipped.burden}}</span>
+                                </div>
+                            {{/if}}
+                        {{else}}
+                            {{!-- Armor Stats --}}
+                            <div class="stat-row">
+                                <span class="stat-label">Base Score</span>
+                                <span class="stat-value">{{equipped.baseScore}}</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Thresholds</span>
+                                <span class="stat-value">{{equipped.thresholdMajor}} / {{equipped.thresholdSevere}}</span>
+                            </div>
+                        {{/if}}
+                    </div>
+                    {{#if equipped.features.length}}
+                        <div class="item-features">
+                            {{#each equipped.features}}
+                                <div class="feature-row">
+                                    <span class="feature-name">{{this.name}}:</span>
+                                    <span class="feature-desc">{{this.description}}</span>
+                                </div>
+                            {{/each}}
+                        </div>
+                    {{/if}}
+                </div>
+            {{else}}
+                <div class="no-item">
+                    <i class="fas fa-times-circle"></i>
+                    <span>No item equipped</span>
+                </div>
+            {{/if}}
+        </div>
+
+        {{!-- Divider --}}
+        <div class="comparison-divider"></div>
+
+        {{!-- Right Column: Store Item --}}
+        <div class="comparison-column store">
+            <div class="column-header">Store Item</div>
+            <div class="item-card">
+                <img src="{{storeItem.img}}" class="item-img" alt="{{storeItem.name}}"/>
+                <div class="item-name">{{storeItem.name}}</div>
+                <div class="tier-badge tier-{{storeItem.tier}}">Tier {{storeItem.tier}}</div>
+                {{#if storeItem.description}}
+                    <div class="item-description">{{storeItem.description}}</div>
+                {{/if}}
+                <div class="item-stats">
+                    {{#if storeItem.isWeapon}}
+                        {{#if storeItem.trait}}
+                            <div class="stat-row">
+                                <span class="stat-label">Trait</span>
+                                <span class="stat-value">{{storeItem.trait}}</span>
+                            </div>
+                        {{/if}}
+                        {{#if storeItem.range}}
+                            <div class="stat-row">
+                                <span class="stat-label">Range</span>
+                                <span class="stat-value">{{storeItem.range}}</span>
+                            </div>
+                        {{/if}}
+                        {{#if storeItem.damageDisplay}}
+                            <div class="stat-row">
+                                <span class="stat-label">Damage</span>
+                                <span class="stat-value">
+                                    {{storeItem.damageDisplay}}
+                                    {{#if storeItem.isDirect}}<span class="direct-tag">Direct</span>{{/if}}
+                                </span>
+                            </div>
+                        {{/if}}
+                        {{#if storeItem.burden}}
+                            <div class="stat-row">
+                                <span class="stat-label">Burden</span>
+                                <span class="stat-value">{{storeItem.burden}}</span>
+                            </div>
+                        {{/if}}
+                    {{else}}
+                        {{!-- Armor Stats --}}
+                        <div class="stat-row">
+                            <span class="stat-label">Base Score</span>
+                            <span class="stat-value">{{storeItem.baseScore}}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Thresholds</span>
+                            <span class="stat-value">{{storeItem.thresholdMajor}} / {{storeItem.thresholdSevere}}</span>
+                        </div>
+                    {{/if}}
+                </div>
+                {{#if storeItem.features.length}}
+                    <div class="item-features">
+                        {{#each storeItem.features}}
+                            <div class="feature-row">
+                                <span class="feature-name">{{this.name}}:</span>
+                                <span class="feature-desc">{{this.description}}</span>
+                            </div>
+                        {{/each}}
+                    </div>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+</div>

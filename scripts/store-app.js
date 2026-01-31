@@ -263,6 +263,290 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         }
     }
 
+    /**
+     * Checks if a category supports item comparison.
+     * @param {string} categoryId - The category ID
+     * @returns {boolean}
+     */
+    _isComparableCategory(categoryId) {
+        return ["primary", "secondary", "wheelchairs", "armors"].includes(categoryId);
+    }
+
+    /**
+     * Gets the currently equipped item for a given category.
+     * @param {Actor} actor - The actor to check
+     * @param {string} category - The category ID
+     * @returns {Item|null}
+     */
+    _getEquippedItem(actor, category) {
+        if (!actor) return null;
+
+        switch (category) {
+            case "primary":
+                return actor.items.find(x =>
+                    x.type === "weapon" &&
+                    x.system.equipped &&
+                    !x.system.secondary &&
+                    !x.name.includes("Wheelchair")
+                );
+            case "secondary":
+                return actor.items.find(x =>
+                    x.type === "weapon" &&
+                    x.system.equipped &&
+                    x.system.secondary &&
+                    !x.name.includes("Wheelchair")
+                );
+            case "wheelchairs":
+                return actor.items.find(x =>
+                    x.type === "weapon" &&
+                    x.system.equipped &&
+                    x.name.includes("Wheelchair")
+                );
+            case "armors":
+                return actor.items.find(x =>
+                    x.type === "armor" &&
+                    x.system.equipped
+                );
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * Cleans HTML and price tags from a description.
+     * @param {string} html - The raw HTML description
+     * @returns {string}
+     */
+    _cleanDescription(html) {
+        if (!html) return "";
+        return String(html)
+            .replace(/\{\{\{[^}]+\}\}\}/g, '')
+            .replace(/<[^>]*>/g, '')
+            .trim()
+            .substring(0, 200);
+    }
+
+    /**
+     * Extracts weapon stats from a document.
+     * @param {Item} doc - The weapon item document
+     * @returns {Object}
+     */
+    _extractWeaponStats(doc) {
+        try {
+            const system = doc.system;
+            if (!system.attack) return {};
+
+            // Trait mapping (full names for comparison tooltip)
+            const traitMap = {
+                "agility": "Agility",
+                "strength": "Strength",
+                "finesse": "Finesse",
+                "instinct": "Instinct",
+                "presence": "Presence",
+                "knowledge": "Knowledge",
+                "agi": "Agility",
+                "str": "Strength",
+                "fin": "Finesse",
+                "ins": "Instinct",
+                "pre": "Presence",
+                "kno": "Knowledge"
+            };
+            const traitRaw = String(system.attack.roll?.trait || "").toLowerCase();
+            const trait = traitMap[traitRaw] || (traitRaw ? traitRaw.charAt(0).toUpperCase() + traitRaw.slice(1) : "");
+
+            // Range
+            const rangeRaw = system.attack.range || "";
+            const rangeMap = {
+                "melee": "Melee",
+                "veryClose": "Very Close",
+                "close": "Close",
+                "far": "Far",
+                "veryFar": "Very Far"
+            };
+            const range = rangeMap[rangeRaw] || (rangeRaw ? String(rangeRaw).charAt(0).toUpperCase() + String(rangeRaw).slice(1) : "");
+
+            // Damage type mapping (full names)
+            const damageTypeMap = {
+                "physical": "Physical",
+                "phy": "Physical",
+                "magic": "Magic",
+                "mag": "Magic"
+            };
+
+            // Damage
+            const part0 = system.attack.damage?.parts?.[0] || {};
+            const val = part0.value || {};
+            const isCustom = val.custom?.enabled === true;
+            let damageDisplay = "";
+            let damageType = "";
+
+            if (isCustom) {
+                damageDisplay = "Custom";
+            } else {
+                const weaponDamage = val.dice || "";
+                const typeRaw = part0.type;
+                let typesList = [];
+
+                if (Array.isArray(typeRaw)) {
+                    typesList = typeRaw;
+                } else if (typeRaw instanceof Set) {
+                    typesList = Array.from(typeRaw);
+                } else if (typeof typeRaw === "string") {
+                    typesList = typeRaw.includes(",") ? typeRaw.split(",") : [typeRaw];
+                } else if (typeRaw && typeof typeRaw === "object") {
+                    typesList = Object.values(typeRaw);
+                }
+
+                damageType = typesList
+                    .map(t => {
+                        const s = String(t || "").trim().toLowerCase();
+                        if (!s) return "";
+                        return damageTypeMap[s] || (s.charAt(0).toUpperCase() + s.slice(1));
+                    })
+                    .filter(t => t)
+                    .join("/");
+
+                const bonusVal = val.bonus;
+                let weaponBonus = "";
+                if (bonusVal !== null && bonusVal !== undefined && String(bonusVal).trim() !== "") {
+                    weaponBonus = `+${bonusVal}`;
+                }
+
+                damageDisplay = `${weaponDamage}${weaponBonus}`;
+                if (damageType) {
+                    damageDisplay += ` (${damageType})`;
+                }
+            }
+
+            // Direct damage
+            const isDirect = system.attack.damage?.direct === true;
+
+            // Burden
+            const burdenRaw = String(system.burden || "");
+            const burdenMap = {
+                "1": "One-Handed",
+                "2": "Two-Handed",
+                "oneHanded": "One-Handed",
+                "twoHanded": "Two-Handed"
+            };
+            const burden = burdenMap[burdenRaw] || burdenRaw;
+
+            // Weapon Features
+            const features = [];
+            const weaponFeatures = system.weaponFeatures || [];
+            for (const feature of weaponFeatures) {
+                const featureValue = feature.value;
+                if (featureValue) {
+                    try {
+                        const featureName = featureValue.charAt(0).toUpperCase() + featureValue.slice(1);
+                        const featureDesc = game.i18n.localize(`${CONFIG.DH.ITEM.weaponFeatures[featureValue]?.description}`) || "";
+                        if (featureDesc) {
+                            features.push({ name: featureName, description: featureDesc });
+                        }
+                    } catch (e) {
+                        // Feature not found in config, skip
+                    }
+                }
+            }
+
+            return { trait, range, damageDisplay, damageType, isDirect, burden, features };
+        } catch (err) {
+            console.error(`${MODULE_ID} | Error extracting weapon stats:`, err);
+            return {};
+        }
+    }
+
+    /**
+     * Extracts armor stats from a document.
+     * @param {Item} doc - The armor item document
+     * @returns {Object}
+     */
+    _extractArmorStats(doc) {
+        try {
+            const system = doc.system;
+
+            // Armor Features
+            const features = [];
+            const armorFeatures = system.armorFeatures || [];
+            for (const feature of armorFeatures) {
+                const featureValue = feature.value;
+                if (featureValue) {
+                    try {
+                        const featureName = featureValue.charAt(0).toUpperCase() + featureValue.slice(1);
+                        const featureDesc = game.i18n.localize(`${CONFIG.DH.ITEM.armorFeatures[featureValue]?.description}`) || "";
+                        if (featureDesc) {
+                            features.push({ name: featureName, description: featureDesc });
+                        }
+                    } catch (e) {
+                        // Feature not found in config, skip
+                    }
+                }
+            }
+
+            return {
+                baseScore: system.baseScore ?? 0,
+                thresholdMajor: system.baseThresholds?.major ?? 0,
+                thresholdSevere: system.baseThresholds?.severe ?? 0,
+                features: features
+            };
+        } catch (err) {
+            console.error(`${MODULE_ID} | Error extracting armor stats:`, err);
+            return { baseScore: 0, thresholdMajor: 0, thresholdSevere: 0, features: [] };
+        }
+    }
+
+    /**
+     * Formats an item for comparison display.
+     * @param {Item} item - The item to format
+     * @returns {Object}
+     */
+    _formatItemForComparison(item) {
+        if (!item) return null;
+
+        const isWeapon = item.type === "weapon";
+        const desc = foundry.utils.getProperty(item, "system.description.value") ||
+                     foundry.utils.getProperty(item, "system.description") || "";
+        const cleanedDescription = this._cleanDescription(desc);
+        const tier = foundry.utils.getProperty(item, "system.tier") ||
+                     foundry.utils.getProperty(item, "system.rarity") || 1;
+
+        const base = {
+            name: item.name,
+            img: item.img,
+            tier: parseInt(tier) || 1,
+            description: cleanedDescription,
+            isWeapon: isWeapon
+        };
+
+        if (isWeapon) {
+            const weaponStats = this._extractWeaponStats(item);
+            return { ...base, ...weaponStats };
+        } else {
+            const armorStats = this._extractArmorStats(item);
+            return { ...base, ...armorStats };
+        }
+    }
+
+    /**
+     * Builds comparison data for the tooltip.
+     * @param {string} storeItemUuid - UUID of the store item
+     * @param {string} category - The category ID
+     * @param {Actor} actor - The player's actor
+     * @returns {Promise<Object>}
+     */
+    async _buildComparisonData(storeItemUuid, category, actor) {
+        const storeDoc = await fromUuid(storeItemUuid);
+        if (!storeDoc) return null;
+
+        const equippedItem = this._getEquippedItem(actor, category);
+
+        return {
+            equipped: this._formatItemForComparison(equippedItem),
+            storeItem: this._formatItemForComparison(storeDoc),
+            hasEquipped: !!equippedItem
+        };
+    }
+
     async _handleCurrencyConversion(actor) {
         const gold = actor.system.gold || {};
         const handfuls = gold.handfuls || 0;
@@ -546,6 +830,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             }
                         }
 
+                        // Item Comparison: Only for players in comparable categories
+                        const canCompare = !isGM && hasActor && this._isComparableCategory(cat.id);
+
                         customItems.push({
                             id: doc.id,
                             uuid: doc.uuid,
@@ -569,7 +856,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             stockQuantity: stockQuantity,
                             stockStatus: stockStatus,
                             stockEnabled: stockEnabled,
-                            showStockQty: showStockQuantity
+                            showStockQty: showStockQuantity,
+                            canCompare: canCompare
                         });
                     }
                 }
@@ -717,6 +1005,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         }
                     }
 
+                    // Item Comparison: Only for players in comparable categories
+                    const canCompare = !isGM && hasActor && this._isComparableCategory(cat.id);
+
                     if (tierGroups[tier]) {
                         tierGroups[tier].items.push({
                             id: doc.id,
@@ -740,7 +1031,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             stockQuantity: stockQuantity,
                             stockStatus: stockStatus,
                             stockEnabled: stockEnabled,
-                            showStockQty: showStockQuantity
+                            showStockQty: showStockQuantity,
+                            canCompare: canCompare
                         });
                     }
                 }
@@ -867,6 +1159,101 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 }
                 // Remove any visible tooltip
                 document.querySelectorAll(".daggerheart-store-tooltip").forEach(t => t.remove());
+            });
+        });
+
+        // Item Comparison Tooltip (Players Only)
+        const compareBtns = html.querySelectorAll(".compare-btn");
+        let compareTooltipTimeout = null;
+        let compareTooltipRemoveTimeout = null;
+
+        compareBtns.forEach(btn => {
+            btn.addEventListener("mouseenter", async (e) => {
+                const target = e.currentTarget;
+                const itemUuid = target.dataset.itemUuid;
+                const category = target.dataset.category;
+                const actor = game.user.character;
+
+                if (!actor) return;
+
+                // Clear any existing timeouts
+                if (compareTooltipTimeout) clearTimeout(compareTooltipTimeout);
+                if (compareTooltipRemoveTimeout) clearTimeout(compareTooltipRemoveTimeout);
+
+                // Delay before showing tooltip (400ms)
+                compareTooltipTimeout = setTimeout(async () => {
+                    // Remove any existing comparison tooltip
+                    document.querySelectorAll(".comparison-tooltip").forEach(t => t.remove());
+
+                    // Build comparison data
+                    const comparisonData = await this._buildComparisonData(itemUuid, category, actor);
+                    if (!comparisonData) return;
+
+                    // Render the template
+                    const templatePath = "modules/daggerheart-store/templates/item-comparison.hbs";
+                    const tooltipHtml = await foundry.applications.handlebars.renderTemplate(templatePath, comparisonData);
+
+                    // Create tooltip element
+                    const tooltipContainer = document.createElement("div");
+                    tooltipContainer.innerHTML = tooltipHtml;
+                    const tooltip = tooltipContainer.firstElementChild;
+                    document.body.appendChild(tooltip);
+
+                    // Position tooltip (prefer above button)
+                    const rect = target.getBoundingClientRect();
+                    const tooltipRect = tooltip.getBoundingClientRect();
+
+                    // Check if there's space above
+                    let top = rect.top - tooltipRect.height - 10;
+                    if (top < 10) {
+                        // Not enough space above, position below
+                        top = rect.bottom + 10;
+                    }
+
+                    // Center horizontally on button
+                    let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+
+                    // Constrain to viewport
+                    if (left < 10) left = 10;
+                    if (left + tooltipRect.width > window.innerWidth - 10) {
+                        left = window.innerWidth - tooltipRect.width - 10;
+                    }
+                    if (top + tooltipRect.height > window.innerHeight - 10) {
+                        top = window.innerHeight - tooltipRect.height - 10;
+                    }
+
+                    tooltip.style.position = "fixed";
+                    tooltip.style.left = `${left}px`;
+                    tooltip.style.top = `${top}px`;
+                    tooltip.style.zIndex = "10000";
+
+                    // Keep tooltip visible when hovering over it
+                    tooltip.addEventListener("mouseenter", () => {
+                        if (compareTooltipRemoveTimeout) {
+                            clearTimeout(compareTooltipRemoveTimeout);
+                            compareTooltipRemoveTimeout = null;
+                        }
+                    });
+
+                    tooltip.addEventListener("mouseleave", () => {
+                        compareTooltipRemoveTimeout = setTimeout(() => {
+                            tooltip.remove();
+                        }, 200);
+                    });
+                }, 400);
+            });
+
+            btn.addEventListener("mouseleave", () => {
+                // Cancel pending tooltip creation
+                if (compareTooltipTimeout) {
+                    clearTimeout(compareTooltipTimeout);
+                    compareTooltipTimeout = null;
+                }
+
+                // Delay removal to allow hovering over tooltip
+                compareTooltipRemoveTimeout = setTimeout(() => {
+                    document.querySelectorAll(".comparison-tooltip").forEach(t => t.remove());
+                }, 200);
             });
         });
 
@@ -1812,23 +2199,42 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
 
         if (!confirmed) return;
 
+        // Read current form values directly from input elements
         const storeActor = await StockManager.getStoreActor();
-        const categoryDefaults = storeActor.getFlag(MODULE_ID, "stock.categoryDefaults");
+        const categoryDefaults = {};
 
-        // Show progress bar
-        SceneNavigation.displayProgressBar({ label: "Preparing stock data...", pct: 0 });
+        // Get all stock tier inputs from the form
+        const stockInputs = this.element.querySelectorAll("input.stock-tier-input");
 
-        // Use batch update with progress callback
-        const itemCount = await StockManager.batchApplyDefaults(categoryDefaults, (current, total) => {
-            const pct = Math.round((current / total) * 100);
-            SceneNavigation.displayProgressBar({
-                label: `Processing item ${current} of ${total}...`,
-                pct: pct
+        if (stockInputs.length > 0) {
+            // Parse input names like "stockDefaults.Primary Weapons.tier1"
+            stockInputs.forEach(input => {
+                const name = input.name;
+                const match = name.match(/^stockDefaults\.(.+)\.(tier\d)$/);
+                if (match) {
+                    const [, categoryKey, tierKey] = match;
+                    if (!categoryDefaults[categoryKey]) {
+                        categoryDefaults[categoryKey] = {};
+                    }
+                    categoryDefaults[categoryKey][tierKey] = parseInt(input.value) || 0;
+                }
             });
-        });
 
-        // Clear progress bar
-        SceneNavigation.displayProgressBar({ label: null, pct: 0 });
+            // Save the form values to the actor so they persist
+            if (Object.keys(categoryDefaults).length > 0) {
+                await storeActor.update({
+                    [`flags.${MODULE_ID}.stock.categoryDefaults`]: categoryDefaults
+                });
+            }
+        }
+
+        // Fall back to saved/default values if no form inputs found
+        const finalDefaults = Object.keys(categoryDefaults).length > 0
+            ? categoryDefaults
+            : (storeActor?.getFlag(MODULE_ID, "stock.categoryDefaults") || StockManager._getDefaultCategorySettings());
+
+        // Use batch update
+        const itemCount = await StockManager.batchApplyDefaults(finalDefaults);
 
         ui.notifications.info(`Stock defaults applied to ${itemCount} items!`);
         this.render();

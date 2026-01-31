@@ -278,6 +278,17 @@
                                         </div>
                                     {{/if}}
 
+                                    <!-- COMPARE BUTTON (Players Only) -->
+                                    {{#if this.canCompare}}
+                                        <button type="button"
+                                                class="compare-btn"
+                                                data-item-uuid="{{this.uuid}}"
+                                                data-category="{{../../../activeTab}}"
+                                                title="Compare with equipped">
+                                            <i class="fas fa-scale-unbalanced"></i>
+                                        </button>
+                                    {{/if}}
+
                                     <!-- SELL BUTTON (NEW) -->
                                     <button type="button"
                                             class="sell-btn"

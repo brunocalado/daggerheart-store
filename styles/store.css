@@ -1258,3 +1258,237 @@
     border-color: #d4af37;
     box-shadow: 0 0 4px rgba(212, 175, 55, 0.3);
 }
+
+/* ==================================================== */
+/* ITEM COMPARISON FEATURE */
+/* ==================================================== */
+
+/* Compare Button */
+.daggerheart-store .compare-btn {
+    background: #3f4345;
+    color: white;
+    border: 1px solid #5a6065;
+    padding: 6px 10px;
+    cursor: pointer;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-family: "Lato", sans-serif;
+    font-size: 0.9em;
+    transition: all 0.2s;
+}
+
+.daggerheart-store .compare-btn:hover {
+    background: #8a9299;
+    box-shadow: 0 0 5px #71797E;
+    border-color: #d4af37;
+}
+
+/* Comparison Tooltip Container */
+.comparison-tooltip {
+    position: fixed;
+    z-index: 10000;
+    width: 600px;
+    max-height: 500px;
+    overflow-y: auto;
+    background: #1a1a1a;
+    border: 2px solid #d4af37;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.9);
+    font-family: "Lato", sans-serif;
+    scrollbar-width: thin;
+    scrollbar-color: #d4af37 #1a1a1a;
+}
+
+.comparison-tooltip .comparison-container {
+    display: flex;
+    flex-direction: row;
+}
+
+/* Comparison Columns */
+.comparison-tooltip .comparison-column {
+    flex: 1;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.comparison-tooltip .comparison-column.equipped {
+    background: #1a1a1a;
+}
+
+.comparison-tooltip .comparison-column.store {
+    background: #1f1f1f;
+}
+
+.comparison-tooltip .column-header {
+    font-family: "Aleo", serif;
+    font-size: 0.9em;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #888;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #333;
+    text-align: center;
+}
+
+/* Divider between columns */
+.comparison-tooltip .comparison-divider {
+    width: 2px;
+    background: linear-gradient(to bottom, #1a1a1a, #d4af37, #1a1a1a);
+    flex-shrink: 0;
+}
+
+/* Item Card */
+.comparison-tooltip .item-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.comparison-tooltip .item-img {
+    width: 64px;
+    height: 64px;
+    border: 2px solid #4a4a4a;
+    border-radius: 6px;
+    background: #0d0d0d;
+}
+
+.comparison-tooltip .item-name {
+    font-family: "Aleo", serif;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #d4af37;
+    text-align: center;
+}
+
+/* Tier Badges */
+.comparison-tooltip .tier-badge {
+    font-size: 0.75em;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    color: #fff;
+}
+
+.comparison-tooltip .tier-badge.tier-1 {
+    background: #4a4a4a;
+    border: 1px solid #666;
+}
+
+.comparison-tooltip .tier-badge.tier-2 {
+    background: #3a5a7a;
+    border: 1px solid #4a6a8a;
+}
+
+.comparison-tooltip .tier-badge.tier-3 {
+    background: #6a3a6a;
+    border: 1px solid #7a4a7a;
+}
+
+.comparison-tooltip .tier-badge.tier-4 {
+    background: #7a5a1a;
+    border: 1px solid #8a6a2a;
+}
+
+/* Item Description */
+.comparison-tooltip .item-description {
+    font-size: 0.85em;
+    color: #aaa;
+    text-align: center;
+    line-height: 1.4;
+    max-height: 80px;
+    overflow-y: auto;
+    padding: 0 5px;
+}
+
+/* Item Stats */
+.comparison-tooltip .item-stats {
+    width: 100%;
+    margin-top: 8px;
+    padding-top: 10px;
+    border-top: 1px solid #333;
+}
+
+.comparison-tooltip .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+}
+
+.comparison-tooltip .stat-label {
+    font-size: 0.8em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #888;
+}
+
+.comparison-tooltip .stat-value {
+    font-size: 0.95em;
+    font-weight: bold;
+    color: #d4af37;
+}
+
+/* Direct Damage Tag */
+.comparison-tooltip .direct-tag {
+    font-size: 0.75em;
+    background: #8b0000;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-left: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* No Item Placeholder */
+.comparison-tooltip .no-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 40px 20px;
+    border: 2px dashed #333;
+    border-radius: 6px;
+    color: #666;
+    font-style: italic;
+}
+
+.comparison-tooltip .no-item i {
+    font-size: 2em;
+    opacity: 0.5;
+}
+
+/* Item Features */
+.comparison-tooltip .item-features {
+    width: 100%;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #333;
+}
+
+.comparison-tooltip .feature-row {
+    padding: 4px 0;
+    line-height: 1.4;
+}
+
+.comparison-tooltip .feature-name {
+    font-size: 0.85em;
+    font-weight: bold;
+    color: #d4af37;
+}
+
+.comparison-tooltip .feature-desc {
+    font-size: 0.8em;
+    color: #aaa;
+    margin-left: 4px;
+}
