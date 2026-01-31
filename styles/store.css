@@ -698,6 +698,61 @@
     margin-bottom: 0;
 }
 
+/* Custom Checkbox Styling for Config - OPTIMIZED & CLEAN */
+.daggerheart-store-config input[type="checkbox"] {
+    /* CLEANED DEAD CODE: Removed -webkit-appearance, -moz-appearance, and filter */
+    appearance: none !important; /* Standard property, works in Foundry V13 */
+    
+    width: 20px;
+    height: 20px;
+    
+    /* Solid dark background for maximum contrast with white border */
+    background: #111111 !important; 
+    
+    /* Thicker White border (2px) to be clearly visible */
+    border: 2px solid #ffffff !important; 
+    
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+    position: relative;
+    vertical-align: middle;
+    transition: all 0.2s ease;
+    padding: 0;
+    
+    /* Kept only essential resets */
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Custom Checkmark State - Full Fill Lighter Gold */
+.daggerheart-store-config input[type="checkbox"]:checked {
+    background: #ffd700 !important; /* Lighter/Brighter Gold */
+    border-color: #ffffff !important;
+    box-shadow: none !important;
+}
+
+/* Draw the checkmark using pure CSS */
+.daggerheart-store-config input[type="checkbox"]:checked::after {
+    content: "";
+    /* Use flex centering from parent instead of absolute positioning */
+    width: 5px;
+    height: 10px;
+    border: solid #000000; /* Dark check for contrast */
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    display: block;
+    margin-bottom: 2px;
+}
+
+.daggerheart-store-config input[type="checkbox"]:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.3) !important;
+}
+
 /* Slider Styles */
 .daggerheart-store-config .form-group .form-fields {
     display: flex;
