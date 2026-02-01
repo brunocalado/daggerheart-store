@@ -1696,7 +1696,7 @@
 }
 
 .store-dialog .window-header .window-title {
-    color: #d4af37 !important;
+    color: #ffffff !important;
 }
 
 .store-dialog .window-content {
@@ -1804,6 +1804,7 @@
     font-weight: bold;
     margin: 0;
     transition: all 0.2s;
+    height: auto;
 }
 
 .store-dialog .direction-btn.deposit-btn {

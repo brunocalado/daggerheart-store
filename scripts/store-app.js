@@ -45,6 +45,7 @@ function getChatWhisperRecipients() {
  * Helper to show styled confirmation dialogs
  * @param {Object} options - Dialog options
  * @param {string} options.title - Window title
+ * @param {string} [options.icon] - Window icon class (e.g., "fas fa-save")
  * @param {string} options.headerText - Header text displayed in the dialog
  * @param {string} options.headerColor - Color for the header (default: #D4AF37 gold)
  * @param {string} options.message - Main message (supports HTML)
@@ -63,6 +64,7 @@ function getChatWhisperRecipients() {
 async function showStoreDialog(options) {
     const {
         title,
+        icon = "fas fa-check",
         headerText,
         headerColor = "#D4AF37",
         message,
@@ -110,9 +112,10 @@ async function showStoreDialog(options) {
     if (input || customContent) {
         return new Promise((resolve) => {
             new DialogV2({
-                window: { title, icon: buttons.confirmIcon || "fas fa-check" },
+                window: { title, icon },
                 content: contentHtml,
                 classes: ["store-dialog"],
+                modal: true,
                 buttons: [
                     {
                         action: "confirm",
@@ -149,7 +152,7 @@ async function showStoreDialog(options) {
 
     // Simple confirmation dialog
     return DialogV2.confirm({
-        window: { title },
+        window: { title, icon },
         content: contentHtml,
         classes: ["store-dialog"],
         rejectClose: false,
@@ -1721,6 +1724,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             window: { title: "Transfer Funds", icon: "fas fa-exchange-alt", resizable: false },
             content: content,
             classes: ["store-dialog"],
+            modal: true,
             buttons: [
                 {
                     action: "confirm",
@@ -2061,17 +2065,35 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const players = game.users.filter(u => !u.isGM && u.active);
         if (players.length === 0) return ui.notifications.warn("No active players.");
         const options = players.map(p => `<option value="${p.name}">${p.name}</option>`).join("");
-        const content = `<div style="margin-bottom:10px;"><label>Select Player:</label><select name="targetPlayer" style="width:100%">${options}</select></div>`;
-        new DialogV2({
-            window: { title: "Show Store to Player" },
-            content: content,
-            buttons: [{ action: "show", label: "Show", icon: "fas fa-share", callback: (event, button, dialog) => { const select = button.form.elements.targetPlayer; globalThis.Store.Show(select.value); } }]
-        }).render(true);
+        const selectHtml = `
+            <div class="store-dialog-input-group">
+                <label>Select Player:</label>
+                <select name="targetPlayer" style="width:100%">${options}</select>
+            </div>
+        `;
+
+        const result = await showStoreDialog({
+            title: "Show Store to Player",
+            icon: "fas fa-share",
+            headerText: "Share Store",
+            headerColor: "#D4AF37",
+            message: "Select which player should receive the store window.",
+            customContent: selectHtml,
+            buttons: {
+                confirm: "Show",
+                confirmIcon: "fas fa-share"
+            }
+        });
+
+        if (result.confirmed && result.formData?.targetPlayer) {
+            globalThis.Store.Show(result.formData.targetPlayer);
+        }
     }
     
     async _onSavePreset(event, target) {
         const result = await showStoreDialog({
             title: "Save Store Profile",
+            icon: "fas fa-save",
             headerText: "Save Profile",
             headerColor: "#D4AF37",
             message: "Enter a name for this profile.",
@@ -2132,6 +2154,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
         const confirm = await showStoreDialog({
             title: "Load Profile",
+            icon: "fas fa-folder-open",
             headerText: "Load Profile",
             headerColor: "#D4AF37",
             message: `Are you sure you want to load the profile <b>"${profileName}"</b>?`,
@@ -2199,6 +2222,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
         const confirm = await showStoreDialog({
             title: "Delete Profile",
+            icon: "fas fa-trash",
             headerText: "Delete Profile",
             headerColor: "#D32F2F",
             message: `Are you sure you want to delete the profile <b>"${profileName}"</b>?`,
@@ -2558,9 +2582,13 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             );
         }
 
-        const confirmed = await DialogV2.confirm({
-            window: { title: "Apply Stock Defaults" },
-            content: "<p>This will set quantities for ALL items based on category/tier defaults. Already configured items will be overwritten. Continue?</p>"
+        const confirmed = await showStoreDialog({
+            title: "Apply Stock Defaults",
+            icon: "fas fa-magic",
+            headerText: "Apply Defaults",
+            headerColor: "#D4AF37",
+            message: "This will set quantities for <b>ALL items</b> based on category/tier defaults.",
+            description: "Already configured items will be overwritten. Continue?"
         });
 
         if (!confirmed) return;
@@ -2616,6 +2644,17 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
                 "Configure a Party Actor before managing stock."
             );
         }
+
+        const confirmed = await showStoreDialog({
+            title: "Restock All",
+            icon: "fas fa-redo",
+            headerText: "Restock All Items",
+            headerColor: "#D4AF37",
+            message: "This will restore <b>ALL items</b> to their original stock quantities.",
+            description: "Items will be reset to their default values. Continue?"
+        });
+
+        if (!confirmed) return;
 
         await StockManager.resetAllStock();
         ui.notifications.info("All items restocked!");
@@ -3075,7 +3114,8 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
      */
     async _onRandomizeAll(event, target) {
         const confirm = await showStoreDialog({
-            title: "Warning!",
+            title: "Randomize All",
+            icon: "fas fa-dice-d20",
             headerText: "DANGER ZONE",
             headerColor: "#D32F2F",
             message: "Are you sure you want to <b>RANDOMIZE ALL CATEGORIES</b>?",
@@ -3105,7 +3145,8 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
      */
     async _onResetAll(event, target) {
         const confirm = await showStoreDialog({
-            title: "Warning!",
+            title: "Reset All",
+            icon: "fas fa-undo",
             headerText: "DANGER ZONE",
             headerColor: "#D32F2F",
             message: "Are you sure you want to <b>RESET ALL DATA</b>?",
