@@ -1715,6 +1715,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             </div>
         `;
 
+        const storeApp = this;
+
         const dialog = new DialogV2({
             window: { title: "Transfer Funds", icon: "fas fa-exchange-alt", resizable: false },
             content: content,
@@ -1732,12 +1734,12 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
                         if (direction === "deposit") {
                             if (amount > userWealth) return ui.notifications.warn("Insufficient funds.");
-                            
+
                             if (currencyMode === "smart") {
                                 const newUserTotal = userWealth - amount;
                                 const newPartyTotal = partyWealth + amount;
-                                const optUser = this._optimizeCurrency(newUserTotal);
-                                const optParty = this._optimizeCurrency(newPartyTotal);
+                                const optUser = storeApp._optimizeCurrency(newUserTotal);
+                                const optParty = storeApp._optimizeCurrency(newPartyTotal);
 
                                 await userActor.update({
                                     "system.gold.chests": optUser.chests, "system.gold.bags": optUser.bags,
@@ -1751,17 +1753,17 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                                 await userActor.update({ "system.gold.coins": userWealth - amount });
                                 await partyActor.update({ "system.gold.coins": partyWealth + amount });
                             }
-                            
-                            this._createTransferChatMessage(userActor, partyActor, amount, "deposit", currency);
+
+                            storeApp._createTransferChatMessage(userActor, partyActor, amount, "deposit", currency);
 
                         } else {
                             if (amount > partyWealth) return ui.notifications.warn("Insufficient party funds.");
-                            
+
                             if (currencyMode === "smart") {
                                 const newPartyTotal = partyWealth - amount;
                                 const newUserTotal = userWealth + amount;
-                                const optParty = this._optimizeCurrency(newPartyTotal);
-                                const optUser = this._optimizeCurrency(newUserTotal);
+                                const optParty = storeApp._optimizeCurrency(newPartyTotal);
+                                const optUser = storeApp._optimizeCurrency(newUserTotal);
 
                                 await partyActor.update({
                                     "system.gold.chests": optParty.chests, "system.gold.bags": optParty.bags,
@@ -1776,49 +1778,41 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                                 await userActor.update({ "system.gold.coins": userWealth + amount });
                             }
 
-                            this._createTransferChatMessage(userActor, partyActor, amount, "withdraw", currency);
+                            storeApp._createTransferChatMessage(userActor, partyActor, amount, "withdraw", currency);
                         }
 
-                        this.render();
+                        storeApp.render();
                     }
                 },
                 { action: "cancel", label: "Cancel", icon: "fas fa-times" }
-            ],
-            render: (event, html) => {
-                console.log("daggerheart-store | Transfer render callback fired");
-                console.log("daggerheart-store | event:", event);
-                console.log("daggerheart-store | html:", html);
-                console.log("daggerheart-store | html type:", typeof html, html?.constructor?.name);
+            ]
+        });
 
-                const container = html?.querySelector?.(".transfer-direction-container");
-                console.log("daggerheart-store | container:", container);
+        // Render and then attach event listeners via hook
+        Hooks.once("renderDialogV2", (app, element) => {
+            if (app !== dialog) return;
 
-                if (!container) {
-                    console.log("daggerheart-store | Container not found, trying document.querySelector");
-                    const fallbackContainer = document.querySelector(".store-dialog .transfer-direction-container");
-                    console.log("daggerheart-store | fallback container:", fallbackContainer);
-                    return;
-                }
+            const container = element.querySelector(".transfer-direction-container");
+            if (!container) return;
 
-                const buttons = container.querySelectorAll(".direction-btn");
-                const hiddenInput = html.querySelector('input[name="direction"]');
-                console.log("daggerheart-store | buttons:", buttons);
-                console.log("daggerheart-store | hiddenInput:", hiddenInput);
+            const buttons = container.querySelectorAll(".direction-btn");
+            const hiddenInput = element.querySelector('input[name="direction"]');
 
-                container.addEventListener("click", (e) => {
-                    console.log("daggerheart-store | Click event fired");
-                    console.log("daggerheart-store | e.target:", e.target);
-                    const btn = e.target.closest(".direction-btn");
-                    console.log("daggerheart-store | btn found:", btn);
-                    if (!btn) return;
+            buttons.forEach(btn => {
+                btn.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
 
                     buttons.forEach(b => b.classList.remove("selected"));
                     btn.classList.add("selected");
-                    hiddenInput.value = btn.dataset.direction;
-                    console.log("daggerheart-store | Direction set to:", btn.dataset.direction);
+
+                    if (hiddenInput) {
+                        hiddenInput.value = btn.dataset.direction;
+                    }
                 });
-            }
+            });
         });
+
         dialog.render(true);
     }
 
