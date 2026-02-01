@@ -191,9 +191,28 @@ async function showStoreDialog(options) {
 export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) {
     constructor(options) {
         super(options);
-        this.searchQuery = ""; 
+        this.searchQuery = "";
         this.activeTab = "primary"; // IMPORTANT: This is the source of truth for the active tab
         this.options.window.title = game.settings.get(MODULE_ID, "storeName");
+
+        // Listen for actor item updates to refresh compare buttons
+        this._onActorItemUpdate = (item, changes, _options, _userId) => {
+            if (!game.user.character) return;
+            if (item.parent?.id !== game.user.character.id) return;
+            // Only re-render if equipped status changed
+            if (changes?.system?.equipped !== undefined) {
+                this.render();
+            }
+        };
+        Hooks.on("updateItem", this._onActorItemUpdate);
+    }
+
+    _onClose(options) {
+        // Remove the hook listener when the store is closed
+        if (this._onActorItemUpdate) {
+            Hooks.off("updateItem", this._onActorItemUpdate);
+        }
+        super._onClose?.(options);
     }
 
     static DEFAULT_OPTIONS = {
@@ -441,10 +460,11 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     !x.name.includes("Wheelchair")
                 );
             case "wheelchairs":
+                // Wheelchairs compare with primary weapon (non-secondary)
                 return actor.items.find(x =>
                     x.type === "weapon" &&
                     x.system.equipped &&
-                    x.name.includes("Wheelchair")
+                    !x.system.secondary
                 );
             case "armors":
                 return actor.items.find(x =>
@@ -1105,6 +1125,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
                         // Item Comparison: Only for players in comparable categories
                         const canCompare = !isGM && hasActor && this._isComparableCategory(cat.id);
+                        const hasEquippedItem = canCompare && !!this._getEquippedItem(userActor, cat.id);
 
                         customItems.push({
                             id: doc.id,
@@ -1131,7 +1152,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             stockUnlimited: stockUnlimited,
                             stockEnabled: stockEnabled,
                             showStockQty: showStockQuantity,
-                            canCompare: canCompare
+                            canCompare: canCompare,
+                            hasEquippedItem: hasEquippedItem
                         });
                     }
                 }
@@ -1303,6 +1325,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
                     // Item Comparison: Only for players in comparable categories
                     const canCompare = !isGM && hasActor && this._isComparableCategory(cat.id);
+                    const hasEquippedItem = canCompare && !!this._getEquippedItem(userActor, cat.id);
 
                     if (tierGroups[tier]) {
                         tierGroups[tier].items.push({
@@ -1329,7 +1352,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             stockUnlimited: stockUnlimited,
                             stockEnabled: stockEnabled,
                             showStockQty: showStockQuantity,
-                            canCompare: canCompare
+                            canCompare: canCompare,
+                            hasEquippedItem: hasEquippedItem
                         });
                     }
                 }
@@ -2882,17 +2906,44 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     async _onAddCompendium(event, target) {
-        const settings = foundry.utils.deepClone(game.settings.get(MODULE_ID, "customCompendiums"));
-        settings.push({ pack: "", category: "Loot" }); 
-        await game.settings.set(MODULE_ID, "customCompendiums", settings); 
+        // Capture current form values before re-rendering to preserve unsaved selections
+        const currentFormValues = [];
+        const packSelects = this.element.querySelectorAll("select[name^='customCompendiums.'][name$='.pack']");
+        packSelects.forEach((packSelect, index) => {
+            const categorySelect = this.element.querySelector(`select[name='customCompendiums.${index}.category']`);
+            currentFormValues.push({
+                pack: packSelect.value || "",
+                category: categorySelect?.value || "Loot"
+            });
+        });
+
+        // Add the new empty entry
+        currentFormValues.push({ pack: "", category: "Loot" });
+
+        // Save the form values (including unsaved selections) and re-render
+        await game.settings.set(MODULE_ID, "customCompendiums", currentFormValues);
         this.render();
     }
     
     async _onRemoveCompendium(event, target) {
-        const idx = target.dataset.index;
-        const settings = foundry.utils.deepClone(game.settings.get(MODULE_ID, "customCompendiums"));
-        settings.splice(idx, 1);
-        await game.settings.set(MODULE_ID, "customCompendiums", settings);
+        const idx = parseInt(target.dataset.index);
+
+        // Capture current form values before re-rendering to preserve unsaved selections
+        const currentFormValues = [];
+        const packSelects = this.element.querySelectorAll("select[name^='customCompendiums.'][name$='.pack']");
+        packSelects.forEach((packSelect, index) => {
+            const categorySelect = this.element.querySelector(`select[name='customCompendiums.${index}.category']`);
+            currentFormValues.push({
+                pack: packSelect.value || "",
+                category: categorySelect?.value || "Loot"
+            });
+        });
+
+        // Remove the specified entry
+        currentFormValues.splice(idx, 1);
+
+        // Save the form values (including unsaved selections) and re-render
+        await game.settings.set(MODULE_ID, "customCompendiums", currentFormValues);
         this.render();
     }
 

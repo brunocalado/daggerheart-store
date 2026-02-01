@@ -8,9 +8,6 @@
                     <img src="{{equipped.img}}" class="item-img" alt="{{equipped.name}}"/>
                     <div class="item-name">{{equipped.name}}</div>
                     <div class="tier-badge tier-{{equipped.tier}}">Tier {{equipped.tier}}</div>
-                    {{#if equipped.description}}
-                        <div class="item-description">{{equipped.description}}</div>
-                    {{/if}}
                     <div class="item-stats">
                         {{#if equipped.isWeapon}}
                             {{#if equipped.trait}}
@@ -81,9 +78,6 @@
                 <img src="{{storeItem.img}}" class="item-img" alt="{{storeItem.name}}"/>
                 <div class="item-name">{{storeItem.name}}</div>
                 <div class="tier-badge tier-{{storeItem.tier}}">Tier {{storeItem.tier}}</div>
-                {{#if storeItem.description}}
-                    <div class="item-description">{{storeItem.description}}</div>
-                {{/if}}
                 <div class="item-stats">
                     {{#if storeItem.isWeapon}}
                         {{#if storeItem.trait}}
