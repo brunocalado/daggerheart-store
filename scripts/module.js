@@ -286,6 +286,52 @@ Hooks.on("updateActor", (actor, changes, options, userId) => {
     }
 });
 
+Hooks.on("preDeleteActor", (actor, options, userId) => {
+    const partyActorId = game.settings.get(MODULE_ID, "partyActorId");
+
+    if (!partyActorId || actor.id !== partyActorId) {
+        return true;
+    }
+
+    DialogV2.prompt({
+        window: {
+            title: "Cannot Delete Party Actor",
+            icon: "fas fa-exclamation-triangle"
+        },
+        content: `
+            <div style="text-align: center; padding: 20px;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: #ff9800; margin-bottom: 15px;"></i>
+                <h3 style="color: #ff9800; margin-bottom: 10px;">Protected Actor</h3>
+                <p style="margin-bottom: 10px;">
+                    The actor <strong>"${actor.name}"</strong> is currently configured as the <strong>Party Actor</strong> in Daggerheart Store.
+                </p>
+                <p style="color: #ccc; font-size: 0.9em; line-height: 1.4;">
+                    To delete this actor, you must first:<br>
+                    1. Open the Store Configuration<br>
+                    2. Go to the "General" tab<br>
+                    3. Set "Party Actor" to "None"
+                </p>
+            </div>
+        `,
+        ok: {
+            label: "I Understand",
+            icon: "fas fa-check"
+        }
+    });
+
+    return false;
+});
+
+Hooks.on("deleteActor", (actor, options, userId) => {
+    const partyActorId = game.settings.get(MODULE_ID, "partyActorId");
+
+    if (partyActorId && actor.id === partyActorId) {
+        game.settings.set(MODULE_ID, "partyActorId", "");
+        console.log(`${MODULE_ID} | Party actor was deleted, configuration automatically cleared.`);
+        ui.notifications.warn(`Party Actor "${actor.name}" was deleted. Store configuration has been reset.`);
+    }
+});
+
 Hooks.on("renderDaggerheartMenu", (app, html, data) => {
     const element = (html instanceof jQuery) ? html[0] : html;
     const myButton = document.createElement("button");
