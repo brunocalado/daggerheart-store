@@ -667,10 +667,66 @@
 
 /* Updated Footer Style for Config Window */
 .daggerheart-store-config .config-footer {
-    display: flex; 
+    display: flex;
     justify-content: center;
-    padding-top: 10px;
+    gap: 15px;
+    padding-top: 15px;
     margin-bottom: 10px;
+}
+
+/* Primary button - dark/gold theme (Save Settings) */
+.daggerheart-store-config .config-btn-primary {
+    background: linear-gradient(to bottom, #3a3015, #2d230a);
+    color: #f5e6b8;
+    border: 1px solid #6b582a;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-family: "Aleo", serif;
+    font-size: 1em;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    flex: none;
+    width: fit-content;
+}
+
+.daggerheart-store-config .config-btn-primary:hover {
+    background: linear-gradient(to bottom, #4a4025, #3d331a);
+    box-shadow: 0 0 10px #6b582a;
+    border-color: #d4af37;
+    color: #fff;
+}
+
+/* Secondary button - dark gray theme (Instructions) */
+.daggerheart-store-config .config-btn-secondary {
+    background: #333;
+    color: #e0e0e0;
+    border: 1px solid #555;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-family: "Lato", sans-serif;
+    font-size: 1em;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    flex: none;
+    width: fit-content;
+}
+
+.daggerheart-store-config .config-btn-secondary:hover {
+    background: #444;
+    border-color: #888;
+    color: #fff;
 }
 
 /* Tiers Tab Headers (H4) */
@@ -1032,29 +1088,6 @@
     margin-right: 8px;
 }
 
-/* Instructions Button Styling */
-.daggerheart-store-randomizer .instructions-btn {
-    position: absolute;
-    right: 0;
-    top: 0;
-    background: transparent;
-    border: 1px solid #555;
-    color: #aaa;
-    padding: 4px 8px;
-    font-size: 0.85em;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.daggerheart-store-randomizer .instructions-btn:hover {
-    background: #333;
-    color: #fff;
-    border-color: #888;
-}
 
 /* Updated Font Colors for Randomizer */
 .daggerheart-store-randomizer .notes {
@@ -1223,9 +1256,10 @@
     flex-shrink: 0;
 }
 
-.daggerheart-store-randomizer .randomize-all-btn {
+/* Primary button - dark/gold theme (Randomize All) */
+.daggerheart-store-randomizer .randomizer-btn-primary {
     background: linear-gradient(to bottom, #3a3015, #2d230a);
-    color: #d4af37;
+    color: #f5e6b8;
     border: 1px solid #6b582a;
     padding: 10px 20px;
     border-radius: 4px;
@@ -1233,36 +1267,39 @@
     font-weight: bold;
     font-family: "Aleo", serif;
     font-size: 1em;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
     transition: all 0.2s;
     display: flex;
     align-items: center;
     gap: 8px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }
 
-.daggerheart-store-randomizer .randomize-all-btn:hover {
+.daggerheart-store-randomizer .randomizer-btn-primary:hover {
     background: linear-gradient(to bottom, #4a4025, #3d331a);
     box-shadow: 0 0 10px #6b582a;
     border-color: #d4af37;
+    color: #fff;
 }
 
-.daggerheart-store-randomizer .reset-all-btn {
+/* Secondary buttons - dark gray theme (Reset All, Instructions) */
+.daggerheart-store-randomizer .randomizer-btn-secondary {
     background: #333;
-    color: #ccc;
+    color: #e0e0e0;
     border: 1px solid #555;
     padding: 10px 20px;
     border-radius: 4px;
     cursor: pointer;
     font-weight: bold;
     font-family: "Lato", sans-serif;
+    font-size: 1em;
     transition: all 0.2s;
     display: flex;
     align-items: center;
     gap: 8px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }
 
-.daggerheart-store-randomizer .reset-all-btn:hover {
+.daggerheart-store-randomizer .randomizer-btn-secondary:hover {
     background: #444;
     border-color: #888;
     color: #fff;

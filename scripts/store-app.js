@@ -2547,10 +2547,13 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
      * Handles opening the instructions journal from Config
      */
     async _onOpenInstructions(event, target) {
-        const uuid = "Compendium.daggerheart-store.journals.JournalEntry.fIXCeXWeDbAu3uFg.JournalEntryPage.acPvDUbb85GK4BiU";
-        const entry = await fromUuid(uuid);
-        if (entry) {
-            entry.sheet.render(true);
+        const uuid = "Compendium.daggerheart-store.journals.JournalEntry.fIXCeXWeDbAu3uFg.JournalEntryPage.bbQY9zgHxE3hTplw";
+        const page = await fromUuid(uuid);
+        if (page) {
+            const journal = page.parent;
+            if (journal) {
+                journal.sheet.render(true, { pageId: page.id });
+            }
         } else {
             ui.notifications.warn("Instructions journal not found in the compendium.");
         }
@@ -2845,6 +2848,16 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
             }
 
             cat.itemCount = itemCount;
+
+            // Get default qty from category defaults (use max tier value)
+            const storeActor = StockManager.getStoreActor();
+            const categoryDefaults = storeActor?.getFlag(MODULE_ID, "stock.categoryDefaults") || StockManager._getDefaultCategorySettings();
+            const catDefaults = categoryDefaults[cat.key];
+            if (catDefaults) {
+                cat.defaultQty = Math.max(catDefaults.tier1 || 0, catDefaults.tier2 || 0, catDefaults.tier3 || 0, catDefaults.tier4 || 0);
+            } else {
+                cat.defaultQty = 10;
+            }
         }
 
         return {
@@ -2944,16 +2957,18 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
     _onResetCategoryDefaults(event, target) {
         const categoryKey = target.dataset.category;
         const itemCount = parseInt(target.dataset.itemCount) || 0;
-        
+        const defaultQty = parseInt(target.dataset.defaultQty) || 10;
+
         // Find the specific row for this category
         const row = this.element.querySelector(`.category-randomizer-row[data-category="${categoryKey}"]`);
-        
+
         if (!row) return;
 
-        // Reset values: Min=0, Max=ItemCount, MaxQty=0, Sales=0, Variation=0
+        // Reset values
         const minInput = row.querySelector(".rand-min-items");
         const maxInput = row.querySelector(".rand-max-items");
-        const maxQtyInput = row.querySelector(".rand-max-qty");
+        const qtyMinInput = row.querySelector(".rand-qty-min");
+        const qtyMaxInput = row.querySelector(".rand-qty-max");
         const salesMinInput = row.querySelector(".rand-sales-min");
         const salesMaxInput = row.querySelector(".rand-sales-max");
         const varMinInput = row.querySelector(".rand-var-min");
@@ -2961,7 +2976,8 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
 
         if (minInput) minInput.value = 0;
         if (maxInput) maxInput.value = itemCount;
-        if (maxQtyInput) maxQtyInput.value = 0;
+        if (qtyMinInput) qtyMinInput.value = 1;
+        if (qtyMaxInput) qtyMaxInput.value = defaultQty;
         if (salesMinInput) salesMinInput.value = 0;
         if (salesMaxInput) salesMaxInput.value = 0;
         if (varMinInput) varMinInput.value = 0;
@@ -3009,21 +3025,20 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
 
         const minItems = parseInt(row.querySelector(".rand-min-items").value) || 0;
         const maxItems = parseInt(row.querySelector(".rand-max-items").value) || 0;
-        const maxQty = parseInt(row.querySelector(".rand-max-qty").value) || 0;
+        const qtyMin = parseInt(row.querySelector(".rand-qty-min").value) || 1;
+        const qtyMax = parseInt(row.querySelector(".rand-qty-max").value) || 0;
         const salesMin = parseInt(row.querySelector(".rand-sales-min").value) || 0;
         const salesMax = parseInt(row.querySelector(".rand-sales-max").value) || 0;
         const varMin = parseInt(row.querySelector(".rand-var-min").value) || 0;
         const varMax = parseInt(row.querySelector(".rand-var-max").value) || 0;
 
-        await this._randomizeCategory(categoryKey, minItems, maxItems, maxQty, salesMin, salesMax, varMin, varMax);
-
-        // Notification removed
+        await this._randomizeCategory(categoryKey, minItems, maxItems, qtyMin, qtyMax, salesMin, salesMax, varMin, varMax);
     }
 
     /**
      * Core randomization logic for a category
      */
-    async _randomizeCategory(categoryKey, minItems, maxItems, maxQty, salesMin, salesMax, varMin, varMax) {
+    async _randomizeCategory(categoryKey, minItems, maxItems, qtyMin, qtyMax, salesMin, salesMax, varMin, varMax) {
         const items = await this._getCategoryItems(categoryKey);
 
         if (items.length === 0) return;
@@ -3089,16 +3104,18 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
         await game.settings.set(MODULE_ID, "saleItems", saleItems);
         await game.settings.set(MODULE_ID, "priceOverrides", priceOverrides);
 
-        // Apply stock quantities if maxQty > 0 and stock system is enabled
+        // Apply stock quantities if qtyMax > 0 and stock system is enabled
         const stockEnabled = game.settings.get(MODULE_ID, "stockEnabled");
-        if (stockEnabled && maxQty > 0) {
+        if (stockEnabled && qtyMax > 0) {
             const actor = StockManager.getStoreActor();
             if (actor) {
                 const stockItems = actor.getFlag(MODULE_ID, "stock.items") || {};
+                const effectiveQtyMin = Math.max(1, qtyMin);
+                const effectiveQtyMax = Math.max(effectiveQtyMin, qtyMax);
 
-                // Set random stock quantity (1 to maxQty) for visible items
+                // Set random stock quantity (qtyMin to qtyMax) for visible items
                 for (const item of visibleItems) {
-                    const qty = Math.floor(Math.random() * maxQty) + 1;
+                    const qty = Math.floor(Math.random() * (effectiveQtyMax - effectiveQtyMin + 1)) + effectiveQtyMin;
                     const key = StockManager.sanitizeKey(item.uuid);
                     stockItems[key] = {
                         stockpile: { q: qty, r: qty, u: false }
@@ -3145,13 +3162,14 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
             const categoryKey = row.dataset.category;
             const minItems = parseInt(row.querySelector(".rand-min-items").value) || 0;
             const maxItems = parseInt(row.querySelector(".rand-max-items").value) || 0;
-            const maxQty = parseInt(row.querySelector(".rand-max-qty").value) || 0;
+            const qtyMin = parseInt(row.querySelector(".rand-qty-min").value) || 1;
+            const qtyMax = parseInt(row.querySelector(".rand-qty-max").value) || 0;
             const salesMin = parseInt(row.querySelector(".rand-sales-min").value) || 0;
             const salesMax = parseInt(row.querySelector(".rand-sales-max").value) || 0;
             const varMin = parseInt(row.querySelector(".rand-var-min").value) || 0;
             const varMax = parseInt(row.querySelector(".rand-var-max").value) || 0;
 
-            await this._randomizeCategory(categoryKey, minItems, maxItems, maxQty, salesMin, salesMax, varMin, varMax);
+            await this._randomizeCategory(categoryKey, minItems, maxItems, qtyMin, qtyMax, salesMin, salesMax, varMin, varMax);
         }
     }
 
