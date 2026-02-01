@@ -1,7 +1,9 @@
 # 0.1.3
-- css fix
-- New Feature: Stock
-- New Feature: You can compare the current weapon/armor with a new one.
+- Numerous CSS enhancements
+- New Feature: Inventory Stock (or simply Stock Management)
+- New Feature: Equipment Comparison (Current vs. New)
+- Refined transfer template
+- Load profile confirmation dialog
 
 # 0.1.2
 - Removed transparency. +Performance

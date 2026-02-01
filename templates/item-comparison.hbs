@@ -95,14 +95,20 @@
                         {{#if storeItem.range}}
                             <div class="stat-row">
                                 <span class="stat-label">Range</span>
-                                <span class="stat-value">{{storeItem.range}}</span>
+                                <span class="stat-value {{#if (eq storeItem.rangeCompare 'up')}}compare-better{{else if (eq storeItem.rangeCompare 'down')}}compare-worse{{/if}}">
+                                    {{storeItem.range}}
+                                    {{#if (eq storeItem.rangeCompare 'up')}}<i class="fas fa-caret-up"></i>{{/if}}
+                                    {{#if (eq storeItem.rangeCompare 'down')}}<i class="fas fa-caret-down"></i>{{/if}}
+                                </span>
                             </div>
                         {{/if}}
                         {{#if storeItem.damageDisplay}}
                             <div class="stat-row">
                                 <span class="stat-label">Damage</span>
-                                <span class="stat-value">
+                                <span class="stat-value {{#if (eq storeItem.damageCompare 'up')}}compare-better{{else if (eq storeItem.damageCompare 'down')}}compare-worse{{/if}}">
                                     {{storeItem.damageDisplay}}
+                                    {{#if (eq storeItem.damageCompare 'up')}}<i class="fas fa-caret-up"></i>{{/if}}
+                                    {{#if (eq storeItem.damageCompare 'down')}}<i class="fas fa-caret-down"></i>{{/if}}
                                     {{#if storeItem.isDirect}}<span class="direct-tag">Direct</span>{{/if}}
                                 </span>
                             </div>
@@ -117,11 +123,27 @@
                         {{!-- Armor Stats --}}
                         <div class="stat-row">
                             <span class="stat-label">Base Score</span>
-                            <span class="stat-value">{{storeItem.baseScore}}</span>
+                            <span class="stat-value {{#if (eq storeItem.baseScoreCompare 'up')}}compare-better{{else if (eq storeItem.baseScoreCompare 'down')}}compare-worse{{/if}}">
+                                {{storeItem.baseScore}}
+                                {{#if (eq storeItem.baseScoreCompare 'up')}}<i class="fas fa-caret-up"></i>{{/if}}
+                                {{#if (eq storeItem.baseScoreCompare 'down')}}<i class="fas fa-caret-down"></i>{{/if}}
+                            </span>
                         </div>
                         <div class="stat-row">
                             <span class="stat-label">Thresholds</span>
-                            <span class="stat-value">{{storeItem.thresholdMajor}} / {{storeItem.thresholdSevere}}</span>
+                            <span class="stat-value">
+                                <span class="{{#if (eq storeItem.thresholdMajorCompare 'up')}}compare-better{{else if (eq storeItem.thresholdMajorCompare 'down')}}compare-worse{{/if}}">
+                                    {{storeItem.thresholdMajor}}
+                                    {{#if (eq storeItem.thresholdMajorCompare 'up')}}<i class="fas fa-caret-up"></i>{{/if}}
+                                    {{#if (eq storeItem.thresholdMajorCompare 'down')}}<i class="fas fa-caret-down"></i>{{/if}}
+                                </span>
+                                /
+                                <span class="{{#if (eq storeItem.thresholdSevereCompare 'up')}}compare-better{{else if (eq storeItem.thresholdSevereCompare 'down')}}compare-worse{{/if}}">
+                                    {{storeItem.thresholdSevere}}
+                                    {{#if (eq storeItem.thresholdSevereCompare 'up')}}<i class="fas fa-caret-up"></i>{{/if}}
+                                    {{#if (eq storeItem.thresholdSevereCompare 'down')}}<i class="fas fa-caret-down"></i>{{/if}}
+                                </span>
+                            </span>
                         </div>
                     {{/if}}
                 </div>
@@ -132,6 +154,14 @@
                                 <span class="feature-name">{{this.name}}:</span>
                                 <span class="feature-desc">{{this.description}}</span>
                             </div>
+                        {{/each}}
+                    </div>
+                {{/if}}
+                {{#if storeItem.lostFeatures.length}}
+                    <div class="lost-features">
+                        <div class="lost-features-header"><i class="fas fa-exclamation-triangle"></i> Features Lost</div>
+                        {{#each storeItem.lostFeatures}}
+                            <span class="lost-feature-name">{{this}}</span>
                         {{/each}}
                     </div>
                 {{/if}}

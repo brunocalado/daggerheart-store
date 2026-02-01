@@ -42,6 +42,122 @@ function getChatWhisperRecipients() {
 }
 
 /**
+ * Helper to show styled confirmation dialogs
+ * @param {Object} options - Dialog options
+ * @param {string} options.title - Window title
+ * @param {string} options.headerText - Header text displayed in the dialog
+ * @param {string} options.headerColor - Color for the header (default: #D4AF37 gold)
+ * @param {string} options.message - Main message (supports HTML)
+ * @param {string} options.description - Secondary description text
+ * @param {Object} [options.input] - Optional input field configuration
+ * @param {string} [options.input.name] - Input field name
+ * @param {string} [options.input.label] - Input field label
+ * @param {string} [options.input.defaultValue] - Default value
+ * @param {string} [options.input.placeholder] - Placeholder text
+ * @param {string} [options.input.notes] - Notes below the input
+ * @param {Object} [options.buttons] - Custom button configuration
+ * @param {string} [options.buttons.confirm] - Confirm button label
+ * @param {string} [options.buttons.confirmIcon] - Confirm button icon
+ * @returns {Promise<boolean|Object>} - Returns boolean for confirm, or object with input values
+ */
+async function showStoreDialog(options) {
+    const {
+        title,
+        headerText,
+        headerColor = "#D4AF37",
+        message,
+        description,
+        input,
+        buttons = {},
+        customContent = null
+    } = options;
+
+    // Build the content HTML
+    let contentHtml = `<div class="store-dialog-content">`;
+
+    if (headerText) {
+        contentHtml += `<h3 class="store-dialog-header" style="color: ${headerColor};">${headerText}</h3>`;
+    }
+
+    if (message) {
+        contentHtml += `<p class="store-dialog-message">${message}</p>`;
+    }
+
+    if (description) {
+        contentHtml += `<p class="store-dialog-description">${description}</p>`;
+    }
+
+    contentHtml += `</div>`;
+
+    // If there's an input field, add it
+    if (input) {
+        contentHtml += `
+            <div class="store-dialog-input-group">
+                <label>${input.label || "Value:"}</label>
+                <input type="${input.type || "text"}" name="${input.name}" value="${input.defaultValue || ""}"
+                       placeholder="${input.placeholder || ""}">
+                ${input.notes ? `<p class="store-dialog-notes">${input.notes}</p>` : ""}
+            </div>
+        `;
+    }
+
+    // If there's custom content, add it
+    if (customContent) {
+        contentHtml += customContent;
+    }
+
+    // If input or custom content exists, use DialogV2 with custom buttons
+    if (input || customContent) {
+        return new Promise((resolve) => {
+            new DialogV2({
+                window: { title, icon: buttons.confirmIcon || "fas fa-check" },
+                content: contentHtml,
+                classes: ["store-dialog"],
+                buttons: [
+                    {
+                        action: "confirm",
+                        label: buttons.confirm || "Confirm",
+                        icon: buttons.confirmIcon || "fas fa-check",
+                        callback: (event, button, dialog) => {
+                            const result = { confirmed: true };
+                            if (input) {
+                                result.value = button.form.elements[input.name]?.value;
+                            }
+                            // Collect all form data for custom content
+                            if (customContent && button.form) {
+                                result.formData = {};
+                                const formData = new FormData(button.form);
+                                for (const [key, value] of formData.entries()) {
+                                    result.formData[key] = value;
+                                }
+                            }
+                            resolve(result);
+                        }
+                    },
+                    {
+                        action: "cancel",
+                        label: buttons.cancel || "Cancel",
+                        icon: "fas fa-times",
+                        callback: () => resolve({ confirmed: false, value: null })
+                    }
+                ],
+                close: () => resolve({ confirmed: false, value: null }),
+                render: options.onRender || null
+            }).render(true);
+        });
+    }
+
+    // Simple confirmation dialog
+    return DialogV2.confirm({
+        window: { title },
+        content: contentHtml,
+        classes: ["store-dialog"],
+        rejectClose: false,
+        modal: true
+    });
+}
+
+/**
  * Main Store Application (Application V2)
  */
 export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) {
@@ -539,12 +655,115 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         if (!storeDoc) return null;
 
         const equippedItem = this._getEquippedItem(actor, category);
+        const equipped = this._formatItemForComparison(equippedItem);
+        const storeItem = this._formatItemForComparison(storeDoc);
+
+        // Add comparison indicators if there's an equipped item
+        if (equipped && storeItem) {
+            this._addComparisonIndicators(equipped, storeItem);
+        }
 
         return {
-            equipped: this._formatItemForComparison(equippedItem),
-            storeItem: this._formatItemForComparison(storeDoc),
+            equipped: equipped,
+            storeItem: storeItem,
             hasEquipped: !!equippedItem
         };
+    }
+
+    /**
+     * Adds comparison indicators (up/down arrows, colors) to the store item.
+     * @param {Object} equipped - The equipped item data
+     * @param {Object} storeItem - The store item data
+     */
+    _addComparisonIndicators(equipped, storeItem) {
+        // Range order for weapons (lower index = shorter range)
+        const rangeOrder = ["Melee", "Very Close", "Close", "Far", "Very Far"];
+
+        if (storeItem.isWeapon && equipped.isWeapon) {
+            // Compare range
+            const equippedRangeIdx = rangeOrder.indexOf(equipped.range);
+            const storeRangeIdx = rangeOrder.indexOf(storeItem.range);
+            if (equippedRangeIdx !== -1 && storeRangeIdx !== -1) {
+                if (storeRangeIdx > equippedRangeIdx) {
+                    storeItem.rangeCompare = "up"; // Longer range is better
+                } else if (storeRangeIdx < equippedRangeIdx) {
+                    storeItem.rangeCompare = "down";
+                }
+            }
+
+            // Compare damage (parse dice and bonus)
+            const equippedDamage = this._parseDamageValue(equipped.damageDisplay);
+            const storeDamage = this._parseDamageValue(storeItem.damageDisplay);
+            if (equippedDamage !== null && storeDamage !== null) {
+                if (storeDamage > equippedDamage) {
+                    storeItem.damageCompare = "up";
+                } else if (storeDamage < equippedDamage) {
+                    storeItem.damageCompare = "down";
+                }
+            }
+
+            // Check for lost features
+            if (equipped.features && equipped.features.length > 0) {
+                const storeFeatureNames = (storeItem.features || []).map(f => f.name.toLowerCase());
+                storeItem.lostFeatures = equipped.features
+                    .filter(f => !storeFeatureNames.includes(f.name.toLowerCase()))
+                    .map(f => f.name);
+            }
+        } else if (!storeItem.isWeapon && !equipped.isWeapon) {
+            // Armor comparison
+            // Compare base score (higher is better)
+            if (storeItem.baseScore > equipped.baseScore) {
+                storeItem.baseScoreCompare = "up";
+            } else if (storeItem.baseScore < equipped.baseScore) {
+                storeItem.baseScoreCompare = "down";
+            }
+
+            // Compare thresholds (higher is better for armor)
+            if (storeItem.thresholdMajor > equipped.thresholdMajor) {
+                storeItem.thresholdMajorCompare = "up";
+            } else if (storeItem.thresholdMajor < equipped.thresholdMajor) {
+                storeItem.thresholdMajorCompare = "down";
+            }
+
+            if (storeItem.thresholdSevere > equipped.thresholdSevere) {
+                storeItem.thresholdSevereCompare = "up";
+            } else if (storeItem.thresholdSevere < equipped.thresholdSevere) {
+                storeItem.thresholdSevereCompare = "down";
+            }
+
+            // Check for lost features
+            if (equipped.features && equipped.features.length > 0) {
+                const storeFeatureNames = (storeItem.features || []).map(f => f.name.toLowerCase());
+                storeItem.lostFeatures = equipped.features
+                    .filter(f => !storeFeatureNames.includes(f.name.toLowerCase()))
+                    .map(f => f.name);
+            }
+        }
+    }
+
+    /**
+     * Parses a damage display string and returns a comparable numeric value.
+     * E.g., "d10+7" -> 12.5 (average of d10 is 5.5, plus 7)
+     * @param {string} damageStr - The damage string
+     * @returns {number|null}
+     */
+    _parseDamageValue(damageStr) {
+        if (!damageStr || damageStr === "Custom") return null;
+
+        // Remove damage type suffix like "(Physical)"
+        const cleanStr = damageStr.replace(/\s*\([^)]*\)\s*$/, "").trim();
+
+        // Match patterns like "d10", "d10+5", "2d6+3"
+        const match = cleanStr.match(/^(\d*)d(\d+)(?:\+(\d+))?$/i);
+        if (!match) return null;
+
+        const numDice = parseInt(match[1]) || 1;
+        const dieSize = parseInt(match[2]);
+        const bonus = parseInt(match[3]) || 0;
+
+        // Calculate average damage
+        const avgPerDie = (dieSize + 1) / 2;
+        return numDice * avgPerDie + bonus;
     }
 
     async _handleCurrencyConversion(actor) {
@@ -626,7 +845,13 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const partyActorId = game.settings.get(MODULE_ID, "partyActorId");
         let partyActor = null;
         if (partyActorId) partyActor = game.actors.get(partyActorId);
-        const hasPartyActor = !!partyActor;
+
+        // For players, only enable party features if the party actor has "All Players Owner" permission
+        let hasPartyActor = !!partyActor;
+        if (hasPartyActor && !isGM) {
+            const defaultOwnership = partyActor.ownership?.default ?? 0;
+            hasPartyActor = defaultOwnership >= 3; // 3 = Owner
+        }
 
         let userGold = 0;
         let partyGold = 0;
@@ -1462,22 +1687,38 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         }
 
         const content = `
-            <div class="form-group" style="margin-bottom: 10px;">
-                <label style="display:block; margin-bottom:5px;"><strong>Transfer Direction:</strong></label>
-                <select name="direction" style="width: 100%;">
-                    <option value="deposit">Deposit to Party (My Gold: ${userWealth})</option>
-                    <option value="withdraw">Withdraw from Party (Party Gold: ${partyWealth})</option>
-                </select>
+            <div class="store-dialog-content">
+                <h3 class="store-dialog-header" style="color: #8e44ad;">Transfer Funds</h3>
             </div>
-            <div class="form-group">
-                <label style="display:block; margin-bottom:5px;"><strong>Amount (${currency}):</strong></label>
-                <input type="number" name="amount" min="1" step="1" placeholder="0" style="width: 100%;">
+            <div class="transfer-wealth-display">
+                <div class="transfer-wealth-item">
+                    <div class="transfer-wealth-label"><i class="fas fa-coins"></i> My Wealth</div>
+                    <div class="transfer-wealth-value">${userWealth} ${currency}</div>
+                </div>
+                <div class="transfer-wealth-item">
+                    <div class="transfer-wealth-label"><i class="fas fa-users"></i> Party Resources</div>
+                    <div class="transfer-wealth-value">${partyWealth} ${currency}</div>
+                </div>
+            </div>
+            <div class="transfer-direction-container">
+                <button type="button" class="direction-btn deposit-btn selected" data-direction="deposit">
+                    <i class="fas fa-arrow-right"></i> Deposit to Party
+                </button>
+                <button type="button" class="direction-btn withdraw-btn" data-direction="withdraw">
+                    <i class="fas fa-arrow-left"></i> Withdraw from Party
+                </button>
+            </div>
+            <input type="hidden" name="direction" value="deposit">
+            <div class="store-dialog-input-group">
+                <label>Amount (${currency}):</label>
+                <input type="number" name="amount" min="1" step="1" placeholder="0">
             </div>
         `;
 
-        new DialogV2({
+        const dialog = new DialogV2({
             window: { title: "Transfer Funds", icon: "fas fa-exchange-alt", resizable: false },
             content: content,
+            classes: ["store-dialog"],
             buttons: [
                 {
                     action: "confirm",
@@ -1537,13 +1778,48 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
                             this._createTransferChatMessage(userActor, partyActor, amount, "withdraw", currency);
                         }
-                        
+
                         this.render();
                     }
                 },
                 { action: "cancel", label: "Cancel", icon: "fas fa-times" }
-            ]
-        }).render(true);
+            ],
+            render: (event, html) => {
+                console.log("daggerheart-store | Transfer render callback fired");
+                console.log("daggerheart-store | event:", event);
+                console.log("daggerheart-store | html:", html);
+                console.log("daggerheart-store | html type:", typeof html, html?.constructor?.name);
+
+                const container = html?.querySelector?.(".transfer-direction-container");
+                console.log("daggerheart-store | container:", container);
+
+                if (!container) {
+                    console.log("daggerheart-store | Container not found, trying document.querySelector");
+                    const fallbackContainer = document.querySelector(".store-dialog .transfer-direction-container");
+                    console.log("daggerheart-store | fallback container:", fallbackContainer);
+                    return;
+                }
+
+                const buttons = container.querySelectorAll(".direction-btn");
+                const hiddenInput = html.querySelector('input[name="direction"]');
+                console.log("daggerheart-store | buttons:", buttons);
+                console.log("daggerheart-store | hiddenInput:", hiddenInput);
+
+                container.addEventListener("click", (e) => {
+                    console.log("daggerheart-store | Click event fired");
+                    console.log("daggerheart-store | e.target:", e.target);
+                    const btn = e.target.closest(".direction-btn");
+                    console.log("daggerheart-store | btn found:", btn);
+                    if (!btn) return;
+
+                    buttons.forEach(b => b.classList.remove("selected"));
+                    btn.classList.add("selected");
+                    hiddenInput.value = btn.dataset.direction;
+                    console.log("daggerheart-store | Direction set to:", btn.dataset.direction);
+                });
+            }
+        });
+        dialog.render(true);
     }
 
     async _createTransferChatMessage(userActor, partyActor, amount, type, currency) {
@@ -1800,70 +2076,76 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
     }
     
     async _onSavePreset(event, target) {
-        const content = `
-            <div style="padding: 5px 0;">
-                <label>Profile Name:</label>
-                <input type="text" name="profileName" value="New Profile" style="width: 100%; margin-top: 5px; padding: 5px;">
-                <p class="notes" style="font-size: 0.9em; color: #888; margin-top: 5px;">
-                    This will save all current store settings (prices, sales, hidden items, configuration) to a new profile.
-                </p>
-            </div>
-        `;
+        const result = await showStoreDialog({
+            title: "Save Store Profile",
+            headerText: "Save Profile",
+            headerColor: "#D4AF37",
+            message: "Enter a name for this profile.",
+            description: "This will save all current store settings (prices, sales, hidden items, configuration).",
+            input: {
+                name: "profileName",
+                label: "Profile Name:",
+                defaultValue: "New Profile"
+            },
+            buttons: {
+                confirm: "Save Profile",
+                confirmIcon: "fas fa-save"
+            }
+        });
 
-        new DialogV2({
-            window: { title: "Save Store Profile", icon: "fas fa-save" },
-            content: content,
-            buttons: [
-                {
-                    action: "save",
-                    label: "Save Profile",
-                    icon: "fas fa-save",
-                    callback: async (event, button, dialog) => {
-                        const name = button.form.elements.profileName.value.trim() || "New Profile";
-                        
-                        if (name === "Default") {
-                            return ui.notifications.error("You cannot overwrite the factory 'Default' profile. Please choose another name.");
-                        }
+        if (!result.confirmed) return;
 
-                        const currentSettings = {
-                            storeName: game.settings.get(MODULE_ID, "storeName"),
-                            priceModifier: game.settings.get(MODULE_ID, "priceModifier"),
-                            allowedTiers: game.settings.get(MODULE_ID, "allowedTiers"),
-                            hiddenCategories: game.settings.get(MODULE_ID, "hiddenCategories"),
-                            customCompendiums: game.settings.get(MODULE_ID, "customCompendiums"),
-                            priceOverrides: game.settings.get(MODULE_ID, "priceOverrides"),
-                            saleDiscount: game.settings.get(MODULE_ID, "saleDiscount"),
-                            saleItems: game.settings.get(MODULE_ID, "saleItems"),
-                            hiddenItems: game.settings.get(MODULE_ID, "hiddenItems"),
-                            blockedSaleItems: game.settings.get(MODULE_ID, "blockedSaleItems"),
-                            blockedPurchaseItems: game.settings.get(MODULE_ID, "blockedPurchaseItems"),
-                            partyActorId: game.settings.get(MODULE_ID, "partyActorId"),
-                            customTabName: game.settings.get(MODULE_ID, "customTabName"),
-                            customTabCompendium: game.settings.get(MODULE_ID, "customTabCompendium"),
-                            sellRatio: game.settings.get(MODULE_ID, "sellRatio"),
-                            stockEnabled: game.settings.get(MODULE_ID, "stockEnabled"),
-                            showStockQuantity: game.settings.get(MODULE_ID, "showStockQuantity")
-                        };
+        const name = result.value?.trim() || "New Profile";
 
-                        const profiles = foundry.utils.deepClone(game.settings.get(MODULE_ID, "storeProfiles")) || {};
-                        profiles[name] = currentSettings;
-                        
-                        await game.settings.set(MODULE_ID, "storeProfiles", profiles);
-                        await game.settings.set(MODULE_ID, "currentProfile", name);
+        if (name === "Default") {
+            return ui.notifications.error("You cannot overwrite the factory 'Default' profile. Please choose another name.");
+        }
 
-                        this.render();
-                    }
-                },
-                { action: "cancel", label: "Cancel", icon: "fas fa-times" }
-            ]
-        }).render(true);
+        const currentSettings = {
+            storeName: game.settings.get(MODULE_ID, "storeName"),
+            priceModifier: game.settings.get(MODULE_ID, "priceModifier"),
+            allowedTiers: game.settings.get(MODULE_ID, "allowedTiers"),
+            hiddenCategories: game.settings.get(MODULE_ID, "hiddenCategories"),
+            customCompendiums: game.settings.get(MODULE_ID, "customCompendiums"),
+            priceOverrides: game.settings.get(MODULE_ID, "priceOverrides"),
+            saleDiscount: game.settings.get(MODULE_ID, "saleDiscount"),
+            saleItems: game.settings.get(MODULE_ID, "saleItems"),
+            hiddenItems: game.settings.get(MODULE_ID, "hiddenItems"),
+            blockedSaleItems: game.settings.get(MODULE_ID, "blockedSaleItems"),
+            blockedPurchaseItems: game.settings.get(MODULE_ID, "blockedPurchaseItems"),
+            partyActorId: game.settings.get(MODULE_ID, "partyActorId"),
+            customTabName: game.settings.get(MODULE_ID, "customTabName"),
+            customTabCompendium: game.settings.get(MODULE_ID, "customTabCompendium"),
+            sellRatio: game.settings.get(MODULE_ID, "sellRatio"),
+            stockEnabled: game.settings.get(MODULE_ID, "stockEnabled"),
+            showStockQuantity: game.settings.get(MODULE_ID, "showStockQuantity")
+        };
+
+        const profiles = foundry.utils.deepClone(game.settings.get(MODULE_ID, "storeProfiles")) || {};
+        profiles[name] = currentSettings;
+
+        await game.settings.set(MODULE_ID, "storeProfiles", profiles);
+        await game.settings.set(MODULE_ID, "currentProfile", name);
+
+        this.render();
     }
 
     async _onLoadPreset(event, target) {
         const selectEl = this.element.querySelector(".preset-select");
         if (!selectEl) return;
-        
+
         const profileName = selectEl.value;
+
+        const confirm = await showStoreDialog({
+            title: "Load Profile",
+            headerText: "Load Profile",
+            headerColor: "#D4AF37",
+            message: `Are you sure you want to load the profile <b>"${profileName}"</b>?`,
+            description: "This will overwrite current store settings."
+        });
+
+        if (!confirm) return;
+
         let profileData;
 
         if (profileName === "Default") {
@@ -1921,29 +2203,23 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             return ui.notifications.warn("You cannot delete the Default profile.");
         }
 
-        new DialogV2({
-            window: { title: "Delete Profile", icon: "fas fa-trash" },
-            content: `<p>Are you sure you want to delete the profile <strong>${profileName}</strong>? This cannot be undone.</p>`,
-            buttons: [
-                {
-                    action: "delete",
-                    label: "Delete",
-                    icon: "fas fa-trash",
-                    callback: async (event, button, dialog) => {
-                        const profiles = foundry.utils.deepClone(game.settings.get(MODULE_ID, "storeProfiles"));
-                        if (profiles[profileName]) {
-                            delete profiles[profileName];
-                            await game.settings.set(MODULE_ID, "storeProfiles", profiles);
+        const confirm = await showStoreDialog({
+            title: "Delete Profile",
+            headerText: "Delete Profile",
+            headerColor: "#D32F2F",
+            message: `Are you sure you want to delete the profile <b>"${profileName}"</b>?`,
+            description: "This action cannot be undone."
+        });
 
-                            await game.settings.set(MODULE_ID, "currentProfile", "Default");
+        if (!confirm) return;
 
-                            this.render();
-                        }
-                    }
-                },
-                { action: "cancel", label: "Cancel", icon: "fas fa-times" }
-            ]
-        }).render(true);
+        const profiles = foundry.utils.deepClone(game.settings.get(MODULE_ID, "storeProfiles"));
+        if (profiles[profileName]) {
+            delete profiles[profileName];
+            await game.settings.set(MODULE_ID, "storeProfiles", profiles);
+            await game.settings.set(MODULE_ID, "currentProfile", "Default");
+            this.render();
+        }
     }
 
     async _onPriceOverrideChange(event) {
@@ -2804,17 +3080,12 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
      * Randomize all categories at once
      */
     async _onRandomizeAll(event, target) {
-        const confirm = await foundry.applications.api.DialogV2.confirm({
-            window: { title: "Warning!" },
-            content: `
-                <div style="text-align: center;">
-                    <h3 style="color: #D32F2F; margin-bottom: 10px;">DANGER ZONE</h3>
-                    <p>Are you sure you want to <b>RANDOMIZE ALL CATEGORIES</b>?</p>
-                    <p style="font-size: 0.9em; color: #ffffff;">This will overwrite current visibility, sales, and prices for all items.</p>
-                </div>
-            `,
-            rejectClose: false,
-            modal: true
+        const confirm = await showStoreDialog({
+            title: "Warning!",
+            headerText: "DANGER ZONE",
+            headerColor: "#D32F2F",
+            message: "Are you sure you want to <b>RANDOMIZE ALL CATEGORIES</b>?",
+            description: "This will overwrite current visibility, sales, and prices for all items."
         });
 
         if (!confirm) return;
@@ -2839,17 +3110,12 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
      * Reset all items to visible (clear hidden, sales, and price overrides)
      */
     async _onResetAll(event, target) {
-        const confirm = await foundry.applications.api.DialogV2.confirm({
-            window: { title: "Warning!" },
-            content: `
-                <div style="text-align: center;">
-                    <h3 style="color: #D32F2F; margin-bottom: 10px;">DANGER ZONE</h3>
-                    <p>Are you sure you want to <b>RESET ALL DATA</b>?</p>
-                    <p style="font-size: 0.9em; color: #ffffff;">This action cannot be undone. All items will become visible.</p>
-                </div>
-            `,
-            rejectClose: false,
-            modal: true
+        const confirm = await showStoreDialog({
+            title: "Warning!",
+            headerText: "DANGER ZONE",
+            headerColor: "#D32F2F",
+            message: "Are you sure you want to <b>RESET ALL DATA</b>?",
+            description: "This action cannot be undone. All items will become visible."
         });
 
         if (!confirm) return;

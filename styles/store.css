@@ -1475,7 +1475,7 @@
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 1px;
-    color: #888;
+    color: #fff;
     margin-bottom: 12px;
     padding-bottom: 8px;
     border-bottom: 1px solid #333;
@@ -1574,13 +1574,29 @@
     font-size: 0.8em;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: #888;
+    color: #fff;
 }
 
 .comparison-tooltip .stat-value {
     font-size: 0.95em;
     font-weight: bold;
     color: #d4af37;
+}
+
+/* Comparison Indicators */
+.comparison-tooltip .stat-value.compare-better,
+.comparison-tooltip .compare-better {
+    color: #4caf50;
+}
+
+.comparison-tooltip .stat-value.compare-worse,
+.comparison-tooltip .compare-worse {
+    color: #f44336;
+}
+
+.comparison-tooltip .stat-value i.fa-caret-up,
+.comparison-tooltip .stat-value i.fa-caret-down {
+    margin-left: 5px;
 }
 
 /* Direct Damage Tag */
@@ -1637,4 +1653,180 @@
     font-size: 0.8em;
     color: #aaa;
     margin-left: 4px;
+}
+
+/* Lost Features Warning */
+.comparison-tooltip .lost-features {
+    width: 100%;
+    margin-top: 10px;
+    padding: 8px;
+    background: rgba(244, 67, 54, 0.15);
+    border: 1px solid #f44336;
+    border-radius: 4px;
+}
+
+.comparison-tooltip .lost-features-header {
+    font-size: 0.85em;
+    font-weight: bold;
+    color: #f44336;
+    margin-bottom: 5px;
+}
+
+.comparison-tooltip .lost-features-header i {
+    margin-right: 5px;
+}
+
+.comparison-tooltip .lost-feature-name {
+    display: inline-block;
+    font-size: 0.8em;
+    color: #f44336;
+    background: rgba(244, 67, 54, 0.2);
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin: 2px;
+}
+
+/* ==================================================== */
+/* STORE DIALOGS (Confirmation & Input) */
+/* ==================================================== */
+
+.store-dialog .window-header {
+    background: #141414 !important;
+    border-bottom: 1px solid #4a3d1a !important;
+}
+
+.store-dialog .window-header .window-title {
+    color: #d4af37 !important;
+}
+
+.store-dialog .window-content {
+    background: #1a1a1a !important;
+    color: #ffffff !important;
+}
+
+.store-dialog-content {
+    text-align: center;
+    padding: 10px 0;
+}
+
+.store-dialog-header {
+    margin-bottom: 10px;
+    font-family: "Aleo", serif;
+    font-weight: bold;
+    font-size: 1.3em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.store-dialog-message {
+    color: #ffffff;
+    font-size: 1em;
+    margin-bottom: 8px;
+}
+
+.store-dialog-description {
+    font-size: 0.9em;
+    color: #ffffff;
+}
+
+.store-dialog-input-group {
+    padding: 10px 0;
+    text-align: left;
+}
+
+.store-dialog-input-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.store-dialog-input-group input {
+    width: 100%;
+    padding: 8px;
+    background: #2a2a2a;
+    border: 1px solid #555;
+    border-radius: 4px;
+    color: #ffffff;
+}
+
+.store-dialog-input-group input:focus {
+    border-color: #d4af37;
+    outline: none;
+}
+
+.store-dialog-notes {
+    font-size: 0.9em;
+    color: #aaaaaa;
+    margin-top: 5px;
+}
+
+/* Transfer Funds Dialog Specific Styles */
+.store-dialog .transfer-wealth-display {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: #2a2a2a;
+    border-radius: 6px;
+    border: 1px solid #444;
+}
+
+.store-dialog .transfer-wealth-item {
+    text-align: center;
+    flex: 1;
+}
+
+.store-dialog .transfer-wealth-label {
+    font-size: 12px;
+    color: #aaaaaa;
+    margin-bottom: 4px;
+}
+
+.store-dialog .transfer-wealth-value {
+    font-size: 18px;
+    font-weight: bold;
+    color: #d4af37;
+}
+
+.store-dialog .transfer-direction-container {
+    display: flex !important;
+    flex-direction: row !important;
+    margin-bottom: 15px;
+}
+
+.store-dialog .direction-btn {
+    flex: 1 1 50%;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+    margin: 0;
+    transition: all 0.2s;
+}
+
+.store-dialog .direction-btn.deposit-btn {
+    border-radius: 6px 0 0 6px;
+}
+
+.store-dialog .direction-btn.withdraw-btn {
+    border-radius: 0 6px 6px 0;
+}
+
+.store-dialog .direction-btn.selected {
+    background: #8e44ad;
+    border: 2px solid #8e44ad;
+    color: white;
+}
+
+.store-dialog .direction-btn:not(.selected) {
+    background: #2a2a2a;
+    border: 2px solid #444;
+    color: #bbbbbb;
+}
+
+.store-dialog .direction-btn:not(.selected):hover {
+    border-color: #8e44ad;
+    color: #ffffff;
 }
