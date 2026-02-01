@@ -2063,7 +2063,8 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             addCompendium: StoreConfig.prototype._onAddCompendium,
             removeCompendium: StoreConfig.prototype._onRemoveCompendium,
             applyStockDefaults: StoreConfig.prototype._onApplyStockDefaults,
-            restockAll: StoreConfig.prototype._onRestockAll
+            restockAll: StoreConfig.prototype._onRestockAll,
+            openInstructions: StoreConfig.prototype._onOpenInstructions // Added openInstructions action
         }
     };
 
@@ -2175,6 +2176,19 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
                 });
             }
         });
+    }
+
+    /**
+     * Handles opening the instructions journal from Config
+     */
+    async _onOpenInstructions(event, target) {
+        const uuid = "Compendium.daggerheart-store.journals.JournalEntry.fIXCeXWeDbAu3uFg";
+        const entry = await fromUuid(uuid);
+        if (entry) {
+            entry.sheet.render(true);
+        } else {
+            ui.notifications.warn("Instructions journal not found in the compendium.");
+        }
     }
 
     async _onAddCompendium(event, target) {
