@@ -730,7 +730,7 @@
 
 /* Custom Checkmark State - Full Fill Lighter Gold */
 .daggerheart-store-config input[type="checkbox"]:checked {
-    background: #ffd700 !important; /* Lighter/Brighter Gold */
+    background: #d4af37 !important; /* Lighter/Brighter Gold */
     border-color: #ffffff !important;
     box-shadow: none !important;
 }
@@ -751,6 +751,77 @@
 .daggerheart-store-config input[type="checkbox"]:focus {
     outline: none;
     box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.3) !important;
+}
+
+/* Inline Form Groups */
+.daggerheart-store-config .form-group.inline-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.daggerheart-store-config .form-group.inline-group > label {
+    min-width: 120px;
+    flex-shrink: 0;
+}
+
+.daggerheart-store-config .form-group.inline-group > input[type="text"],
+.daggerheart-store-config .form-group.inline-group > select {
+    flex: 1;
+    min-width: 150px;
+    max-width: 250px;
+}
+
+/* Party Actor Ownership Info */
+.daggerheart-store-config .ownership-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 15px;
+    font-size: 0.9em;
+}
+
+.daggerheart-store-config .ownership-label {
+    color: #aaa;
+}
+
+.daggerheart-store-config .ownership-value {
+    color: #d4af37;
+    font-weight: bold;
+}
+
+.daggerheart-store-config .ownership-status {
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-weight: bold;
+    font-size: 0.85em;
+}
+
+.daggerheart-store-config .ownership-status.status-ok {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4caf50;
+    border: 1px solid #4caf50;
+}
+
+.daggerheart-store-config .ownership-status.status-warning {
+    background: rgba(255, 152, 0, 0.2);
+    color: #ff9800;
+    border: 1px solid #ff9800;
+}
+
+/* Config Separators */
+.daggerheart-store-config .config-separator {
+    color: #555;
+    font-weight: 100;
+    margin: 0 2px;
+}
+
+/* Slider Form Groups - Better Spacing */
+.daggerheart-store-config .form-group .form-fields + .notes {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #333;
 }
 
 /* Slider Styles */

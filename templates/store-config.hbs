@@ -10,16 +10,16 @@
 
     <!-- Tab: General -->
     <div class="tab-content {{#if (eq activeTab 'general')}}active{{/if}}" data-tab="general">
-        
-        <div class="form-group">
+
+        <div class="form-group inline-group">
             <label>Store Window Name</label>
             <input type="text" name="storeName" value="{{storeName}}">
-            <p class="notes">Sets the title of the main store window.</p>
         </div>
+        <p class="notes">Sets the title of the main store window.</p>
 
         <hr>
 
-        <div class="form-group">
+        <div class="form-group inline-group">
             <label>Party Actor</label>
             <select name="partyActorId">
                 <option value="">None</option>
@@ -27,10 +27,21 @@
                 <option value="{{this.id}}" {{#if (eq this.id ../selectedPartyActor)}}selected{{/if}}>{{this.name}}</option>
                 {{/each}}
             </select>
-            <p class="notes">Select a party actor. If selected, the group can access the wealth stored in this sheet.</p>
+            <span class="ownership-info" {{#unless selectedPartyActor}}style="display: none;"{{/unless}}>
+                <span class="config-separator">|</span>
+                <span class="ownership-label">Ownership:</span>
+                <span class="ownership-value">{{partyActorOwnership}}</span>
+                <span class="config-separator">|</span>
+                <span class="ownership-status {{#if partyActorOwnershipOk}}status-ok{{else}}status-warning{{/if}}">
+                    Status: {{#if partyActorOwnershipOk}}OK{{else}}WARNING (Read Docs){{/if}}
+                </span>
+            </span>
         </div>
+        <p class="notes">Select a party actor to enable shared wealth, stock management, and randomizer features.</p>
 
         <hr>
+
+        <h3 style="margin-top: 5px;">Price Modifiers</h3>
 
         <!-- Global Price Multiplier Slider (Updated) -->
         <div class="form-group">
@@ -153,21 +164,14 @@
     <!-- Tab: Stock Management -->
     <div class="tab-content {{#if (eq activeTab 'stock')}}active{{/if}}" data-tab="stock">
 
-        {{#unless hasPartyActor}}
-        <div class="notification warning" style="background: rgba(255, 152, 0, 0.2); border: 1px solid #ff9800; padding: 10px; border-radius: 4px; margin-bottom: 10px;">
-            <i class="fas fa-exclamation-triangle" style="color: #ff9800;"></i>
-            <strong>Warning:</strong> Configure a <strong>Party Actor</strong> in the General tab to enable stock management.
-        </div>
-        {{/unless}}
-
         <div class="form-group" style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
-            <input type="checkbox" name="stockEnabled" {{checked stockEnabled}} {{#unless hasPartyActor}}disabled{{/unless}} style="margin: 0;">
+            <input type="checkbox" id="stockEnabledCheckbox" name="stockEnabled" {{checked stockEnabled}} {{#unless stockReady}}disabled{{/unless}} style="margin: 0;">
             <span>
                 <strong>Enable Limited Stock System:</strong>
-                {{#if hasPartyActor}}
+                {{#if stockReady}}
                     Tracks item quantities and prevents purchases when out of stock.
                 {{else}}
-                    <em style="color: #ff9800;">Requires Party Actor configuration.</em>
+                    <em style="color: #ff9800;">Requires Party Actor with Owner permission.</em>
                 {{/if}}
             </span>
         </div>

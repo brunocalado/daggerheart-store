@@ -2096,6 +2096,19 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
 
         const partyActors = game.actors.filter(a => a.type === "party").map(a => ({ id: a.id, name: a.name })).sort((a, b) => a.name.localeCompare(b.name));
         const availablePacks = game.packs.filter(p => p.documentName === "Item").map(p => ({ id: p.collection, label: `${p.metadata.label} (${p.collection})` })).sort((a, b) => a.label.localeCompare(b.label));
+
+        // Party Actor Ownership Info
+        let partyActorOwnership = "";
+        let partyActorOwnershipOk = false;
+        if (selectedPartyActor) {
+            const partyActor = game.actors.get(selectedPartyActor);
+            if (partyActor) {
+                const defaultOwnership = partyActor.ownership.default ?? 0;
+                const ownershipLevels = { 0: "None", 1: "Limited", 2: "Observer", 3: "Owner" };
+                partyActorOwnership = ownershipLevels[defaultOwnership] || "None";
+                partyActorOwnershipOk = defaultOwnership >= 3;
+            }
+        }
         
         let allCategories = foundry.utils.deepClone(STANDARD_CATEGORIES);
 
@@ -2137,6 +2150,9 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             availablePacks: availablePacks,
             partyActors: partyActors,
             selectedPartyActor: selectedPartyActor,
+            partyActorOwnership: partyActorOwnership,
+            partyActorOwnershipOk: partyActorOwnershipOk,
+            stockReady: hasPartyActor && partyActorOwnershipOk,
             activeTab: this.currentTab,
             hasPartyActor: hasPartyActor,
             stockEnabled: stockEnabled,
@@ -2176,13 +2192,68 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
                 });
             }
         });
+
+        // Party Actor ownership update
+        const partySelect = html.querySelector("select[name='partyActorId']");
+        if (partySelect) {
+            partySelect.addEventListener("change", (e) => {
+                const actorId = e.target.value;
+                const ownershipInfo = html.querySelector(".ownership-info");
+
+                let hasActor = false;
+                let isOk = false;
+                let ownershipText = "None";
+
+                if (actorId) {
+                    const actor = game.actors.get(actorId);
+                    if (actor) {
+                        hasActor = true;
+                        const defaultOwnership = actor.ownership.default ?? 0;
+                        const ownershipLevels = { 0: "None", 1: "Limited", 2: "Observer", 3: "Owner" };
+                        ownershipText = ownershipLevels[defaultOwnership] || "None";
+                        isOk = defaultOwnership >= 3;
+                    }
+                }
+
+                // Update ownership info display
+                if (ownershipInfo) {
+                    if (hasActor) {
+                        ownershipInfo.style.display = "flex";
+                        const valueSpan = ownershipInfo.querySelector(".ownership-value");
+                        const statusSpan = ownershipInfo.querySelector(".ownership-status");
+                        if (valueSpan) valueSpan.textContent = ownershipText;
+                        if (statusSpan) {
+                            statusSpan.textContent = isOk ? "Status: OK" : "Status: WARNING (Read Docs)";
+                            statusSpan.classList.remove("status-ok", "status-warning");
+                            statusSpan.classList.add(isOk ? "status-ok" : "status-warning");
+                        }
+                    } else {
+                        ownershipInfo.style.display = "none";
+                    }
+                }
+
+                // Update stock checkbox state
+                const stockReady = hasActor && isOk;
+                const stockCheckbox = html.querySelector("#stockEnabledCheckbox");
+                if (stockCheckbox) {
+                    stockCheckbox.disabled = !stockReady;
+                    const descSpan = stockCheckbox.nextElementSibling;
+                    if (descSpan) {
+                        const restHtml = stockReady
+                            ? " Tracks item quantities and prevents purchases when out of stock."
+                            : ' <em style="color: #ff9800;">Requires Party Actor with Owner permission.</em>';
+                        descSpan.innerHTML = `<strong>Enable Limited Stock System:</strong>${restHtml}`;
+                    }
+                }
+            });
+        }
     }
 
     /**
      * Handles opening the instructions journal from Config
      */
     async _onOpenInstructions(event, target) {
-        const uuid = "Compendium.daggerheart-store.journals.JournalEntry.fIXCeXWeDbAu3uFg";
+        const uuid = "Compendium.daggerheart-store.journals.JournalEntry.fIXCeXWeDbAu3uFg.JournalEntryPage.acPvDUbb85GK4BiU";
         const entry = await fromUuid(uuid);
         if (entry) {
             entry.sheet.render(true);
