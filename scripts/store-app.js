@@ -1049,7 +1049,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         let stockQuantity = null;
                         let stockStatus = "available";
                         if (stockEnabled) {
-                            const qty = await StockManager.getStock(doc.name);
+                            const qty = await StockManager.getStock(doc.uuid);
                             if (qty !== null) {
                                 stockQuantity = qty;
                                 if (qty === 0) {
@@ -1226,7 +1226,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     let stockQuantity = null;
                     let stockStatus = "available";
                     if (stockEnabled) {
-                        const qty = await StockManager.getStock(doc.name);
+                        const qty = await StockManager.getStock(doc.uuid);
                         if (qty !== null) {
                             stockQuantity = qty;
                             if (qty === 0) {
@@ -1317,16 +1317,16 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const stockInputs = html.querySelectorAll(".gm-stock-input");
         stockInputs.forEach(input => {
             input.addEventListener("change", async (e) => {
-                const itemName = e.target.dataset.name;
+                const itemUuid = e.target.dataset.uuid;
                 const value = e.target.value.trim();
 
                 if (value === "" || value === "∞") {
                     // Set to unlimited
-                    await StockManager.setStock(itemName, 0, true);
+                    await StockManager.setStock(itemUuid, 0, true);
                 } else {
                     const qty = parseInt(value);
                     if (!isNaN(qty) && qty >= 0) {
-                        await StockManager.setStock(itemName, qty, false);
+                        await StockManager.setStock(itemUuid, qty, false);
                     }
                 }
             });
@@ -1558,7 +1558,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const stockEnabled = game.settings.get(MODULE_ID, "stockEnabled") && hasPartyActor;
 
         if (stockEnabled) {
-            const stockQty = await StockManager.getStock(itemName);
+            const stockQty = await StockManager.getStock(itemUuid);
             if (stockQty !== null && stockQty < 1) {
                 return ui.notifications.warn(`${itemName} is out of stock.`);
             }
@@ -1994,7 +1994,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const stockEnabled = game.settings.get(MODULE_ID, "stockEnabled") && hasPartyActor;
 
         if (stockEnabled) {
-            const success = await StockManager.decrementStock(itemName, 1);
+            const success = await StockManager.decrementStock(itemUuid, 1);
             if (!success) {
                 ui.notifications.warn(
                     "Stock depleted during purchase. Item added but stock was not updated."
@@ -2384,7 +2384,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         const stockEnabled = game.settings.get(MODULE_ID, "stockEnabled");
         const showStockQuantity = game.settings.get(MODULE_ID, "showStockQuantity");
 
-        const storeActor = await StockManager.getStoreActor();
+        const storeActor = StockManager.getStoreActor();
         const categoryDefaults = storeActor?.getFlag(MODULE_ID, "stock.categoryDefaults") ||
             StockManager._getDefaultCategorySettings();
 
@@ -2594,7 +2594,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         if (!confirmed) return;
 
         // Read current form values directly from input elements
-        const storeActor = await StockManager.getStoreActor();
+        const storeActor = StockManager.getStoreActor();
         const categoryDefaults = {};
 
         // Get all stock tier inputs from the form
@@ -2627,8 +2627,23 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             ? categoryDefaults
             : (storeActor?.getFlag(MODULE_ID, "stock.categoryDefaults") || StockManager._getDefaultCategorySettings());
 
+        // Build a map of item name -> uuid from all packs
+        const itemUuidMap = new Map();
+        for (const packId of Object.values(PACK_MAPPING)) {
+            const pack = game.packs.get(packId);
+            if (pack) {
+                const docs = await pack.getDocuments();
+                for (const doc of docs) {
+                    itemUuidMap.set(doc.name, doc.uuid);
+                }
+            }
+        }
+
+        // Function to get UUID from item name
+        const getItemUuid = (itemName) => itemUuidMap.get(itemName) || null;
+
         // Use batch update
-        const itemCount = await StockManager.batchApplyDefaults(finalDefaults);
+        const itemCount = await StockManager.batchApplyDefaults(finalDefaults, getItemUuid);
 
         ui.notifications.info(`Stock defaults applied to ${itemCount} items!`);
         this.render();
@@ -2716,7 +2731,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
 
         // Save category defaults to actor
         if (expanded.stockDefaults) {
-            const actor = await StockManager.getStoreActor();
+            const actor = StockManager.getStoreActor();
             if (actor) {
                 await actor.update({
                     [`flags.${MODULE_ID}.stock.categoryDefaults`]: expanded.stockDefaults
@@ -2862,6 +2877,7 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
 
                     items.push({
                         name: doc.name,
+                        uuid: doc.uuid,
                         basePrice: basePrice
                     });
                 }
@@ -2883,6 +2899,7 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
                                 const basePrice = Math.ceil(priceList[doc.name].price * priceMod);
                                 items.push({
                                     name: doc.name,
+                                    uuid: doc.uuid,
                                     basePrice: basePrice
                                 });
                             }
@@ -2908,6 +2925,7 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
                                 }
                                 items.push({
                                     name: doc.name,
+                                    uuid: doc.uuid,
                                     basePrice: basePrice
                                 });
                             }
@@ -3081,21 +3099,18 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
                 // Set random stock quantity (1 to maxQty) for visible items
                 for (const item of visibleItems) {
                     const qty = Math.floor(Math.random() * maxQty) + 1;
-                    stockItems[item.name] = {
-                        quantity: qty,
-                        unlimited: false,
-                        restockQuantity: qty,
-                        lastRestocked: Date.now()
+                    const key = StockManager.sanitizeKey(item.uuid);
+                    stockItems[key] = {
+                        stockpile: { q: qty, r: qty, u: false }
                     };
                 }
 
                 // Set stock to 0 for hidden items
-                for (const name of hiddenItemNames) {
-                    stockItems[name] = {
-                        quantity: 0,
-                        unlimited: false,
-                        restockQuantity: 0,
-                        lastRestocked: Date.now()
+                const hiddenItems = shuffled.slice(numVisible);
+                for (const item of hiddenItems) {
+                    const key = StockManager.sanitizeKey(item.uuid);
+                    stockItems[key] = {
+                        stockpile: { q: 0, r: 0, u: false }
                     };
                 }
 

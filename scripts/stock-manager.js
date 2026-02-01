@@ -2,10 +2,41 @@
  * StockManager - Gerencia sistema de estoque limitado
  * Usa Actor Flags no Party Actor configurado para armazenar dados de estoque
  * Players precisam de permissão Owner no Party Actor para decrementar stock
+ *
+ * Estrutura de dados:
+ * stock: {
+ *   version: number,
+ *   items: {
+ *     [sanitizedUuid]: { stockpile: { q: quantity, r: restockQuantity, u: unlimited } }
+ *   },
+ *   categoryDefaults: { [category]: { tier1, tier2, tier3, tier4 } }
+ * }
+ *
+ * Nota: UUIDs são sanitizados (pontos substituídos por pipes) para evitar
+ * conflitos com a notação de path do Foundry VTT.
+ * Ex: "Compendium.daggerheart.weapons.Item.ABC123" -> "Compendium|daggerheart|weapons|Item|ABC123"
  */
 
 export class StockManager {
     static MODULE_ID = "daggerheart-store";
+
+    /**
+     * Sanitiza UUID para uso como chave de objeto (substitui pontos por pipes)
+     * @param {string} uuid - UUID original
+     * @returns {string} UUID sanitizado
+     */
+    static sanitizeKey(uuid) {
+        return uuid.replace(/\./g, "|");
+    }
+
+    /**
+     * Restaura UUID original de uma chave sanitizada
+     * @param {string} key - Chave sanitizada
+     * @returns {string} UUID original
+     */
+    static unsanitizeKey(key) {
+        return key.replace(/\|/g, ".");
+    }
 
     /**
      * Obtém o actor de inventário da loja (Party Actor configurado)
@@ -60,30 +91,31 @@ export class StockManager {
 
     /**
      * Obtém quantidade em estoque para um item
-     * @param {string} itemName - Nome do item
+     * @param {string} itemUuid - UUID do item (ex: "Compendium.daggerheart.weapons.Item.PC5EyEIq7NWBV0n5")
      * @returns {number|null} Quantidade (null = ilimitado)
      */
-    static getStock(itemName) {
+    static getStock(itemUuid) {
         if (!this.isStockEnabled()) return null;
 
         const actor = this.getStoreActor();
         if (!actor) return null;
 
         const stockData = actor.getFlag(this.MODULE_ID, "stock.items") || {};
-        const itemStock = stockData[itemName];
+        const key = this.sanitizeKey(itemUuid);
+        const itemStock = stockData[key];
 
-        if (!itemStock || itemStock.unlimited) return null;
-        return itemStock.quantity ?? 0;
+        if (!itemStock?.stockpile || itemStock.stockpile.u) return null;
+        return itemStock.stockpile.q ?? 0;
     }
 
     /**
      * Define quantidade em estoque para um item (GM only)
-     * @param {string} itemName - Nome do item
+     * @param {string} itemUuid - UUID do item
      * @param {number} quantity - Quantidade
      * @param {boolean} unlimited - Se true, ignora quantity
      * @returns {boolean} Sucesso
      */
-    static async setStock(itemName, quantity, unlimited = false) {
+    static async setStock(itemUuid, quantity, unlimited = false) {
         if (!game.user.isGM) {
             console.warn(`${this.MODULE_ID} | Only GM can set stock`);
             return false;
@@ -93,20 +125,22 @@ export class StockManager {
         if (!actor) return false;
 
         try {
-            const stockPath = `flags.${this.MODULE_ID}.stock.items.${itemName}`;
+            const key = this.sanitizeKey(itemUuid);
+            const stockItems = actor.getFlag(this.MODULE_ID, "stock.items") || {};
+            const existingRestock = stockItems[key]?.stockpile?.r;
 
-            await actor.update({
-                [stockPath]: {
-                    quantity: unlimited ? null : Math.max(0, quantity),
-                    unlimited: unlimited,
-                    restockQuantity: unlimited ? 0 : Math.max(0, quantity),
-                    lastRestocked: Date.now()
+            stockItems[key] = {
+                stockpile: {
+                    q: unlimited ? null : Math.max(0, quantity),
+                    r: existingRestock ?? (unlimited ? 0 : Math.max(0, quantity)),
+                    u: unlimited
                 }
-            });
+            };
 
+            await actor.setFlag(this.MODULE_ID, "stock.items", stockItems);
             return true;
         } catch (err) {
-            console.error(`${this.MODULE_ID} | Error setting stock for "${itemName}":`, err);
+            console.error(`${this.MODULE_ID} | Error setting stock for "${itemUuid}":`, err);
             return false;
         }
     }
@@ -114,11 +148,11 @@ export class StockManager {
     /**
      * Decrementa estoque de um item
      * Player precisa de permissão Owner no Party Actor
-     * @param {string} itemName - Nome do item
+     * @param {string} itemUuid - UUID do item
      * @param {number} amount - Quantidade a decrementar
      * @returns {boolean} Sucesso
      */
-    static async decrementStock(itemName, amount = 1) {
+    static async decrementStock(itemUuid, amount = 1) {
         if (!this.isStockEnabled()) return true;
 
         const actor = this.getStoreActor();
@@ -132,35 +166,43 @@ export class StockManager {
             return true;
         }
 
+        const key = this.sanitizeKey(itemUuid);
         const stockData = actor.getFlag(this.MODULE_ID, "stock.items") || {};
-        const itemStock = stockData[itemName];
+        const itemStock = stockData[key];
 
         // Se ilimitado ou não rastreado, permitir
-        if (!itemStock || itemStock.unlimited) return true;
+        if (!itemStock?.stockpile || itemStock.stockpile.u) return true;
 
-        const currentQty = itemStock.quantity ?? 0;
+        const currentQty = itemStock.stockpile.q ?? 0;
         if (currentQty < amount) return false; // Sem estoque suficiente
 
         try {
-            const version = actor.getFlag(this.MODULE_ID, "stock.version") || 1;
-            const stockPath = `flags.${this.MODULE_ID}.stock`;
+            // Update the item stock
+            stockData[key].stockpile.q = currentQty - amount;
 
+            const version = actor.getFlag(this.MODULE_ID, "stock.version") || 1;
             await actor.update({
-                [`${stockPath}.items.${itemName}.quantity`]: currentQty - amount,
-                [`${stockPath}.version`]: version + 1
+                [`flags.${this.MODULE_ID}.stock.items`]: stockData,
+                [`flags.${this.MODULE_ID}.stock.version`]: version + 1
             });
 
             return true;
         } catch (err) {
-            console.error(`${this.MODULE_ID} | Error decrementing stock for "${itemName}":`, err);
+            console.error(`${this.MODULE_ID} | Error decrementing stock for "${itemUuid}":`, err);
             return false;
         }
     }
 
     /**
      * Define estoque em lote para uma categoria/tier (GM only)
+     * @param {string} categoryKey - Chave da categoria
+     * @param {number} tier - Tier do item
+     * @param {number} quantity - Quantidade
+     * @param {boolean} unlimited - Se ilimitado
+     * @param {Function} getItemUuid - Função para obter UUID do item pelo nome
+     * @returns {boolean} Sucesso
      */
-    static async bulkSetCategoryStock(categoryKey, tier, quantity, unlimited = false) {
+    static async bulkSetCategoryStock(categoryKey, tier, quantity, unlimited = false, getItemUuid) {
         if (!game.user.isGM) return false;
 
         try {
@@ -170,7 +212,10 @@ export class StockManager {
             const updates = [];
             for (const [itemName, data] of Object.entries(categoryItems)) {
                 if (data.tier === tier) {
-                    updates.push(this.setStock(itemName, quantity, unlimited));
+                    const uuid = getItemUuid ? getItemUuid(itemName) : null;
+                    if (uuid) {
+                        updates.push(this.setStock(uuid, quantity, unlimited));
+                    }
                 }
             }
 
@@ -185,10 +230,11 @@ export class StockManager {
     /**
      * Batch apply stock defaults - single actor update for all items
      * @param {Object} categoryDefaults - Default quantities by category/tier
+     * @param {Function} getItemUuid - Function to get item UUID from name and category
      * @param {Function} progressCallback - Optional callback for progress updates (current, total)
      * @returns {number} Number of items updated
      */
-    static async batchApplyDefaults(categoryDefaults, progressCallback = null) {
+    static async batchApplyDefaults(categoryDefaults, getItemUuid, progressCallback = null) {
         if (!game.user.isGM) return 0;
 
         const actor = this.getStoreActor();
@@ -213,13 +259,14 @@ export class StockManager {
             for (const [itemName, itemData] of Object.entries(categoryData)) {
                 const tier = itemData.tier;
                 const qty = defaults[`tier${tier}`] || 0;
+                const uuid = getItemUuid ? getItemUuid(itemName, categoryKey) : null;
 
-                stockItems[itemName] = {
-                    quantity: qty,
-                    unlimited: false,
-                    restockQuantity: qty,
-                    lastRestocked: Date.now()
-                };
+                if (uuid) {
+                    const key = this.sanitizeKey(uuid);
+                    stockItems[key] = {
+                        stockpile: { q: qty, r: qty, u: false }
+                    };
+                }
 
                 itemCount++;
 
@@ -256,19 +303,21 @@ export class StockManager {
 
         try {
             const stockData = actor.getFlag(this.MODULE_ID, "stock.items") || {};
-            const updates = {};
+            let hasChanges = false;
 
-            for (const [itemName, itemStock] of Object.entries(stockData)) {
-                if (!itemStock.unlimited) {
-                    updates[`flags.${this.MODULE_ID}.stock.items.${itemName}.quantity`] =
-                        itemStock.restockQuantity || 0;
-                    updates[`flags.${this.MODULE_ID}.stock.items.${itemName}.lastRestocked`] =
-                        Date.now();
+            for (const [key, itemStock] of Object.entries(stockData)) {
+                if (!itemStock.stockpile?.u) {
+                    stockData[key].stockpile.q = itemStock.stockpile?.r || 0;
+                    hasChanges = true;
                 }
             }
 
-            if (Object.keys(updates).length > 0) {
-                await actor.update(updates);
+            if (hasChanges) {
+                const version = actor.getFlag(this.MODULE_ID, "stock.version") || 1;
+                await actor.update({
+                    [`flags.${this.MODULE_ID}.stock.items`]: stockData,
+                    [`flags.${this.MODULE_ID}.stock.version`]: version + 1
+                });
             }
         } catch (err) {
             console.error(`${this.MODULE_ID} | Error during full restock:`, err);
@@ -281,13 +330,13 @@ export class StockManager {
      */
     static _getDefaultCategorySettings() {
         return {
-            "Primary Weapons": { tier1: 10, tier2: 5, tier3: 3, tier4: 1, unlimited: false },
-            "Secondary Weapons": { tier1: 10, tier2: 5, tier3: 3, tier4: 1, unlimited: false },
-            "Armors": { tier1: 8, tier2: 4, tier3: 2, tier4: 1, unlimited: false },
-            "Wheelchairs": { tier1: 5, tier2: 3, tier3: 2, tier4: 1, unlimited: false },
-            "Potions": { tier1: 20, tier2: 15, tier3: 10, tier4: 5, unlimited: false },
-            "Consumables": { tier1: 15, tier2: 10, tier3: 5, tier4: 3, unlimited: false },
-            "Loot": { tier1: 10, tier2: 7, tier3: 4, tier4: 2, unlimited: false }
+            "Primary Weapons": { tier1: 10, tier2: 5, tier3: 3, tier4: 1 },
+            "Secondary Weapons": { tier1: 10, tier2: 5, tier3: 3, tier4: 1 },
+            "Armors": { tier1: 8, tier2: 4, tier3: 2, tier4: 1 },
+            "Wheelchairs": { tier1: 5, tier2: 3, tier3: 2, tier4: 1 },
+            "Potions": { tier1: 20, tier2: 15, tier3: 10, tier4: 5 },
+            "Consumables": { tier1: 15, tier2: 10, tier3: 5, tier4: 3 },
+            "Loot": { tier1: 10, tier2: 7, tier3: 4, tier4: 2 }
         };
     }
 }
