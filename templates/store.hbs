@@ -157,7 +157,9 @@
                                 <img src="{{this.img}}" title="Click to view details" class="item-image" data-uuid="{{this.uuid}}" width="36" height="36"/>
                                 {{#unless ../../../isGM}}
                                     {{#if this.stockEnabled}}
-                                        {{#if this.stockQuantity}}
+                                        {{#if this.stockUnlimited}}
+                                            <span class="item-quantity-badge unlimited"><i class="fas fa-infinity"></i></span>
+                                        {{else if this.stockQuantity}}
                                             <span class="item-quantity-badge">{{this.stockQuantity}}</span>
                                         {{else}}
                                             {{#if (eq this.stockStatus "out")}}
@@ -299,6 +301,7 @@
                                             class="sell-btn"
                                             data-action="sellItem"
                                             data-name="{{this.name}}"
+                                            data-uuid="{{this.uuid}}"
                                             data-price="{{this.sellPrice}}"
                                             title="Sell Item for {{this.sellPrice}}"
                                             {{#unless this.canSell}}disabled{{/unless}}>

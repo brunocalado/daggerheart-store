@@ -463,6 +463,20 @@
     line-height: 18px;
 }
 
+/* Unlimited Badge */
+.daggerheart-store .item-quantity-badge.unlimited {
+    background: rgba(0, 0, 0, 0.9);
+    border-color: #888888;
+    color: #ffffff;
+    min-width: 18px;
+    padding: 0;
+}
+
+.daggerheart-store .item-quantity-badge.unlimited i {
+    font-size: 10px;
+    line-height: 18px;
+}
+
 /* ==================================================== */
 /* CONTROLS & BUTTONS */
 /* ==================================================== */

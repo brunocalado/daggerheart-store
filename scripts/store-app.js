@@ -1062,7 +1062,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         // Stock System: Fetch stock data if enabled
                         let stockQuantity = null;
                         let stockStatus = "available";
+                        let stockUnlimited = false;
                         if (stockEnabled) {
+                            stockUnlimited = StockManager.isUnlimited(doc.uuid);
                             const qty = await StockManager.getStock(doc.uuid);
                             if (qty !== null) {
                                 stockQuantity = qty;
@@ -1099,6 +1101,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             header: itemHeader,
                             stockQuantity: stockQuantity,
                             stockStatus: stockStatus,
+                            stockUnlimited: stockUnlimited,
                             stockEnabled: stockEnabled,
                             showStockQty: showStockQuantity,
                             canCompare: canCompare
@@ -1239,7 +1242,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     // Stock System: Fetch stock data if enabled
                     let stockQuantity = null;
                     let stockStatus = "available";
+                    let stockUnlimited = false;
                     if (stockEnabled) {
+                        stockUnlimited = StockManager.isUnlimited(doc.uuid);
                         const qty = await StockManager.getStock(doc.uuid);
                         if (qty !== null) {
                             stockQuantity = qty;
@@ -1276,6 +1281,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             description: cleanedDescription,
                             stockQuantity: stockQuantity,
                             stockStatus: stockStatus,
+                            stockUnlimited: stockUnlimited,
                             stockEnabled: stockEnabled,
                             showStockQty: showStockQuantity,
                             canCompare: canCompare
@@ -1606,6 +1612,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         if (target.disabled) return;
 
         const itemName = target.dataset.name;
+        const itemUuid = target.dataset.uuid;
         const sellPrice = parseInt(target.dataset.price);
         const userActor = game.user.character;
 
@@ -1619,6 +1626,15 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         if (!itemToDelete) return ui.notifications.warn(`You do not have a "${itemName}" to sell.`);
 
         await itemToDelete.delete();
+
+        // Increment stock if stock control is enabled
+        const partyActorId = game.settings.get(MODULE_ID, "partyActorId");
+        const hasPartyActor = !!(partyActorId && game.actors.get(partyActorId));
+        const stockEnabled = game.settings.get(MODULE_ID, "stockEnabled") && hasPartyActor;
+
+        if (stockEnabled && itemUuid) {
+            await StockManager.incrementStock(itemUuid, 1);
+        }
 
         // Handle Currency Update (Smart vs Default)
         const currencyMode = game.settings.get(MODULE_ID, "currencyMode");
