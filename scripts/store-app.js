@@ -705,12 +705,19 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 }
             }
 
-            // Check for lost features
+            // Check for lost features (keep full object with name and description)
             if (equipped.features && equipped.features.length > 0) {
                 const storeFeatureNames = (storeItem.features || []).map(f => f.name.toLowerCase());
                 storeItem.lostFeatures = equipped.features
-                    .filter(f => !storeFeatureNames.includes(f.name.toLowerCase()))
-                    .map(f => f.name);
+                    .filter(f => !storeFeatureNames.includes(f.name.toLowerCase()));
+            }
+
+            // Mark gained features on storeItem.features
+            if (storeItem.features && storeItem.features.length > 0) {
+                const equippedFeatureNames = (equipped.features || []).map(f => f.name.toLowerCase());
+                storeItem.features.forEach(f => {
+                    f.isGained = !equippedFeatureNames.includes(f.name.toLowerCase());
+                });
             }
         } else if (!storeItem.isWeapon && !equipped.isWeapon) {
             // Armor comparison
@@ -734,12 +741,19 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 storeItem.thresholdSevereCompare = "down";
             }
 
-            // Check for lost features
+            // Check for lost features (keep full object with name and description)
             if (equipped.features && equipped.features.length > 0) {
                 const storeFeatureNames = (storeItem.features || []).map(f => f.name.toLowerCase());
                 storeItem.lostFeatures = equipped.features
-                    .filter(f => !storeFeatureNames.includes(f.name.toLowerCase()))
-                    .map(f => f.name);
+                    .filter(f => !storeFeatureNames.includes(f.name.toLowerCase()));
+            }
+
+            // Mark gained features on storeItem.features
+            if (storeItem.features && storeItem.features.length > 0) {
+                const equippedFeatureNames = (equipped.features || []).map(f => f.name.toLowerCase());
+                storeItem.features.forEach(f => {
+                    f.isGained = !equippedFeatureNames.includes(f.name.toLowerCase());
+                });
             }
         }
     }
@@ -2414,9 +2428,22 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             });
         }
 
+        // Icon mapping for categories
+        const categoryIcons = {
+            "Primary Weapons": "fa-sword",
+            "Secondary Weapons": "fa-bow-arrow",
+            "Wheelchairs": "fa-wheelchair",
+            "Armors": "fa-shield-halved",
+            "Potions": "fa-flask-round-potion",
+            "Consumables": "fa-utensils",
+            "Loot": "fa-gem",
+            "CustomTab": "fa-store"
+        };
+
         const categoryConfigList = allCategories.map(cat => ({
             key: cat.key,
             label: cat.label,
+            icon: categoryIcons[cat.key] || "fa-box",
             tiers: allowedTiers[cat.key] || {1:true, 2:true, 3:true, 4:true},
             isVisible: !hiddenCategories[cat.key]
         }));
@@ -2526,21 +2553,158 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
                     }
                 }
 
-                // Update stock checkbox state
+                // Update stock checkbox and card state
                 const stockReady = hasActor && isOk;
+                const stockCard = html.querySelector(".stock-toggle-card");
                 const stockCheckbox = html.querySelector("#stockEnabledCheckbox");
-                if (stockCheckbox) {
+
+                if (stockCard && stockCheckbox) {
                     stockCheckbox.disabled = !stockReady;
-                    const descSpan = stockCheckbox.nextElementSibling;
+
+                    // Update card disabled state
+                    if (stockReady) {
+                        stockCard.classList.remove("disabled");
+                    } else {
+                        stockCard.classList.add("disabled");
+                        stockCard.classList.remove("active");
+                        stockCheckbox.checked = false;
+                    }
+
+                    // Update description text
+                    const descSpan = stockCard.querySelector(".stock-description");
                     if (descSpan) {
-                        const restHtml = stockReady
-                            ? " Tracks item quantities and prevents purchases when out of stock."
-                            : ' <em style="color: #ff9800;">Requires Party Actor with Owner permission.</em>';
-                        descSpan.innerHTML = `<strong>Enable Limited Stock System:</strong>${restHtml}`;
+                        descSpan.innerHTML = stockReady
+                            ? "Tracks item quantities and prevents purchases when out of stock."
+                            : '<em class="warning">Requires Party Actor with Owner permission.</em>';
                     }
                 }
             });
         }
+
+        // Category Cards Toggle Visual
+        const categoryCards = html.querySelectorAll(".category-card");
+        categoryCards.forEach(card => {
+            card.addEventListener("click", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const checkbox = card.querySelector("input[type='checkbox']");
+                if (checkbox) {
+                    checkbox.checked = !checkbox.checked;
+                    if (checkbox.checked) {
+                        card.classList.add("active");
+                    } else {
+                        card.classList.remove("active");
+                    }
+                }
+            });
+        });
+
+        // Stock Toggle Card Visual
+        const stockToggleCard = html.querySelector(".stock-toggle-card");
+        if (stockToggleCard) {
+            stockToggleCard.addEventListener("click", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Don't toggle if disabled
+                if (stockToggleCard.classList.contains("disabled")) return;
+
+                const checkbox = stockToggleCard.querySelector("input[type='checkbox']");
+                if (checkbox && !checkbox.disabled) {
+                    checkbox.checked = !checkbox.checked;
+                    stockToggleCard.classList.toggle("active", checkbox.checked);
+                }
+            });
+        }
+
+        // Tier Matrix: Tier Button Toggle Visual
+        const tierBtns = html.querySelectorAll(".tier-btn");
+        tierBtns.forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                e.preventDefault();
+                const checkbox = btn.querySelector("input[type='checkbox']");
+                if (checkbox) {
+                    checkbox.checked = !checkbox.checked;
+                    btn.classList.toggle("active", checkbox.checked);
+                    this._updateBulkCheckboxes(html);
+                }
+            });
+        });
+
+        // Tier Matrix: Bulk Column Toggle (toggle all tiers in a column)
+        const bulkColToggles = html.querySelectorAll(".bulk-col-toggle");
+        bulkColToggles.forEach(toggle => {
+            toggle.addEventListener("change", (e) => {
+                const tier = e.target.dataset.tier;
+                const isChecked = e.target.checked;
+                const tierCheckboxes = html.querySelectorAll(`input[name$=".${tier}"]`);
+                tierCheckboxes.forEach(cb => {
+                    cb.checked = isChecked;
+                    const btn = cb.closest(".tier-btn");
+                    if (btn) btn.classList.toggle("active", isChecked);
+                });
+                this._updateBulkRowCheckboxes(html);
+            });
+        });
+
+        // Tier Matrix: Bulk Row Toggle (toggle all tiers in a row/category)
+        const bulkRowToggles = html.querySelectorAll(".bulk-row-toggle");
+        bulkRowToggles.forEach(toggle => {
+            toggle.addEventListener("change", (e) => {
+                const isChecked = e.target.checked;
+                const row = e.target.closest("tr");
+                if (row) {
+                    const tierCheckboxes = row.querySelectorAll(".tier-btn input[type='checkbox']");
+                    tierCheckboxes.forEach(cb => {
+                        cb.checked = isChecked;
+                        const btn = cb.closest(".tier-btn");
+                        if (btn) btn.classList.toggle("active", isChecked);
+                    });
+                }
+                this._updateBulkColCheckboxes(html);
+            });
+        });
+
+        // Initialize bulk checkbox states
+        this._updateBulkCheckboxes(html);
+    }
+
+    /**
+     * Updates both row and column bulk checkboxes based on current state
+     */
+    _updateBulkCheckboxes(html) {
+        this._updateBulkColCheckboxes(html);
+        this._updateBulkRowCheckboxes(html);
+    }
+
+    /**
+     * Updates column bulk checkboxes based on current tier state
+     */
+    _updateBulkColCheckboxes(html) {
+        for (let tier = 1; tier <= 4; tier++) {
+            const colToggle = html.querySelector(`.bulk-col-toggle[data-tier="${tier}"]`);
+            if (colToggle) {
+                const tierCheckboxes = html.querySelectorAll(`input[name$=".${tier}"]`);
+                const allChecked = Array.from(tierCheckboxes).every(cb => cb.checked);
+                colToggle.checked = allChecked;
+            }
+        }
+    }
+
+    /**
+     * Updates row bulk checkboxes based on current tier state
+     */
+    _updateBulkRowCheckboxes(html) {
+        const rowToggles = html.querySelectorAll(".bulk-row-toggle");
+        rowToggles.forEach(toggle => {
+            const row = toggle.closest("tr");
+            if (row) {
+                const tierCheckboxes = row.querySelectorAll(".tier-btn input[type='checkbox']");
+                const allChecked = Array.from(tierCheckboxes).every(cb => cb.checked);
+                toggle.checked = allChecked;
+            }
+        });
     }
 
     /**

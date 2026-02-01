@@ -77,35 +77,109 @@
 
     <!-- Tab: Categories (Visibility Only) -->
     <div class="tab-content {{#if (eq activeTab 'categories')}}active{{/if}}" data-tab="categories">
-        <p class="notes">Uncheck a box to hide that category tab in the Store.</p>
-        <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <p class="notes">Toggle to show or hide categories in the store.</p>
+
+        <div class="category-grid">
             {{#each categories}}
-            <label>
+            <label class="category-card {{#if this.isVisible}}active{{/if}}">
                 <input type="checkbox" name="visibility.{{this.key}}" {{checked this.isVisible}}>
-                Show {{this.label}}
+                <div class="card-content">
+                    <i class="fas {{this.icon}} category-icon"></i>
+                    <span class="category-name">{{this.label}}</span>
+                </div>
+                <div class="toggle-switch">
+                    <div class="toggle-track"></div>
+                    <div class="toggle-thumb"></div>
+                </div>
             </label>
             {{/each}}
         </div>
     </div>
 
-    <!-- Tab: Tiers (Allowed Tiers Only) -->
+    <!-- Tab: Tiers (Matrix Layout) -->
     <div class="tab-content {{#if (eq activeTab 'tiers')}}active{{/if}}" data-tab="tiers">
-        <p class="notes">Select which tiers are available for purchase in each category.</p>
-        <div class="tiers-config">
-            {{#each categories}}
-            <!-- Only show tiers for standard categories -->
-            {{#if (ne this.key "CustomTab")}}
-                <div class="category-row">
-                    <h4>{{this.label}}</h4>
-                    <div class="checkbox-group">
-                        <label><input type="checkbox" name="tiers.{{this.key}}.1" {{checked (lookup this.tiers "1")}}> Tier 1</label>
-                        <label><input type="checkbox" name="tiers.{{this.key}}.2" {{checked (lookup this.tiers "2")}}> Tier 2</label>
-                        <label><input type="checkbox" name="tiers.{{this.key}}.3" {{checked (lookup this.tiers "3")}}> Tier 3</label>
-                        <label><input type="checkbox" name="tiers.{{this.key}}.4" {{checked (lookup this.tiers "4")}}> Tier 4</label>
-                    </div>
-                </div>
-            {{/if}}
-            {{/each}}
+        <p class="notes">Configure which tiers are available for each category. Click column headers to toggle all.</p>
+
+        <div class="tiers-matrix-container">
+            <table class="tiers-matrix">
+                <thead>
+                    <tr>
+                        <th class="category-col">Category</th>
+                        <!-- Headers with Master Checkboxes -->
+                        <th class="tier-col tier-1-header">
+                            <div class="th-content">
+                                <span>Tier 1</span>
+                                <input type="checkbox" class="bulk-col-toggle" data-tier="1" title="Toggle All Tier 1">
+                            </div>
+                        </th>
+                        <th class="tier-col tier-2-header">
+                            <div class="th-content">
+                                <span>Tier 2</span>
+                                <input type="checkbox" class="bulk-col-toggle" data-tier="2" title="Toggle All Tier 2">
+                            </div>
+                        </th>
+                        <th class="tier-col tier-3-header">
+                            <div class="th-content">
+                                <span>Tier 3</span>
+                                <input type="checkbox" class="bulk-col-toggle" data-tier="3" title="Toggle All Tier 3">
+                            </div>
+                        </th>
+                        <th class="tier-col tier-4-header">
+                            <div class="th-content">
+                                <span>Tier 4</span>
+                                <input type="checkbox" class="bulk-col-toggle" data-tier="4" title="Toggle All Tier 4">
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each categories}}
+                    {{#if (ne this.key "CustomTab")}}
+                    <tr>
+                        <!-- Row Label with Master Checkbox -->
+                        <td class="category-cell">
+                            <label class="row-label">
+                                <input type="checkbox" class="bulk-row-toggle" data-category="{{this.key}}" title="Toggle All Tiers for {{this.label}}">
+                                <i class="fas {{this.icon}}"></i> {{this.label}}
+                            </label>
+                        </td>
+
+                        <!-- Tier 1 Button (Gray) -->
+                        <td class="tier-cell">
+                            <label class="tier-btn t1 {{#if (lookup this.tiers '1')}}active{{/if}}">
+                                <input type="checkbox" name="tiers.{{this.key}}.1" {{checked (lookup this.tiers "1")}}>
+                                <span>I</span>
+                            </label>
+                        </td>
+
+                        <!-- Tier 2 Button (Green) -->
+                        <td class="tier-cell">
+                            <label class="tier-btn t2 {{#if (lookup this.tiers '2')}}active{{/if}}">
+                                <input type="checkbox" name="tiers.{{this.key}}.2" {{checked (lookup this.tiers "2")}}>
+                                <span>II</span>
+                            </label>
+                        </td>
+
+                        <!-- Tier 3 Button (Blue) -->
+                        <td class="tier-cell">
+                            <label class="tier-btn t3 {{#if (lookup this.tiers '3')}}active{{/if}}">
+                                <input type="checkbox" name="tiers.{{this.key}}.3" {{checked (lookup this.tiers "3")}}>
+                                <span>III</span>
+                            </label>
+                        </td>
+
+                        <!-- Tier 4 Button (Purple) -->
+                        <td class="tier-cell">
+                            <label class="tier-btn t4 {{#if (lookup this.tiers '4')}}active{{/if}}">
+                                <input type="checkbox" name="tiers.{{this.key}}.4" {{checked (lookup this.tiers "4")}}>
+                                <span>IV</span>
+                            </label>
+                        </td>
+                    </tr>
+                    {{/if}}
+                    {{/each}}
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -164,17 +238,26 @@
     <!-- Tab: Stock Management -->
     <div class="tab-content {{#if (eq activeTab 'stock')}}active{{/if}}" data-tab="stock">
 
-        <div class="form-group" style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
-            <input type="checkbox" id="stockEnabledCheckbox" name="stockEnabled" {{checked stockEnabled}} {{#unless stockReady}}disabled{{/unless}} style="margin: 0;">
-            <span>
-                <strong>Enable Limited Stock System:</strong>
-                {{#if stockReady}}
-                    Tracks item quantities and prevents purchases when out of stock.
-                {{else}}
-                    <em style="color: #ff9800;">Requires Party Actor with Owner permission.</em>
-                {{/if}}
-            </span>
-        </div>
+        <label class="stock-toggle-card {{#if stockEnabled}}active{{/if}} {{#unless stockReady}}disabled{{/unless}}">
+            <input type="checkbox" id="stockEnabledCheckbox" name="stockEnabled" {{checked stockEnabled}} {{#unless stockReady}}disabled{{/unless}}>
+            <div class="card-content">
+                <i class="fas fa-boxes stock-icon"></i>
+                <div class="stock-text">
+                    <strong>Enable Limited Stock System</strong>
+                    <span class="stock-description">
+                        {{#if stockReady}}
+                            Tracks item quantities and prevents purchases when out of stock.
+                        {{else}}
+                            <em class="warning">Requires Party Actor with Owner permission.</em>
+                        {{/if}}
+                    </span>
+                </div>
+            </div>
+            <div class="toggle-switch">
+                <div class="toggle-track"></div>
+                <div class="toggle-thumb"></div>
+            </div>
+        </label>
 
         <h3 style="margin-top: 5px;">Quick Stock Configuration</h3>
         <p class="notes" style="margin-bottom: 8px;">Set default quantities per category and tier.</p>
@@ -196,16 +279,16 @@
                     <tr style="border-bottom: 1px solid #333;">
                         <td style="padding: 4px 10px; color: #ccc;">{{this.label}}</td>
                         <td style="padding: 3px;">
-                            <input type="number" name="stockDefaults.{{this.key}}.tier1" value="{{this.tier1}}" min="0" max="999" class="stock-tier-input">
+                            <input type="number" name="stockDefaults.{{this.key}}.tier1" value="{{this.tier1}}" min="0" class="stock-tier-input">
                         </td>
                         <td style="padding: 3px;">
-                            <input type="number" name="stockDefaults.{{this.key}}.tier2" value="{{this.tier2}}" min="0" max="999" class="stock-tier-input">
+                            <input type="number" name="stockDefaults.{{this.key}}.tier2" value="{{this.tier2}}" min="0" class="stock-tier-input">
                         </td>
                         <td style="padding: 3px;">
-                            <input type="number" name="stockDefaults.{{this.key}}.tier3" value="{{this.tier3}}" min="0" max="999" class="stock-tier-input">
+                            <input type="number" name="stockDefaults.{{this.key}}.tier3" value="{{this.tier3}}" min="0" class="stock-tier-input">
                         </td>
                         <td style="padding: 3px;">
-                            <input type="number" name="stockDefaults.{{this.key}}.tier4" value="{{this.tier4}}" min="0" max="999" class="stock-tier-input">
+                            <input type="number" name="stockDefaults.{{this.key}}.tier4" value="{{this.tier4}}" min="0" class="stock-tier-input">
                         </td>
                     </tr>
                     {{/each}}

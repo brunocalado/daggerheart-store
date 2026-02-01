@@ -150,7 +150,8 @@
                 {{#if storeItem.features.length}}
                     <div class="item-features">
                         {{#each storeItem.features}}
-                            <div class="feature-row">
+                            <div class="feature-row {{#if this.isGained}}feature-gained{{/if}}">
+                                {{#if this.isGained}}<i class="fas fa-caret-up"></i>{{/if}}
                                 <span class="feature-name">{{this.name}}:</span>
                                 <span class="feature-desc">{{this.description}}</span>
                             </div>
@@ -158,10 +159,13 @@
                     </div>
                 {{/if}}
                 {{#if storeItem.lostFeatures.length}}
-                    <div class="lost-features">
-                        <div class="lost-features-header"><i class="fas fa-exclamation-triangle"></i> Features Lost</div>
+                    <div class="item-features">
                         {{#each storeItem.lostFeatures}}
-                            <span class="lost-feature-name">{{this}}</span>
+                            <div class="feature-row feature-lost">
+                                <i class="fas fa-caret-down"></i>
+                                <span class="feature-name">{{this.name}}:</span>
+                                <span class="feature-desc">{{this.description}}</span>
+                            </div>
                         {{/each}}
                     </div>
                 {{/if}}

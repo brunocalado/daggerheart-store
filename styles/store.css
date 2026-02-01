@@ -476,7 +476,7 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    min-width: 60px;
+    
 }
 
 /* Creates the pulsing text "(SALE)" for the badge */
@@ -741,7 +741,7 @@
     letter-spacing: 0.5px;
 }
 
-/* Tiers Tab (Spacing between categories) */
+/* Tiers Tab (Spacing between categories) - Legacy */
 .daggerheart-store-config .tiers-config .category-row {
     margin-bottom: 20px;
     border-bottom: 1px solid #2a2a2a;
@@ -752,6 +752,153 @@
     display: flex;
     gap: 15px;
     margin-bottom: 0;
+}
+
+/* ==================================================== */
+/* TIERS MATRIX LAYOUT */
+/* ==================================================== */
+
+/* Container da Matriz */
+.daggerheart-store-config .tiers-matrix-container {
+    background: #191919;
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 10px;
+    overflow-x: auto;
+}
+
+.daggerheart-store-config .tiers-matrix {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 500px;
+}
+
+/* Células da Tabela */
+.daggerheart-store-config .tiers-matrix th,
+.daggerheart-store-config .tiers-matrix td {
+    padding: 8px;
+    vertical-align: middle;
+    border-bottom: 1px solid #2a2a2a;
+}
+
+/* Cabeçalho */
+.daggerheart-store-config .tiers-matrix th {
+    background: #222;
+    color: #d4af37;
+    font-family: "Aleo", serif;
+    text-transform: uppercase;
+    font-weight: bold;
+    border-bottom: 2px solid #4a3d1a;
+    padding-bottom: 10px;
+}
+
+.daggerheart-store-config .tiers-matrix .th-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Colunas e Larguras */
+.daggerheart-store-config .category-col {
+    text-align: left;
+    width: 180px;
+}
+
+.daggerheart-store-config .tier-col {
+    text-align: center;
+    width: 80px;
+}
+
+/* Labels de Linha (Categoria) */
+.daggerheart-store-config .row-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: #aaa;
+    font-weight: bold;
+    transition: color 0.2s;
+}
+
+.daggerheart-store-config .row-label:hover {
+    color: #fff;
+}
+
+/* Checkboxes de Controle em Massa (Bulk) */
+.daggerheart-store-config .bulk-col-toggle,
+.daggerheart-store-config .bulk-row-toggle {
+    margin: 0 !important;
+    width: 16px !important;
+    height: 16px !important;
+    border-color: #666 !important;
+}
+
+/* --- BOTÕES DE TIER (VISUAL TOGGLE) --- */
+.daggerheart-store-config .tier-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 32px;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+    color: #666;
+    font-weight: bold;
+    font-family: "Aleo", serif;
+}
+
+.daggerheart-store-config .tier-btn:hover {
+    background: #333;
+    border-color: #666;
+    color: #999;
+}
+
+/* Esconder checkbox real */
+.daggerheart-store-config .tier-btn input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 0;
+    height: 0;
+}
+
+/* --- CORES POR RARIDADE (ATIVO) --- */
+
+/* Tier 1 (Common - Gray) */
+.daggerheart-store-config .tier-btn.t1.active {
+    background: #616161;
+    border-color: #9e9e9e;
+    color: #fff;
+    box-shadow: 0 0 5px rgba(158, 158, 158, 0.4);
+}
+
+/* Tier 2 (Uncommon - Green) */
+.daggerheart-store-config .tier-btn.t2.active {
+    background: #2e7d32;
+    border-color: #4caf50;
+    color: #fff;
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.4);
+}
+
+/* Tier 3 (Rare - Blue) */
+.daggerheart-store-config .tier-btn.t3.active {
+    background: #1565c0;
+    border-color: #2196f3;
+    color: #fff;
+    box-shadow: 0 0 5px rgba(33, 150, 243, 0.4);
+}
+
+/* Tier 4 (Legendary - Purple) */
+.daggerheart-store-config .tier-btn.t4.active {
+    background: #7b1fa2;
+    border-color: #9c27b0;
+    color: #fff;
+    box-shadow: 0 0 5px rgba(156, 39, 176, 0.4);
 }
 
 /* Custom Checkbox Styling for Config - OPTIMIZED & CLEAN */
@@ -1216,7 +1363,7 @@
 
 /* Roll Button */
 .daggerheart-store-randomizer .randomize-btn {
-    background: linear-gradient(to bottom, #2d5a2d, #1a4a1a);
+    background: linear-gradient(to bottom, #034003, #1a4a1a);
     color: #fff;
     border: 1px solid #3a7a3a;
 }
@@ -1344,7 +1491,6 @@
 /* ==================================================== */
 
 .daggerheart-store .stock-display {
-    margin-right: 8px;
     font-size: 0.9em;
     display: inline-block;
 }
@@ -1474,15 +1620,11 @@
     position: fixed;
     z-index: 10000;
     width: 600px;
-    max-height: 500px;
-    overflow-y: auto;
     background: #1a1a1a;
     border: 2px solid #d4af37;
     border-radius: 8px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.9);
     font-family: "Lato", sans-serif;
-    scrollbar-width: thin;
-    scrollbar-color: #d4af37 #1a1a1a;
 }
 
 .comparison-tooltip .comparison-container {
@@ -1676,51 +1818,47 @@
 }
 
 .comparison-tooltip .feature-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 5px;
     padding: 4px 0;
     line-height: 1.4;
+}
+
+.comparison-tooltip .feature-row i {
+    margin-top: 2px;
 }
 
 .comparison-tooltip .feature-name {
     font-size: 0.85em;
     font-weight: bold;
-    color: #d4af37;
+    color: #ffffff;
 }
 
 .comparison-tooltip .feature-desc {
     font-size: 0.8em;
-    color: #aaa;
+    color: #ffffff;
     margin-left: 4px;
 }
 
-/* Lost Features Warning */
-.comparison-tooltip .lost-features {
-    width: 100%;
-    margin-top: 10px;
-    padding: 8px;
-    background: rgba(244, 67, 54, 0.15);
-    border: 1px solid #f44336;
-    border-radius: 4px;
+/* Gained Features (green) */
+.comparison-tooltip .feature-row.feature-gained {
+    color: #4caf50;
 }
 
-.comparison-tooltip .lost-features-header {
-    font-size: 0.85em;
-    font-weight: bold;
+.comparison-tooltip .feature-row.feature-gained .feature-name,
+.comparison-tooltip .feature-row.feature-gained .feature-desc {
+    color: #4caf50;
+}
+
+/* Lost Features (red) */
+.comparison-tooltip .feature-row.feature-lost {
     color: #f44336;
-    margin-bottom: 5px;
 }
 
-.comparison-tooltip .lost-features-header i {
-    margin-right: 5px;
-}
-
-.comparison-tooltip .lost-feature-name {
-    display: inline-block;
-    font-size: 0.8em;
+.comparison-tooltip .feature-row.feature-lost .feature-name,
+.comparison-tooltip .feature-row.feature-lost .feature-desc {
     color: #f44336;
-    background: rgba(244, 67, 54, 0.2);
-    padding: 2px 6px;
-    border-radius: 3px;
-    margin: 2px;
 }
 
 /* ==================================================== */
@@ -1867,4 +2005,236 @@
 .store-dialog .direction-btn:not(.selected):hover {
     border-color: #8e44ad;
     color: #ffffff;
+}
+
+/* ==================================================== */
+/* CATEGORY GRID (Config Window) */
+/* ==================================================== */
+
+/* Container Grid */
+.daggerheart-store-config .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+/* The Card (Button) */
+.daggerheart-store-config .category-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    position: relative;
+}
+
+/* Hover Effect */
+.daggerheart-store-config .category-card:hover {
+    background: #1a1a1a;
+    border-color: #666;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+/* Active State (When Enabled) */
+.daggerheart-store-config .category-card.active {
+    background: linear-gradient(to bottom, #2d230a, #1a1a1a);
+    border-color: #d4af37;
+    box-shadow: inset 0 0 10px rgba(212, 175, 55, 0.1);
+}
+
+.daggerheart-store-config .category-card.active .category-icon {
+    color: #d4af37;
+    text-shadow: 0 0 5px #8a7020;
+}
+
+.daggerheart-store-config .category-card.active .category-name {
+    color: #fff;
+    font-weight: bold;
+}
+
+/* Hide the Default Checkbox */
+.daggerheart-store-config .category-card input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 0;
+    height: 0;
+}
+
+/* Inner Content (Icon + Text) */
+.daggerheart-store-config .card-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.daggerheart-store-config .category-icon {
+    font-size: 1.2em;
+    color: #666;
+    transition: color 0.2s;
+    width: 20px;
+    text-align: center;
+}
+
+.daggerheart-store-config .category-name {
+    font-family: "Aleo", serif;
+    font-size: 1em;
+    color: #aaa;
+    transition: color 0.2s;
+}
+
+/* Toggle Switch Visual */
+.daggerheart-store-config .toggle-switch {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+/* Switch Track */
+.daggerheart-store-config .toggle-track {
+    width: 100%;
+    height: 100%;
+    background: #333;
+    border-radius: 10px;
+    transition: background 0.2s;
+    border: 1px solid #555;
+}
+
+/* Switch Thumb */
+.daggerheart-store-config .toggle-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background: #888;
+    border-radius: 50%;
+    transition: transform 0.2s, background 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+/* Toggle Animation When Active */
+.daggerheart-store-config .category-card.active .toggle-track {
+    background: #2d5a2d;
+    border-color: #4caf50;
+}
+
+.daggerheart-store-config .category-card.active .toggle-thumb {
+    transform: translateX(16px);
+    background: #d4af37;
+    box-shadow: 0 0 5px #d4af37;
+}
+
+/* ==================================================== */
+/* STOCK TOGGLE CARD */
+/* ==================================================== */
+
+.daggerheart-store-config .stock-toggle-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.daggerheart-store-config .stock-toggle-card:hover {
+    background: #1a1a1a;
+    border-color: #666;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+/* Disabled State */
+.daggerheart-store-config .stock-toggle-card.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.daggerheart-store-config .stock-toggle-card.disabled:hover {
+    background: #111;
+    border-color: #333;
+    box-shadow: none;
+}
+
+/* Active State */
+.daggerheart-store-config .stock-toggle-card.active {
+    background: linear-gradient(to bottom, #2d230a, #1a1a1a);
+    border-color: #d4af37;
+    box-shadow: inset 0 0 10px rgba(212, 175, 55, 0.1);
+}
+
+.daggerheart-store-config .stock-toggle-card.active .stock-icon {
+    color: #d4af37;
+    text-shadow: 0 0 5px #8a7020;
+}
+
+/* Hide the Default Checkbox */
+.daggerheart-store-config .stock-toggle-card input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 0;
+    height: 0;
+}
+
+/* Content Layout */
+.daggerheart-store-config .stock-toggle-card .card-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.daggerheart-store-config .stock-icon {
+    font-size: 1.4em;
+    color: #666;
+    transition: color 0.2s;
+    width: 24px;
+    text-align: center;
+}
+
+.daggerheart-store-config .stock-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.daggerheart-store-config .stock-text strong {
+    font-family: "Aleo", serif;
+    font-size: 1em;
+    color: #fff;
+}
+
+.daggerheart-store-config .stock-description {
+    font-size: 0.85em;
+    color: #888;
+}
+
+.daggerheart-store-config .stock-description .warning {
+    color: #ff9800;
+}
+
+/* Toggle Animation When Active */
+.daggerheart-store-config .stock-toggle-card.active .toggle-track {
+    background: #2d5a2d;
+    border-color: #4caf50;
+}
+
+.daggerheart-store-config .stock-toggle-card.active .toggle-thumb {
+    transform: translateX(16px);
+    background: #d4af37;
+    box-shadow: 0 0 5px #d4af37;
 }
