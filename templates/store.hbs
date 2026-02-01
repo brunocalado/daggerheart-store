@@ -153,7 +153,20 @@
 
                         <!-- Left Side: Icon, Name AND Sale Text -->
                         <div class="row-left">
-                            <img src="{{this.img}}" title="Click to view details" class="item-image" data-uuid="{{this.uuid}}" width="36" height="36"/>
+                            <div class="item-icon-wrapper">
+                                <img src="{{this.img}}" title="Click to view details" class="item-image" data-uuid="{{this.uuid}}" width="36" height="36"/>
+                                {{#unless ../../../isGM}}
+                                    {{#if this.stockEnabled}}
+                                        {{#if this.stockQuantity}}
+                                            <span class="item-quantity-badge">{{this.stockQuantity}}</span>
+                                        {{else}}
+                                            {{#if (eq this.stockStatus "out")}}
+                                                <span class="item-quantity-badge out-of-stock"><i class="fas fa-times"></i></span>
+                                            {{/if}}
+                                        {{/if}}
+                                    {{/if}}
+                                {{/unless}}
+                            </div>
 
                             <!-- NEW: Recommendation Crown -->
                             {{#if this.isRecommended}}
@@ -248,19 +261,13 @@
                                 </div>
                             {{else}}
                                 <div class="player-controls">
-                                    <!-- STOCK DISPLAY (Players) -->
+                                    <!-- STOCK DISPLAY (Players) - Only show Out of Stock text -->
                                     {{#if this.stockEnabled}}
-                                        <div class="stock-display">
-                                            {{#if this.stockQuantity}}
-                                                <span class="stock-count stock-{{this.stockStatus}}">
-                                                    {{this.stockQuantity}} left
-                                                </span>
-                                            {{else}}
-                                                {{#if (eq this.stockStatus "out")}}
-                                                    <span class="stock-count stock-out">Out of Stock</span>
-                                                {{/if}}
-                                            {{/if}}
-                                        </div>
+                                        {{#if (eq this.stockStatus "out")}}
+                                            <div class="stock-display">
+                                                <span class="stock-count stock-out">Out of Stock</span>
+                                            </div>
+                                        {{/if}}
                                     {{/if}}
 
                                     <div class="price-display">

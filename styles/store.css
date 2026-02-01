@@ -405,16 +405,62 @@
     padding: 4px 8px;
 }
 
+.daggerheart-store .item-icon-wrapper {
+    position: relative;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
 .daggerheart-store .item-image {
     cursor: pointer;
     border: 1px solid #555;
     border-radius: 4px;
     transition: box-shadow 0.2s;
     background: #000;
+    display: block;
 }
 
 .daggerheart-store .item-image:hover {
     box-shadow: 0 0 6px #d4af37;
+}
+
+/* MMO-Style Quantity Badge (Bottom-Right Corner, offset outside) */
+.daggerheart-store .item-quantity-badge {
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+
+    background: rgba(0, 0, 0, 0.9);
+    border: 1px solid #888;
+    border-radius: 3px;
+
+    color: #ffffff;
+    font-family: "Lato", sans-serif;
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 18px;
+    text-align: center;
+    text-shadow: 1px 1px 1px #000;
+
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Out of Stock Badge */
+.daggerheart-store .item-quantity-badge.out-of-stock {
+    background: rgba(139, 0, 0, 0.9);
+    border-color: #ff5555;
+    color: #ff5555;
+    min-width: 18px;
+    padding: 0;
+}
+
+.daggerheart-store .item-quantity-badge.out-of-stock i {
+    font-size: 10px;
+    line-height: 18px;
 }
 
 /* ==================================================== */
