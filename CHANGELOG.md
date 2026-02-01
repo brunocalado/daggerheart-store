@@ -1,9 +1,13 @@
 # 0.1.3
 - Numerous CSS enhancements
-- New Feature: Inventory Stock (or simply Stock Management)
+- New Feature: Inventory Stock Management
 - New Feature: Equipment Comparison (Current vs. New)
-- Refined transfer template
+- Refined transfer templates
 - Load profile confirmation dialog
+- System Compendiums filter for Custom Compendiums
+- Item type filters for Custom Compendiums
+- Custom Compendiums now populate correct categories
+- Stock quantity display follows MMO model
 
 # 0.1.2
 - Removed transparency. +Performance

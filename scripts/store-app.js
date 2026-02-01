@@ -15,6 +15,31 @@ const STANDARD_CATEGORIES = [
     { id: "loot", label: "Loot", key: "Loot" }
 ];
 
+// Mapping of category keys to expected item types for filtering custom compendiums
+const CATEGORY_ITEM_TYPE = {
+    "Primary Weapons": "weapon",
+    "Secondary Weapons": "weapon",
+    "Wheelchairs": "weapon",
+    "Armors": "armor",
+    "Potions": "consumable",
+    "Consumables": "consumable",
+    "Loot": "loot"
+};
+
+// System compendiums to exclude from custom compendium selection (already used by default)
+const EXCLUDED_SYSTEM_PACKS = [
+    "daggerheart.classes",
+    "daggerheart.subclasses",
+    "daggerheart.domains",
+    "daggerheart.ancestries",
+    "daggerheart.communities",
+    "daggerheart.weapons",
+    "daggerheart.armors",
+    "daggerheart.consumables",
+    "daggerheart.loot",
+    "daggerheart.beastforms"
+];
+
 /**
  * Helper to get Currency Name from System Settings
  */
@@ -626,13 +651,15 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const desc = foundry.utils.getProperty(item, "system.description.value") ||
                      foundry.utils.getProperty(item, "system.description") || "";
         const cleanedDescription = this._cleanDescription(desc);
-        const tier = foundry.utils.getProperty(item, "system.tier") ||
-                     foundry.utils.getProperty(item, "system.rarity") || 1;
+        const sysTier = foundry.utils.getProperty(item, "system.tier") ??
+                       foundry.utils.getProperty(item, "system.rarity");
+        const parsedTier = parseInt(sysTier);
+        const tier = (parsedTier >= 1 && parsedTier <= 4) ? parsedTier : 1;
 
         const base = {
             name: item.name,
             img: item.img,
-            tier: parseInt(tier) || 1,
+            tier: tier,
             description: cleanedDescription,
             isWeapon: isWeapon
         };
@@ -1163,6 +1190,21 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 const docs = await pack.getDocuments();
 
                 for (const doc of docs) {
+                    // For custom compendiums, filter by expected item type for this category
+                    if (!packInfo.isDefault) {
+                        const expectedType = CATEGORY_ITEM_TYPE[cat.key];
+                        if (expectedType && doc.type !== expectedType) continue;
+                    }
+
+                    // For weapons, check system.secondary to determine correct category
+                    if (doc.type === "weapon") {
+                        const isSecondary = foundry.utils.getProperty(doc, "system.secondary") === true;
+                        // Secondary weapons only go in Secondary Weapons tab
+                        if (isSecondary && cat.key !== "Secondary Weapons") continue;
+                        // Primary/Wheelchairs tabs only get non-secondary weapons
+                        if (!isSecondary && cat.key === "Secondary Weapons") continue;
+                    }
+
                     const isHidden = hiddenItems[doc.name];
                     const isSaleBlocked = blockedSaleItems[doc.name];
                     const isPurchaseBlocked = blockedPurchaseItems[doc.name];
@@ -1196,9 +1238,12 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     if (!packInfo.isDefault) {
                         knownItem = true;
                         if (!priceList.hasOwnProperty(doc.name)) {
-                             const sysTier = foundry.utils.getProperty(doc, "system.tier") || 
-                                           foundry.utils.getProperty(doc, "system.rarity") || 1;
-                             tier = parseInt(sysTier) || 1;
+                             // Try to read tier from system properties, fallback to 1
+                             const sysTier = foundry.utils.getProperty(doc, "system.tier") ??
+                                           foundry.utils.getProperty(doc, "system.rarity");
+                             const parsedTier = parseInt(sysTier);
+                             // Ensure tier is valid (1-4), otherwise default to 1
+                             tier = (parsedTier >= 1 && parsedTier <= 4) ? parsedTier : 1;
                         }
                     }
 
@@ -2419,7 +2464,25 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             StockManager._getDefaultCategorySettings();
 
         const partyActors = game.actors.filter(a => a.type === "party").map(a => ({ id: a.id, name: a.name })).sort((a, b) => a.name.localeCompare(b.name));
-        const availablePacks = game.packs.filter(p => p.documentName === "Item").map(p => ({ id: p.collection, label: `${p.metadata.label} (${p.collection})` })).sort((a, b) => a.label.localeCompare(b.label));
+
+        // Filter packs that have at least one valid item type (weapon, armor, consumable, loot)
+        const validItemTypes = ["weapon", "armor", "consumable", "loot"];
+        const candidatePacks = game.packs.filter(p =>
+            p.documentName === "Item" && !EXCLUDED_SYSTEM_PACKS.includes(p.collection)
+        );
+
+        const availablePacks = [];
+        for (const pack of candidatePacks) {
+            const index = await pack.getIndex();
+            const hasValidType = index.some(entry => validItemTypes.includes(entry.type));
+            if (hasValidType) {
+                availablePacks.push({
+                    id: pack.collection,
+                    label: `${pack.metadata.label} (${pack.collection})`
+                });
+            }
+        }
+        availablePacks.sort((a, b) => a.label.localeCompare(b.label));
 
         // Party Actor Ownership Info
         let partyActorOwnership = "";
@@ -2682,8 +2745,87 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             });
         });
 
+        // Merged Compendiums: Filter category options based on selected pack's item types
+        const packSelects = html.querySelectorAll("select[name^='customCompendiums.'][name$='.pack']");
+        packSelects.forEach(packSelect => {
+            // Initial filter on render
+            this._filterCategoryOptions(packSelect);
+
+            // Filter on change
+            packSelect.addEventListener("change", () => {
+                this._filterCategoryOptions(packSelect);
+            });
+        });
+
         // Initialize bulk checkbox states
         this._updateBulkCheckboxes(html);
+    }
+
+    /**
+     * Filters category options based on item types available in the selected compendium
+     */
+    async _filterCategoryOptions(packSelect) {
+        const packId = packSelect.value;
+        const row = packSelect.closest(".compendium-row");
+        if (!row) return;
+
+        const categorySelect = row.querySelector("select[name$='.category']");
+        if (!categorySelect) return;
+
+        // Store current selection
+        const currentCategory = categorySelect.value;
+
+        // Get all available categories
+        const allCategories = STANDARD_CATEGORIES.map(c => c.key);
+
+        // If no pack selected, show all categories
+        if (!packId) {
+            this._updateCategorySelectOptions(categorySelect, allCategories, currentCategory);
+            return;
+        }
+
+        // Get pack and its index
+        const pack = game.packs.get(packId);
+        if (!pack) {
+            this._updateCategorySelectOptions(categorySelect, allCategories, currentCategory);
+            return;
+        }
+
+        const index = await pack.getIndex();
+
+        // Find which item types exist in this pack
+        const typesInPack = new Set(index.map(entry => entry.type));
+
+        // Filter categories based on types in pack
+        const validCategories = allCategories.filter(categoryKey => {
+            const expectedType = CATEGORY_ITEM_TYPE[categoryKey];
+            return expectedType && typesInPack.has(expectedType);
+        });
+
+        // Update the category select options
+        this._updateCategorySelectOptions(categorySelect, validCategories, currentCategory);
+    }
+
+    /**
+     * Updates the category select options
+     */
+    _updateCategorySelectOptions(categorySelect, validCategories, currentValue) {
+        // Clear existing options
+        categorySelect.innerHTML = "";
+
+        // Add valid options
+        for (const cat of validCategories) {
+            const option = document.createElement("option");
+            option.value = cat;
+            option.textContent = cat;
+            if (cat === currentValue) option.selected = true;
+            categorySelect.appendChild(option);
+        }
+
+        // If current value is not valid, select the first available
+        if (!validCategories.includes(currentValue) && validCategories.length > 0) {
+            categorySelect.value = validCategories[0];
+        }
     }
 
     /**
@@ -3015,9 +3157,21 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
                         if (pack) {
                             const docs = await pack.getDocuments();
                             for (const doc of docs) {
-                                const sysTier = foundry.utils.getProperty(doc, "system.tier") ||
-                                              foundry.utils.getProperty(doc, "system.rarity") || 1;
-                                const tier = parseInt(sysTier) || 1;
+                                // Filter by expected item type for this category
+                                const expectedType = CATEGORY_ITEM_TYPE[cat.key];
+                                if (expectedType && doc.type !== expectedType) continue;
+
+                                // For weapons, check system.secondary to determine correct category
+                                if (doc.type === "weapon") {
+                                    const isSecondary = foundry.utils.getProperty(doc, "system.secondary") === true;
+                                    if (isSecondary && cat.key !== "Secondary Weapons") continue;
+                                    if (!isSecondary && cat.key === "Secondary Weapons") continue;
+                                }
+
+                                const sysTier = foundry.utils.getProperty(doc, "system.tier") ??
+                                              foundry.utils.getProperty(doc, "system.rarity");
+                                const parsedTier = parseInt(sysTier);
+                                const tier = (parsedTier >= 1 && parsedTier <= 4) ? parsedTier : 1;
                                 if (catConfig[tier]) {
                                     itemCount++;
                                 }
@@ -3108,9 +3262,21 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
                     if (pack) {
                         const docs = await pack.getDocuments();
                         for (const doc of docs) {
-                            const sysTier = foundry.utils.getProperty(doc, "system.tier") ||
-                                          foundry.utils.getProperty(doc, "system.rarity") || 1;
-                            const tier = parseInt(sysTier) || 1;
+                            // Filter by expected item type for this category
+                            const expectedType = CATEGORY_ITEM_TYPE[categoryKey];
+                            if (expectedType && doc.type !== expectedType) continue;
+
+                            // For weapons, check system.secondary to determine correct category
+                            if (doc.type === "weapon") {
+                                const isSecondary = foundry.utils.getProperty(doc, "system.secondary") === true;
+                                if (isSecondary && categoryKey !== "Secondary Weapons") continue;
+                                if (!isSecondary && categoryKey === "Secondary Weapons") continue;
+                            }
+
+                            const sysTier = foundry.utils.getProperty(doc, "system.tier") ??
+                                          foundry.utils.getProperty(doc, "system.rarity");
+                            const parsedTier = parseInt(sysTier);
+                            const tier = (parsedTier >= 1 && parsedTier <= 4) ? parsedTier : 1;
                             if (catConfig[tier]) {
                                 let basePrice = 0;
                                 if (priceList.hasOwnProperty(doc.name)) {
