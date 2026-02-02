@@ -1266,6 +1266,16 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                              const parsedTier = parseInt(sysTier);
                              // Ensure tier is valid (1-4), otherwise default to 1
                              tier = (parsedTier >= 1 && parsedTier <= 4) ? parsedTier : 1;
+
+                             // Check for price tag {{{X}}} in description
+                             if (!isOverridden) {
+                                 const descForPrice = foundry.utils.getProperty(doc, "system.description.value") ||
+                                                      foundry.utils.getProperty(doc, "system.description") || "";
+                                 const priceTagMatch = String(descForPrice).match(/\{\{\{(\d+)\}\}\}/);
+                                 if (priceTagMatch) {
+                                     basePrice = Math.ceil(parseInt(priceTagMatch[1], 10) * priceMod);
+                                 }
+                             }
                         }
                     }
 
@@ -3042,10 +3052,70 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         // Function to get UUID from item name
         const getItemUuid = (itemName) => itemUuidMap.get(itemName) || null;
 
-        // Use batch update
+        // Use batch update for PRICE_DATA items
         const itemCount = await StockManager.batchApplyDefaults(finalDefaults, getItemUuid);
 
-        ui.notifications.info(`Stock defaults applied to ${itemCount} items!`);
+        // Also process custom compendiums (merged compendiums)
+        const customCompendiums = game.settings.get(MODULE_ID, "customCompendiums") || [];
+        let customItemCount = 0;
+
+        if (customCompendiums.length > 0) {
+            const stockItems = storeActor.getFlag(MODULE_ID, "stock.items") || {};
+
+            for (const custom of customCompendiums) {
+                const categoryKey = custom.category;
+                const defaults = finalDefaults[categoryKey];
+                if (!defaults) continue;
+
+                const pack = game.packs.get(custom.pack);
+                if (!pack) continue;
+
+                const docs = await pack.getDocuments();
+                for (const doc of docs) {
+                    // Filter by expected item type for this category
+                    const expectedType = CATEGORY_ITEM_TYPE[categoryKey];
+                    if (expectedType && doc.type !== expectedType) continue;
+
+                    // For weapons, check system.secondary to determine correct category
+                    if (doc.type === "weapon") {
+                        const isSecondary = foundry.utils.getProperty(doc, "system.secondary") === true;
+                        if (isSecondary && categoryKey !== "Secondary Weapons") continue;
+                        if (!isSecondary && categoryKey === "Secondary Weapons") continue;
+                    }
+
+                    // Skip items that already exist in PRICE_DATA (they were handled by batchApplyDefaults)
+                    if (PRICE_DATA[categoryKey]?.[doc.name]) continue;
+
+                    // Determine tier from system.tier or system.rarity
+                    const sysTier = foundry.utils.getProperty(doc, "system.tier") ??
+                                  foundry.utils.getProperty(doc, "system.rarity");
+                    const parsedTier = parseInt(sysTier);
+                    const tier = (parsedTier >= 1 && parsedTier <= 4) ? parsedTier : 1;
+
+                    // Get quantity from category defaults based on tier
+                    const qty = defaults[`tier${tier}`] || 0;
+
+                    // Add to stock items
+                    const key = StockManager.sanitizeKey(doc.uuid);
+                    stockItems[key] = {
+                        stockpile: { q: qty, r: qty, u: false }
+                    };
+                    customItemCount++;
+                }
+            }
+
+            // Update actor with custom items stock if any were processed
+            if (customItemCount > 0) {
+                const version = storeActor.getFlag(MODULE_ID, "stock.version") || 1;
+                await storeActor.update({
+                    [`flags.${MODULE_ID}.stock.items`]: stockItems,
+                    [`flags.${MODULE_ID}.stock.version`]: version + 1
+                });
+            }
+        }
+
+        const totalItems = itemCount + customItemCount;
+        ui.notifications.info(`Stock defaults applied to ${totalItems} items!`);
         this.render();
     }
 

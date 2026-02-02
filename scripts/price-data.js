@@ -218,7 +218,7 @@ export const PRICE_DATA = {
     },
     "Armors": {
         // Tier 1
-        "Gambeson Armor": { price: 20, tier: 1 },
+        "Gambeson Armor": { price: 45, tier: 1 },
         "Leather Armor": { price: 30, tier: 1 },
         "Chainmail Armor": { price: 40, tier: 1 },
         "Full Plate Armor": { price: 50, tier: 1 },

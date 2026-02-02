@@ -1,3 +1,7 @@
+# 0.1.4
+- cost tags can be used in merged compendiums
+- You can apply stock defaults to custom items from new compendiums now 
+
 # 0.1.3
 - Numerous CSS enhancements
 - New Feature: Inventory Stock Management
