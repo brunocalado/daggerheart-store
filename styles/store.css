@@ -42,6 +42,10 @@
     color: #d4af37;
     border-bottom: 1px solid #4a3d1a;
     padding: 6px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex: 0 0 auto;
 }
 
 /* ==================================================== */
@@ -169,13 +173,6 @@
 /* ==================================================== */
 /* Common Styles */
 /* ==================================================== */
-
-.daggerheart-store .store-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex: 0 0 auto;
-}
 
 .daggerheart-store .header-left {
     display: flex;
@@ -454,7 +451,6 @@
     background: rgba(139, 0, 0, 0.9);
     border-color: #ff5555;
     color: #ffffff;
-    min-width: 18px;
     padding: 0;
 }
 
@@ -468,7 +464,6 @@
     background: rgba(0, 0, 0, 0.9);
     border-color: #888888;
     color: #ffffff;
-    min-width: 18px;
     padding: 0;
 }
 
@@ -540,9 +535,7 @@
 }
 
 .daggerheart-store .price-coin-icon {
-    color: #d4af37;
     font-size: 0.9em;
-    /* Cor interna */
     color: #ffcc00; 
     
     /* Borda Preta Simulada */
