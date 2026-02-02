@@ -102,6 +102,8 @@ Price controls, hide toggles, sale buttons, and profile management.
 
 <p align="center"><img width="700" src="docs/settings.webp"></p>
 
+<p align="center"><img width="700" src="docs/settingsstock.webp"></p>
+
 <p align="center"><img width="700" src="docs/randomizer.webp"></p>
 
 ## 🚀 Installation
