@@ -275,13 +275,17 @@
                                     <div class="price-display">
                                         {{#if this.isSale}}
                                             <span class="item-price sale">
+                                                <i class="fas fa-coins price-coin-icon"></i>
                                                 <span class="original">{{this.originalPrice}}</span>
                                                 <!-- REMOVIDO: currency -->
                                                 <span class="new">{{this.price}}</span>
                                             </span>
                                         {{else}}
                                             <!-- REMOVIDO: currency -->
-                                            <span class="item-price">{{this.price}}</span>
+                                            
+                                            <span class="item-price">
+                                            <i class="fas fa-coins price-coin-icon"></i>
+                                            {{this.price}}</span>
                                         {{/if}}
                                     </div>
 
@@ -305,7 +309,7 @@
                                             data-price="{{this.sellPrice}}"
                                             title="Sell Item for {{this.sellPrice}}"
                                             {{#unless this.canSell}}disabled{{/unless}}>
-                                        <i class="fas fa-coins"></i> Sell
+                                        <i class="fas fa-sack-dollar"></i> Sell
                                     </button>
 
                                     <!-- BUY BUTTONS -->
@@ -320,7 +324,7 @@
                                                 data-name="{{this.name}}"
                                                 title="Buy with your own funds"
                                                 {{#if (or (not this.canBuyPersonal) (eq this.stockStatus "out"))}}disabled{{/if}}>
-                                            <i class="fas fa-coins"></i>
+                                            <i class="fas fa-hand-holding-dollar"></i>
                                         </button>
 
                                         <button type="button"
@@ -345,7 +349,7 @@
                                                 data-price="{{this.price}}"
                                                 data-name="{{this.name}}"
                                                 {{#if (or (not this.canBuyPersonal) (eq this.stockStatus "out"))}}disabled{{/if}}>
-                                            <i class="fas fa-coins"></i> Buy
+                                            <i class="fas fa-hand-holding-dollar"></i> Buy
                                         </button>
                                     {{/if}}
                                 </div>

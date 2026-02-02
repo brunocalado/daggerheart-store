@@ -453,7 +453,7 @@
 .daggerheart-store .item-quantity-badge.out-of-stock {
     background: rgba(139, 0, 0, 0.9);
     border-color: #ff5555;
-    color: #ff5555;
+    color: #ffffff;
     min-width: 18px;
     padding: 0;
 }
@@ -536,7 +536,21 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    gap: 4px;
+}
+
+.daggerheart-store .price-coin-icon {
+    color: #d4af37;
+    font-size: 0.9em;
+    /* Cor interna */
+    color: #ffcc00; 
     
+    /* Borda Preta Simulada */
+    text-shadow: 
+       -1px -1px 0 #000,  
+        1px -1px 0 #000,
+       -1px  1px 0 #000,
+        1px  1px 0 #000;    
 }
 
 /* Creates the pulsing text "(SALE)" for the badge */
@@ -599,13 +613,14 @@
 
 .daggerheart-store .item-price.sale {
     background: #d8f0e0;
-    color: #27ae60;
+    color: #1a5c1a;
     border: 1px solid #27ae60;
 }
 
 .daggerheart-store .item-price.sale .original {
     color: #888;
     font-weight: normal;
+    text-decoration: line-through;
 }
 
 /* Buy Button */
