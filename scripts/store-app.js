@@ -1985,17 +1985,39 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         }
 
         const content = `
-            <div class="split-payment-dialog">
-                <p style="text-align:center; font-size:1.1em; margin-bottom:15px;">
-                    Buying <strong>${itemName}</strong> for <strong>${price} ${currency}</strong>
-                </p>
-                <div class="form-group split-row">
-                    <label style="flex:1;"><i class="fas fa-user"></i> You (${userGold})</label>
-                    <input type="number" id="user-share" value="${defaultUserPay}" min="0" max="${userGold}" style="width:80px; text-align:center;">
+            <div class="split-payment-content">
+                <div class="split-payment-header">
+                    <span class="split-payment-action">Buying</span>
+                    <span class="split-payment-item">${itemName}</span>
+                    <span class="split-payment-cost">Cost: ${price} <i class="fas fa-coins"></i> ${currency}</span>
                 </div>
-                <div class="form-group split-row" style="margin-top:5px;">
-                    <label style="flex:1;"><i class="fas fa-users"></i> ${partyActor.name} (${partyGold})</label>
-                    <input type="number" id="party-share" value="${defaultPartyPay}" min="0" max="${partyGold}" style="width:80px; text-align:center;">
+
+                <div class="split-payment-separator"></div>
+
+                <div class="split-payment-source-group">
+                    <div class="split-payment-row">
+                        <div class="split-payment-label-group">
+                            <span class="split-payment-label">${userActor.name}</span>
+                            <span class="split-payment-wealth">(${userGold} ${currency})</span>
+                        </div>
+                        <div class="split-payment-input-wrapper">
+                            <i class="fas fa-coins"></i>
+                            <input type="number" id="user-share" name="user-share" value="${defaultUserPay}" min="0" max="${userGold}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="split-payment-source-group party">
+                    <div class="split-payment-row">
+                        <div class="split-payment-label-group">
+                            <span class="split-payment-label">Party</span>
+                            <span class="split-payment-wealth">(${partyGold} ${currency})</span>
+                        </div>
+                        <div class="split-payment-input-wrapper">
+                            <i class="fas fa-coins"></i>
+                            <input type="number" id="party-share" name="party-share" value="${defaultPartyPay}" min="0" max="${partyGold}">
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
@@ -2003,6 +2025,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         new DialogV2({
             window: { title: "Split Payment", icon: "fas fa-coins", resizable: false },
             content: content,
+            classes: ["store-dialog", "split-payment-dialog"],
+            modal: true,
             buttons: [
                 {
                     action: "confirm",

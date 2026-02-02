@@ -2083,6 +2083,131 @@
 }
 
 /* ==================================================== */
+/* SPLIT PAYMENT DIALOG */
+/* ==================================================== */
+
+.split-payment-dialog {
+    min-width: 340px !important;
+}
+
+.split-payment-content {
+    padding: 0;
+}
+
+.split-payment-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 15px;
+    background: #1a1a1a;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    border: 1px solid #444;
+}
+
+.split-payment-action {
+    font-size: 0.85em;
+    color: #aaaaaa;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.split-payment-item {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #ffffff;
+    text-align: center;
+}
+
+.split-payment-cost {
+    font-size: 1em;
+    color: #d4af37;
+    font-weight: bold;
+}
+
+.split-payment-cost .fa-coins {
+    font-size: 0.85em;
+    margin-right: 2px;
+}
+
+.split-payment-separator {
+    height: 1px;
+    background: #444;
+    margin: 0 0 15px 0;
+}
+
+.split-payment-source-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 12px;
+    background: #1a1a1a;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    border: 1px solid #444;
+}
+
+.split-payment-source-group.party {
+    background: #1a1a1a;
+    border-color: #444;
+}
+
+.split-payment-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.split-payment-label-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+}
+
+.split-payment-label {
+    font-weight: bold;
+    color: #d4af37;
+}
+
+.split-payment-wealth {
+    font-size: 0.85em;
+    color: #ffffff;
+}
+
+.split-payment-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #1a1a1a;
+    border: 1px solid #555;
+    border-radius: 4px;
+    padding: 4px 8px;
+}
+
+.split-payment-input-wrapper .fa-coins {
+    color: #d4af37;
+    font-size: 0.85em;
+    opacity: 0.7;
+}
+
+.split-payment-input-wrapper input {
+    width: 90px;
+    text-align: center;
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    font-size: 1em;
+    padding: 4px;
+}
+
+.split-payment-input-wrapper input:focus {
+    outline: none;
+}
+
+/* ==================================================== */
 /* CATEGORY GRID (Config Window) */
 /* ==================================================== */
 
