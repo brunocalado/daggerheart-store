@@ -1,3 +1,6 @@
+# 0.1.5
+- You can organize homebrew loot consumable potions using the tag {{{tierX}}} where X should be 1 2 3 or 4
+
 # 0.1.4
 - cost tags can be used in merged compendiums
 - You can apply stock defaults to custom items from new compendiums now 

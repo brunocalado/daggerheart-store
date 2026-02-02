@@ -41,6 +41,30 @@ const EXCLUDED_SYSTEM_PACKS = [
 ];
 
 /**
+ * Helper to determine item tier from system.tier or {{{tierX}}} tag in description
+ * @param {Object} item - The item document
+ * @returns {number} Tier value (1-4), defaults to 1
+ */
+function getItemTier(item) {
+    // First try system.tier (works for weapons and armors)
+    const sysTier = foundry.utils.getProperty(item, "system.tier");
+    const parsedSysTier = parseInt(sysTier);
+    if (parsedSysTier >= 1 && parsedSysTier <= 4) {
+        return parsedSysTier;
+    }
+
+    // For loot/consumables/potions, check for {{{tierX}}} tag in description
+    const desc = foundry.utils.getProperty(item, "system.description") || "";
+    const tierMatch = desc.match(/\{\{\{tier([1-4])\}\}\}/i);
+    if (tierMatch) {
+        return parseInt(tierMatch[1]);
+    }
+
+    // Default to tier 1
+    return 1;
+}
+
+/**
  * Helper to get Currency Name from System Settings
  */
 function getSystemCurrency() {
@@ -671,10 +695,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const desc = foundry.utils.getProperty(item, "system.description.value") ||
                      foundry.utils.getProperty(item, "system.description") || "";
         const cleanedDescription = this._cleanDescription(desc);
-        const sysTier = foundry.utils.getProperty(item, "system.tier") ??
-                       foundry.utils.getProperty(item, "system.rarity");
-        const parsedTier = parseInt(sysTier);
-        const tier = (parsedTier >= 1 && parsedTier <= 4) ? parsedTier : 1;
+        const tier = getItemTier(item);
 
         const base = {
             name: item.name,
@@ -1260,12 +1281,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     if (!packInfo.isDefault) {
                         knownItem = true;
                         if (!priceList.hasOwnProperty(doc.name)) {
-                             // Try to read tier from system properties, fallback to 1
-                             const sysTier = foundry.utils.getProperty(doc, "system.tier") ??
-                                           foundry.utils.getProperty(doc, "system.rarity");
-                             const parsedTier = parseInt(sysTier);
-                             // Ensure tier is valid (1-4), otherwise default to 1
-                             tier = (parsedTier >= 1 && parsedTier <= 4) ? parsedTier : 1;
+                             // Determine tier from system.tier or {{{tierX}}} tag
+                             tier = getItemTier(doc);
 
                              // Check for price tag {{{X}}} in description
                              if (!isOverridden) {
@@ -3086,11 +3103,8 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
                     // Skip items that already exist in PRICE_DATA (they were handled by batchApplyDefaults)
                     if (PRICE_DATA[categoryKey]?.[doc.name]) continue;
 
-                    // Determine tier from system.tier or system.rarity
-                    const sysTier = foundry.utils.getProperty(doc, "system.tier") ??
-                                  foundry.utils.getProperty(doc, "system.rarity");
-                    const parsedTier = parseInt(sysTier);
-                    const tier = (parsedTier >= 1 && parsedTier <= 4) ? parsedTier : 1;
+                    // Determine tier from system.tier or {{{tierX}}} tag
+                    const tier = getItemTier(doc);
 
                     // Get quantity from category defaults based on tier
                     const qty = defaults[`tier${tier}`] || 0;
@@ -3313,10 +3327,7 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
                                     if (!isSecondary && cat.key === "Secondary Weapons") continue;
                                 }
 
-                                const sysTier = foundry.utils.getProperty(doc, "system.tier") ??
-                                              foundry.utils.getProperty(doc, "system.rarity");
-                                const parsedTier = parseInt(sysTier);
-                                const tier = (parsedTier >= 1 && parsedTier <= 4) ? parsedTier : 1;
+                                const tier = getItemTier(doc);
                                 if (catConfig[tier]) {
                                     itemCount++;
                                 }
@@ -3418,10 +3429,7 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
                                 if (!isSecondary && categoryKey === "Secondary Weapons") continue;
                             }
 
-                            const sysTier = foundry.utils.getProperty(doc, "system.tier") ??
-                                          foundry.utils.getProperty(doc, "system.rarity");
-                            const parsedTier = parseInt(sysTier);
-                            const tier = (parsedTier >= 1 && parsedTier <= 4) ? parsedTier : 1;
+                            const tier = getItemTier(doc);
                             if (catConfig[tier]) {
                                 let basePrice = 0;
                                 if (priceList.hasOwnProperty(doc.name)) {
