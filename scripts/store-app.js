@@ -2491,26 +2491,31 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const itemName = target.dataset.name; const saleItems = foundry.utils.deepClone(game.settings.get(MODULE_ID, "saleItems"));
         if (saleItems[itemName]) { delete saleItems[itemName]; } else { saleItems[itemName] = true; }
         await game.settings.set(MODULE_ID, "saleItems", saleItems);
+        this.render();
     }
     async _onToggleHidden(event, target) {
         const itemName = target.dataset.name; const hiddenItems = foundry.utils.deepClone(game.settings.get(MODULE_ID, "hiddenItems"));
         if (hiddenItems[itemName]) { delete hiddenItems[itemName]; } else { hiddenItems[itemName] = true; }
         await game.settings.set(MODULE_ID, "hiddenItems", hiddenItems);
+        this.render();
     }
     async _onToggleBlockSale(event, target) {
         const itemName = target.dataset.name; const blockedSaleItems = foundry.utils.deepClone(game.settings.get(MODULE_ID, "blockedSaleItems"));
         if (blockedSaleItems[itemName]) { delete blockedSaleItems[itemName]; } else { blockedSaleItems[itemName] = true; }
         await game.settings.set(MODULE_ID, "blockedSaleItems", blockedSaleItems);
+        this.render();
     }
     async _onToggleBlockPurchase(event, target) {
         const itemName = target.dataset.name; const blockedPurchaseItems = foundry.utils.deepClone(game.settings.get(MODULE_ID, "blockedPurchaseItems"));
         if (blockedPurchaseItems[itemName]) { delete blockedPurchaseItems[itemName]; } else { blockedPurchaseItems[itemName] = true; }
         await game.settings.set(MODULE_ID, "blockedPurchaseItems", blockedPurchaseItems);
+        this.render();
     }
     async _onToggleLock(event, target) {
         const itemName = target.dataset.name; const lockedItems = foundry.utils.deepClone(game.settings.get(MODULE_ID, "lockedItems"));
         if (lockedItems[itemName]) { delete lockedItems[itemName]; } else { lockedItems[itemName] = true; }
         await game.settings.set(MODULE_ID, "lockedItems", lockedItems);
+        this.render();
     }
 
     async _getCurrentTabItemNames() {
