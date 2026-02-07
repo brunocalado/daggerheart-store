@@ -78,7 +78,10 @@ Hooks.once("init", () => {
         name: "Custom Tab Name", scope: "world", config: false, type: String, default: "General"
     });
     game.settings.register(MODULE_ID, "customTabCompendium", {
-        name: "Custom Tab Compendium", scope: "world", config: false, type: String, default: "daggerheart-store.general-items"
+        name: "Custom Tab Compendium (Legacy)", scope: "world", config: false, type: String, default: ""
+    });
+    game.settings.register(MODULE_ID, "customTabCompendiums", {
+        name: "Custom Tab Compendiums", scope: "world", config: false, type: Array, default: []
     });
 
     // --- PROFILES SETTINGS ---
@@ -189,7 +192,24 @@ function _handleOpenStoreRequest(value) {
     }
 }
 
-Hooks.once("ready", () => {
+Hooks.once("ready", async () => {
+    // Migrate legacy customTabCompendium (string) to customTabCompendiums (array)
+    if (game.user.isGM) {
+        const legacy = game.settings.get(MODULE_ID, "customTabCompendium");
+        const current = game.settings.get(MODULE_ID, "customTabCompendiums") || [];
+        if (current.length === 0) {
+            if (legacy && legacy.trim() !== "") {
+                // Existing world: migrate old setting value
+                await game.settings.set(MODULE_ID, "customTabCompendiums", [legacy]);
+                await game.settings.set(MODULE_ID, "customTabCompendium", "");
+                console.log(`${MODULE_ID} | Migrated customTabCompendium to customTabCompendiums`);
+            } else {
+                // New world or cleared setting: set initial default
+                await game.settings.set(MODULE_ID, "customTabCompendiums", ["daggerheart-store.general-items"]);
+            }
+        }
+    }
+
     globalThis.Store = {
         Open: async () => {
             const app = getStoreInstance();

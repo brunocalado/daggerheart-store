@@ -1,3 +1,6 @@
+# 0.1.6
+- you can add multiple compendiums to custom tab
+
 # 0.1.5
 - You can organize homebrew loot consumable potions using the tag {{{tierX}}} where X should be 1 2 3 or 4
 

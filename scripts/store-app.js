@@ -1018,14 +1018,15 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
         let categories = foundry.utils.deepClone(STANDARD_CATEGORIES);
 
-        const customTabCompendium = game.settings.get(MODULE_ID, "customTabCompendium");
+        const customTabCompendiums = game.settings.get(MODULE_ID, "customTabCompendiums") || [];
         const customTabName = game.settings.get(MODULE_ID, "customTabName");
 
-        if (customTabCompendium && customTabCompendium.trim() !== "") {
-            categories.push({ 
-                id: "custom-tab", 
-                label: customTabName || "General", 
-                key: "CustomTab" 
+        const hasCustomTab = customTabCompendiums.some(p => p && p.trim() !== "");
+        if (hasCustomTab) {
+            categories.push({
+                id: "custom-tab",
+                label: customTabName || "General",
+                key: "CustomTab"
             });
         }
 
@@ -1051,12 +1052,18 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             }
 
             if (cat.id === "custom-tab") {
-                const pack = game.packs.get(customTabCompendium);
                 const customItems = [];
+                const seenNames = new Set();
 
-                if (pack) {
+                for (const packId of customTabCompendiums) {
+                    if (!packId || packId.trim() === "") continue;
+                    const pack = game.packs.get(packId);
+                    if (!pack) continue;
+
                     const docs = await pack.getDocuments();
                     for (const doc of docs) {
+                        if (seenNames.has(doc.name)) continue;
+                        seenNames.add(doc.name);
                         const isHidden = hiddenItems[doc.name];
                         const isSaleBlocked = blockedSaleItems[doc.name];
                         const isPurchaseBlocked = blockedPurchaseItems[doc.name];
@@ -2281,7 +2288,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             blockedPurchaseItems: game.settings.get(MODULE_ID, "blockedPurchaseItems"),
             partyActorId: game.settings.get(MODULE_ID, "partyActorId"),
             customTabName: game.settings.get(MODULE_ID, "customTabName"),
-            customTabCompendium: game.settings.get(MODULE_ID, "customTabCompendium"),
+            customTabCompendiums: game.settings.get(MODULE_ID, "customTabCompendiums"),
             sellRatio: game.settings.get(MODULE_ID, "sellRatio"),
             stockEnabled: game.settings.get(MODULE_ID, "stockEnabled"),
             showStockQuantity: game.settings.get(MODULE_ID, "showStockQuantity")
@@ -2330,7 +2337,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 blockedPurchaseItems: {},
                 partyActorId: "",
                 customTabName: "General",
-                customTabCompendium: "daggerheart-store.general-items",
+                customTabCompendiums: ["daggerheart-store.general-items"],
                 sellRatio: 0.5,
                 stockEnabled: false,
                 showStockQuantity: true
@@ -2346,9 +2353,14 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             "storeName", "priceModifier", "allowedTiers",
             "hiddenCategories", "customCompendiums", "priceOverrides",
             "saleDiscount", "saleItems", "hiddenItems", "blockedSaleItems",
-            "blockedPurchaseItems", "partyActorId", "customTabName", "customTabCompendium", "sellRatio",
+            "blockedPurchaseItems", "partyActorId", "customTabName", "customTabCompendiums", "sellRatio",
             "stockEnabled", "showStockQuantity"
         ];
+
+        // Migrate old profile format: customTabCompendium (string) -> customTabCompendiums (array)
+        if (!profileData.customTabCompendiums && profileData.customTabCompendium) {
+            profileData.customTabCompendiums = [profileData.customTabCompendium];
+        }
 
         for (const key of settingsToUpdate) {
             if (profileData.hasOwnProperty(key)) {
@@ -2506,9 +2518,11 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         actions: {
             addCompendium: StoreConfig.prototype._onAddCompendium,
             removeCompendium: StoreConfig.prototype._onRemoveCompendium,
+            addCustomTabCompendium: StoreConfig.prototype._onAddCustomTabCompendium,
+            removeCustomTabCompendium: StoreConfig.prototype._onRemoveCustomTabCompendium,
             applyStockDefaults: StoreConfig.prototype._onApplyStockDefaults,
             restockAll: StoreConfig.prototype._onRestockAll,
-            openInstructions: StoreConfig.prototype._onOpenInstructions // Added openInstructions action
+            openInstructions: StoreConfig.prototype._onOpenInstructions
         }
     };
 
@@ -2526,7 +2540,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
 
         const storeName = game.settings.get(MODULE_ID, "storeName");
         const customTabName = game.settings.get(MODULE_ID, "customTabName");
-        const customTabCompendium = game.settings.get(MODULE_ID, "customTabCompendium");
+        const customTabCompendiums = game.settings.get(MODULE_ID, "customTabCompendiums") || [];
 
         // Stock System Data
         const partyActorId = game.settings.get(MODULE_ID, "partyActorId");
@@ -2571,10 +2585,11 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
                 partyActorOwnershipOk = defaultOwnership >= 3;
             }
         }
-        
+
         let allCategories = foundry.utils.deepClone(STANDARD_CATEGORIES);
 
-        if (customTabCompendium && customTabCompendium.trim() !== "") {
+        const hasCustomTab = customTabCompendiums.some(p => p && p.trim() !== "");
+        if (hasCustomTab) {
             allCategories.push({
                 id: "custom-tab",
                 label: customTabName || "General",
@@ -2615,7 +2630,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         return {
             storeName: storeName,
             customTabName: customTabName,
-            customTabCompendium: customTabCompendium,
+            customTabCompendiums: customTabCompendiums,
             priceModifier: priceMod,
             saleDiscount: saleDiscount,
             sellRatioPercent: Math.round(sellRatio * 100), // Converted to percent for display
@@ -2998,6 +3013,29 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         this.render();
     }
 
+    async _onAddCustomTabCompendium(event, target) {
+        const currentFormValues = [];
+        const packSelects = this.element.querySelectorAll("select[name^='customTabCompendiums.']");
+        packSelects.forEach(select => {
+            if (select.value) currentFormValues.push(select.value);
+        });
+        currentFormValues.push("");
+        await game.settings.set(MODULE_ID, "customTabCompendiums", currentFormValues);
+        this.render();
+    }
+
+    async _onRemoveCustomTabCompendium(event, target) {
+        const idx = parseInt(target.dataset.index);
+        const currentFormValues = [];
+        const packSelects = this.element.querySelectorAll("select[name^='customTabCompendiums.']");
+        packSelects.forEach(select => {
+            currentFormValues.push(select.value || "");
+        });
+        currentFormValues.splice(idx, 1);
+        await game.settings.set(MODULE_ID, "customTabCompendiums", currentFormValues);
+        this.render();
+    }
+
     async _onApplyStockDefaults(event, target) {
         // Validate Party Actor is configured
         const partyActorId = game.settings.get(MODULE_ID, "partyActorId");
@@ -3170,7 +3208,8 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         }
         
         const allKeys = STANDARD_CATEGORIES.map(c => c.key);
-        if (expanded.customTabName) allKeys.push("CustomTab");
+        const hasCustomTabEntries = expanded.customTabCompendiums && Object.values(expanded.customTabCompendiums).some(v => typeof v === "string" && v.trim() !== "");
+        if (hasCustomTabEntries) allKeys.push("CustomTab");
 
         const finalHiddenMap = {};
         allKeys.forEach(key => {
@@ -3180,17 +3219,22 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
 
         await game.settings.set(MODULE_ID, "storeName", expanded.storeName);
         await game.settings.set(MODULE_ID, "customTabName", expanded.customTabName);
-        await game.settings.set(MODULE_ID, "customTabCompendium", expanded.customTabCompendium);
+
+        // Save custom tab compendiums array
+        if (expanded.customTabCompendiums) {
+            const tabCompendiumArray = Object.values(expanded.customTabCompendiums).filter(v => typeof v === "string");
+            await game.settings.set(MODULE_ID, "customTabCompendiums", tabCompendiumArray);
+        }
 
         await game.settings.set(MODULE_ID, "priceModifier", expanded.priceModifier);
         await game.settings.set(MODULE_ID, "saleDiscount", expanded.saleDiscount);
-        
+
         // Convert Percentage back to Decimal for Sell Ratio
         const sellRatioDecimal = expanded.sellRatioPercent / 100;
         await game.settings.set(MODULE_ID, "sellRatio", sellRatioDecimal);
-        
+
         await game.settings.set(MODULE_ID, "allowedTiers", expanded.tiers || {});
-        
+
         await game.settings.set(MODULE_ID, "hiddenCategories", finalHiddenMap);
         await game.settings.set(MODULE_ID, "partyActorId", expanded.partyActorId);
 
@@ -3261,13 +3305,14 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
     async _prepareContext(options) {
         const allowedTiers = game.settings.get(MODULE_ID, "allowedTiers");
         const hiddenCategories = game.settings.get(MODULE_ID, "hiddenCategories");
-        const customTabCompendium = game.settings.get(MODULE_ID, "customTabCompendium");
+        const customTabCompendiums = game.settings.get(MODULE_ID, "customTabCompendiums") || [];
         const customTabName = game.settings.get(MODULE_ID, "customTabName");
         const customCompendiums = game.settings.get(MODULE_ID, "customCompendiums") || [];
 
         let categories = foundry.utils.deepClone(STANDARD_CATEGORIES);
 
-        if (customTabCompendium && customTabCompendium.trim() !== "") {
+        const hasCustomTab = customTabCompendiums.some(p => p && p.trim() !== "");
+        if (hasCustomTab) {
             categories.push({
                 id: "custom-tab",
                 label: customTabName || "General",
@@ -3283,10 +3328,13 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
             let itemCount = 0;
 
             if (cat.id === "custom-tab") {
-                const pack = game.packs.get(customTabCompendium);
-                if (pack) {
-                    const docs = await pack.getDocuments();
-                    itemCount = docs.length;
+                for (const packId of customTabCompendiums) {
+                    if (!packId || packId.trim() === "") continue;
+                    const pack = game.packs.get(packId);
+                    if (pack) {
+                        const docs = await pack.getDocuments();
+                        itemCount += docs.length;
+                    }
                 }
             } else {
                 const catConfig = allowedTiers[cat.key] || {1:true, 2:true, 3:true, 4:true};
@@ -3360,17 +3408,24 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
      */
     async _getCategoryItems(categoryKey) {
         const allowedTiers = game.settings.get(MODULE_ID, "allowedTiers");
-        const customTabCompendium = game.settings.get(MODULE_ID, "customTabCompendium");
+        const customTabCompendiums = game.settings.get(MODULE_ID, "customTabCompendiums") || [];
         const customCompendiums = game.settings.get(MODULE_ID, "customCompendiums") || [];
         const priceMod = game.settings.get(MODULE_ID, "priceModifier") / 100;
 
         const items = [];
 
         if (categoryKey === "CustomTab") {
-            const pack = game.packs.get(customTabCompendium);
-            if (pack) {
+            const seenNames = new Set();
+            for (const packId of customTabCompendiums) {
+                if (!packId || packId.trim() === "") continue;
+                const pack = game.packs.get(packId);
+                if (!pack) continue;
+
                 const docs = await pack.getDocuments();
                 for (const doc of docs) {
+                    if (seenNames.has(doc.name)) continue;
+                    seenNames.add(doc.name);
+
                     let basePrice = 0;
                     const desc = foundry.utils.getProperty(doc, "system.description.value") ||
                                  foundry.utils.getProperty(doc, "system.description") || "";
