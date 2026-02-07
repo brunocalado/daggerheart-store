@@ -1135,15 +1135,14 @@
 }
 
 .daggerheart-store-config .form-group.inline-group > label {
-    min-width: 120px;
+    min-width: 70px;
     flex-shrink: 0;
 }
 
 .daggerheart-store-config .form-group.inline-group > input[type="text"],
 .daggerheart-store-config .form-group.inline-group > select {
-    flex: 1;
-    min-width: 150px;
-    max-width: 250px;
+    width: 150px;
+    flex: none;
 }
 
 /* Party Actor Ownership Info */

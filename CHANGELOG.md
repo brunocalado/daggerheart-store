@@ -6,6 +6,8 @@
 - bug fix: click the itens buttons required to double click sometimes
 - epic itens
 - visual effects for epic itens
+- general tab visual improv
+
 
 # 0.1.5
 - You can organize homebrew loot consumable potions using the tag {{{tierX}}} where X should be 1 2 3 or 4
