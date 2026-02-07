@@ -67,6 +67,9 @@ Hooks.once("init", () => {
     game.settings.register(MODULE_ID, "blockedPurchaseItems", {
         name: "Blocked Purchase Items", scope: "world", config: false, type: Object, default: {}
     });
+    game.settings.register(MODULE_ID, "lockedItems", {
+        name: "Locked Items", scope: "world", config: false, type: Object, default: {}
+    });
 
     // Party Configuration Setting
     game.settings.register(MODULE_ID, "partyActorId", {

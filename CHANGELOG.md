@@ -2,6 +2,7 @@
 - you can add multiple compendiums to custom tab
 - only weapon armor loot consumable can be added to custom tab
 - custom tab will identify item tier if available.
+- You can now block a item from be affected by Randomizer
 
 # 0.1.5
 - You can organize homebrew loot consumable potions using the tag {{{tierX}}} where X should be 1 2 3 or 4

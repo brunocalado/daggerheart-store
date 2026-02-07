@@ -138,6 +138,13 @@
                     <button type="button" class="bulk-btn" data-action="disableAllSale" title="Disable Sale for All">
                         <i class="fas fa-hand-holding-usd" style="opacity: 0.4;"></i>
                     </button>
+                    <span class="bulk-separator"></span>
+                    <button type="button" class="bulk-btn" data-action="lockAllItems" title="Lock All Items">
+                        <i class="fas fa-lock"></i>
+                    </button>
+                    <button type="button" class="bulk-btn" data-action="unlockAllItems" title="Unlock All Items">
+                        <i class="fas fa-lock-open"></i>
+                    </button>
                 </div>
                 {{/if}}
             </div>
@@ -224,6 +231,14 @@
                                                 class="icon-btn {{#if this.isSaleBlocked}}active-block-sale{{/if}}"
                                                 title="Block Sale (Players cannot sell this item)">
                                             <i class="fas fa-hand-holding-usd"></i>
+                                        </button>
+
+                                        <button type="button"
+                                                data-action="toggleLock"
+                                                data-name="{{this.name}}"
+                                                class="icon-btn {{#if this.isLocked}}active-locked{{/if}}"
+                                                title="Lock Item (Randomizer will skip this item)">
+                                            <i class="fas fa-lock{{#unless this.isLocked}}-open{{/unless}}"></i>
                                         </button>
 
                                         {{#if this.isOverridden}}

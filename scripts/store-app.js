@@ -263,6 +263,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             toggleHidden: DaggerheartStore.prototype._onToggleHidden,
             toggleBlockSale: DaggerheartStore.prototype._onToggleBlockSale,
             toggleBlockPurchase: DaggerheartStore.prototype._onToggleBlockPurchase,
+            toggleLock: DaggerheartStore.prototype._onToggleLock,
+            lockAllItems: DaggerheartStore.prototype._onLockAllItems,
+            unlockAllItems: DaggerheartStore.prototype._onUnlockAllItems,
             markAllOnSale: DaggerheartStore.prototype._onMarkAllOnSale,
             removeAllFromSale: DaggerheartStore.prototype._onRemoveAllFromSale,
             showAllItems: DaggerheartStore.prototype._onShowAllItems,
@@ -1014,6 +1017,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const hiddenItems = game.settings.get(MODULE_ID, "hiddenItems") || {};
         const blockedSaleItems = game.settings.get(MODULE_ID, "blockedSaleItems") || {};
         const blockedPurchaseItems = game.settings.get(MODULE_ID, "blockedPurchaseItems") || {};
+        const lockedItems = game.settings.get(MODULE_ID, "lockedItems") || {};
 
         // Stock System Validation & Setup (requires Party Actor to be configured)
         const stockEnabled = game.settings.get(MODULE_ID, "stockEnabled") && hasPartyActor;
@@ -1176,6 +1180,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             isHidden: isGM && isHidden,
                             isSaleBlocked: isGM && isSaleBlocked,
                             isPurchaseBlocked: isGM && isPurchaseBlocked,
+                            isLocked: isGM && lockedItems[doc.name],
                             isOverridden: isOverridden,
                             canBuyPersonal: canBuyPersonal,
                             canBuyParty: canBuyParty,
@@ -1438,6 +1443,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             isHidden: isGM && isHidden,
                             isSaleBlocked: isGM && isSaleBlocked,
                             isPurchaseBlocked: isGM && isPurchaseBlocked,
+                            isLocked: isGM && lockedItems[doc.name],
                             isOverridden: isOverridden,
                             canBuyPersonal: canBuyPersonal,
                             canBuyParty: canBuyParty,
@@ -2351,6 +2357,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             hiddenItems: game.settings.get(MODULE_ID, "hiddenItems"),
             blockedSaleItems: game.settings.get(MODULE_ID, "blockedSaleItems"),
             blockedPurchaseItems: game.settings.get(MODULE_ID, "blockedPurchaseItems"),
+            lockedItems: game.settings.get(MODULE_ID, "lockedItems"),
             partyActorId: game.settings.get(MODULE_ID, "partyActorId"),
             customTabName: game.settings.get(MODULE_ID, "customTabName"),
             customTabCompendiums: game.settings.get(MODULE_ID, "customTabCompendiums"),
@@ -2401,6 +2408,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 hiddenItems: {},
                 blockedSaleItems: {},
                 blockedPurchaseItems: {},
+                lockedItems: {},
                 partyActorId: "",
                 customTabName: "General",
                 customTabCompendiums: ["daggerheart-store.general-items"],
@@ -2420,7 +2428,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             "storeName", "priceModifier", "allowedTiers",
             "hiddenCategories", "customCompendiums", "priceOverrides",
             "saleDiscount", "saleItems", "hiddenItems", "blockedSaleItems",
-            "blockedPurchaseItems", "partyActorId", "customTabName", "customTabCompendiums", "customTabTierGroup", "sellRatio",
+            "blockedPurchaseItems", "lockedItems", "partyActorId", "customTabName", "customTabCompendiums", "customTabTierGroup", "sellRatio",
             "stockEnabled", "showStockQuantity"
         ];
 
@@ -2499,6 +2507,11 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         if (blockedPurchaseItems[itemName]) { delete blockedPurchaseItems[itemName]; } else { blockedPurchaseItems[itemName] = true; }
         await game.settings.set(MODULE_ID, "blockedPurchaseItems", blockedPurchaseItems);
     }
+    async _onToggleLock(event, target) {
+        const itemName = target.dataset.name; const lockedItems = foundry.utils.deepClone(game.settings.get(MODULE_ID, "lockedItems"));
+        if (lockedItems[itemName]) { delete lockedItems[itemName]; } else { lockedItems[itemName] = true; }
+        await game.settings.set(MODULE_ID, "lockedItems", lockedItems);
+    }
 
     async _getCurrentTabItemNames() {
         const itemNames = [];
@@ -2564,6 +2577,20 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const blockedSaleItems = foundry.utils.deepClone(game.settings.get(MODULE_ID, "blockedSaleItems"));
         itemNames.forEach(name => blockedSaleItems[name] = true);
         await game.settings.set(MODULE_ID, "blockedSaleItems", blockedSaleItems);
+    }
+
+    async _onLockAllItems(event, target) {
+        const itemNames = await this._getCurrentTabItemNames();
+        const lockedItems = foundry.utils.deepClone(game.settings.get(MODULE_ID, "lockedItems"));
+        itemNames.forEach(name => lockedItems[name] = true);
+        await game.settings.set(MODULE_ID, "lockedItems", lockedItems);
+    }
+
+    async _onUnlockAllItems(event, target) {
+        const itemNames = await this._getCurrentTabItemNames();
+        const lockedItems = foundry.utils.deepClone(game.settings.get(MODULE_ID, "lockedItems"));
+        itemNames.forEach(name => delete lockedItems[name]);
+        await game.settings.set(MODULE_ID, "lockedItems", lockedItems);
     }
 }
 
@@ -3665,7 +3692,13 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
      * Core randomization logic for a category
      */
     async _randomizeCategory(categoryKey, minItems, maxItems, qtyMin, qtyMax, salesMin, salesMax, varMin, varMax) {
-        const items = await this._getCategoryItems(categoryKey);
+        const allItems = await this._getCategoryItems(categoryKey);
+
+        if (allItems.length === 0) return;
+
+        // Separate locked items from randomizable items
+        const lockedItems = game.settings.get(MODULE_ID, "lockedItems") || {};
+        const items = allItems.filter(i => !lockedItems[i.name]);
 
         if (items.length === 0) return;
 
@@ -3686,7 +3719,7 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
         const saleItems = foundry.utils.deepClone(game.settings.get(MODULE_ID, "saleItems")) || {};
         const priceOverrides = foundry.utils.deepClone(game.settings.get(MODULE_ID, "priceOverrides")) || {};
 
-        // First, clear all items in this category from hidden/sale/overrides
+        // Clear only unlocked items in this category from hidden/sale/overrides
         for (const item of items) {
             delete hiddenItems[item.name];
             delete saleItems[item.name];
@@ -3817,5 +3850,6 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
         await game.settings.set(MODULE_ID, "hiddenItems", {});
         await game.settings.set(MODULE_ID, "saleItems", {});
         await game.settings.set(MODULE_ID, "priceOverrides", {});
+        await game.settings.set(MODULE_ID, "lockedItems", {});
     }
 }
