@@ -7,7 +7,9 @@
 - epic itens
 - visual effects for epic itens
 - general tab visual improv
-
+- tags {{{header}}} {{{tierX}}} work together
+- You can update and rename profiles
+- Docs for tags
 
 # 0.1.5
 - You can organize homebrew loot consumable potions using the tag {{{tierX}}} where X should be 1 2 3 or 4

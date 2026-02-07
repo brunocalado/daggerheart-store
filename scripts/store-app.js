@@ -1123,16 +1123,17 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
                         if (priceMatch) basePrice = parseInt(priceMatch[1], 10);
 
-                        // Check for header tag (non-numeric content in {{{...}}})
+                        // Check for header tag (non-numeric, non-tier content in {{{...}}})
                         let itemHeader = null;
                         const allTags = descString.match(/\{\{\{([^}]+)\}\}\}/g);
                         if (allTags) {
                             for (const tag of allTags) {
                                 const content = tag.replace(/\{\{\{|\}\}\}/g, '').trim();
-                                if (!/^\d+$/.test(content)) {
-                                    itemHeader = content;
-                                    break;
-                                }
+                                // Skip price tags (pure numbers) and tier tags (tierX)
+                                if (/^\d+$/.test(content)) continue;
+                                if (/^tier[1-4]$/i.test(content)) continue;
+                                itemHeader = content;
+                                break;
                             }
                         }
                         if (priceOverrides.hasOwnProperty(doc.name)) {
@@ -1193,10 +1194,16 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         const canCompare = !isGM && hasActor && this._isComparableCategory(cat.id);
                         const hasEquippedItem = canCompare && !!this._getEquippedItem(userActor, cat.id);
 
-                        // Determine tier for grouping (null if no valid system.tier)
+                        // Determine tier for grouping: system.tier first, then {{{tierX}}} tag
+                        let itemTier = null;
                         const sysTier = foundry.utils.getProperty(doc, "system.tier");
                         const parsedTier = parseInt(sysTier);
-                        const itemTier = (parsedTier >= 1 && parsedTier <= 4) ? parsedTier : null;
+                        if (parsedTier >= 1 && parsedTier <= 4) {
+                            itemTier = parsedTier;
+                        } else {
+                            const tierTagMatch = descString.match(/\{\{\{tier([1-4])\}\}\}/i);
+                            if (tierTagMatch) itemTier = parseInt(tierTagMatch[1]);
+                        }
 
                         customItems.push({
                             id: doc.id,
@@ -2362,27 +2369,91 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
     }
     
     async _onSavePreset(event, target) {
+        const profiles = foundry.utils.deepClone(game.settings.get(MODULE_ID, "storeProfiles")) || {};
+        const currentProfile = game.settings.get(MODULE_ID, "currentProfile") || "Default";
+        const existingNames = Object.keys(profiles).filter(n => n !== "Default");
+        const defaultSelection = (currentProfile !== "Default" && existingNames.includes(currentProfile)) ? currentProfile : "__new__";
+
+        // Build select options
+        let selectOptions = `<option value="__new__" ${defaultSelection === "__new__" ? "selected" : ""}>Add a New Profile</option>`;
+        for (const name of existingNames) {
+            selectOptions += `<option value="${name}" ${defaultSelection === name ? "selected" : ""}>${name}</option>`;
+        }
+
+        const isNewDefault = defaultSelection === "__new__";
+        const customContent = `
+            <div class="store-dialog-input-group save-profile-select-row">
+                <label>Profile:</label>
+                <select name="profileSelect" class="save-profile-select">${selectOptions}</select>
+            </div>
+            <div class="store-dialog-input-group">
+                <label class="save-profile-name-label">${isNewDefault ? "Choose the New Profile Name:" : "Update the Name of the Current Profile:"}</label>
+                <input type="text" name="profileName" class="save-profile-name-input" maxlength="22" value="${isNewDefault ? "" : defaultSelection}" placeholder="Enter profile name">
+            </div>
+            <div class="save-profile-overwrite-warning" style="display: ${isNewDefault ? "none" : "flex"};">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>The selected profile will be overwritten with the current store settings.</span>
+            </div>
+        `;
+
         const result = await showStoreDialog({
             title: "Save Store Profile",
             icon: "fas fa-save",
             headerText: "Save Profile",
             headerColor: "#D4AF37",
-            message: "Enter a name for this profile.",
             description: "This will save all current store settings (prices, sales, hidden items, configuration).",
-            input: {
-                name: "profileName",
-                label: "Profile Name:",
-                defaultValue: "New Profile"
-            },
+            customContent,
             buttons: {
-                confirm: "Save Profile",
+                confirm: defaultSelection === "__new__" ? "Create New" : "Overwrite Profile",
                 confirmIcon: "fas fa-save"
+            },
+            onRender: (event, html) => {
+                const select = html.querySelector(".save-profile-select");
+                const nameInput = html.querySelector(".save-profile-name-input");
+                const nameLabel = html.querySelector(".save-profile-name-label");
+                const warning = html.querySelector(".save-profile-overwrite-warning");
+                const confirmBtn = html.querySelector('button[data-action="confirm"]');
+
+                const updateUI = () => {
+                    const isNew = select.value === "__new__";
+                    nameLabel.textContent = isNew ? "Choose the New Profile Name:" : "Update the Name of the Current Profile:";
+                    warning.style.display = isNew ? "none" : "flex";
+                    if (confirmBtn) {
+                        const labelEl = confirmBtn.querySelector("label") || confirmBtn;
+                        labelEl.textContent = isNew ? "Create New" : "Overwrite Profile";
+                    }
+                    if (isNew) {
+                        nameInput.value = "";
+                        nameInput.placeholder = "Enter profile name";
+                    } else {
+                        nameInput.value = select.value;
+                        nameInput.placeholder = "Rename or keep current name";
+                    }
+                };
+
+                select.addEventListener("change", updateUI);
             }
         });
 
         if (!result.confirmed) return;
 
-        const name = result.value?.trim() || "New Profile";
+        const selectedProfile = result.formData?.profileSelect;
+        const inputName = result.formData?.profileName?.trim();
+        const isNew = selectedProfile === "__new__";
+
+        // Determine the final profile name
+        let name;
+        if (isNew) {
+            name = inputName;
+            if (!name) return ui.notifications.error("Please enter a name for the new profile.");
+        } else {
+            // If renamed, use the new name; otherwise keep the original
+            name = inputName || selectedProfile;
+            // If renamed, remove the old profile
+            if (name !== selectedProfile && profiles[selectedProfile]) {
+                delete profiles[selectedProfile];
+            }
+        }
 
         if (name === "Default") {
             return ui.notifications.error("You cannot overwrite the factory 'Default' profile. Please choose another name.");
@@ -2410,7 +2481,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             showStockQuantity: game.settings.get(MODULE_ID, "showStockQuantity")
         };
 
-        const profiles = foundry.utils.deepClone(game.settings.get(MODULE_ID, "storeProfiles")) || {};
         profiles[name] = currentSettings;
 
         await game.settings.set(MODULE_ID, "storeProfiles", profiles);

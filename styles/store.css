@@ -2123,6 +2123,55 @@
     margin-top: 5px;
 }
 
+.store-dialog-input-group select {
+    width: 100%;
+    padding: 8px;
+    background: #2a2a2a;
+    border: 1px solid #555;
+    border-radius: 4px;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.store-dialog-input-group select:focus {
+    border-color: #d4af37;
+    outline: none;
+}
+
+.save-profile-select-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.save-profile-select-row label {
+    display: inline !important;
+    margin-bottom: 0 !important;
+    white-space: nowrap;
+}
+
+.save-profile-select-row select {
+    flex: 1;
+}
+
+.save-profile-overwrite-warning {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    margin-top: 4px;
+    background: rgba(212, 175, 55, 0.1);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    border-radius: 4px;
+    color: #d4af37;
+    font-size: 0.85em;
+}
+
+.save-profile-overwrite-warning i {
+    font-size: 1.1em;
+    flex-shrink: 0;
+}
+
 /* Transfer Funds Dialog Specific Styles */
 .store-dialog .transfer-wealth-display {
     display: flex;
