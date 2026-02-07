@@ -26,6 +26,9 @@ const CATEGORY_ITEM_TYPE = {
     "Loot": "loot"
 };
 
+// Valid item types for store display
+const VALID_ITEM_TYPES = ["weapon", "armor", "consumable", "loot"];
+
 // System compendiums to exclude from custom compendium selection (already used by default)
 const EXCLUDED_SYSTEM_PACKS = [
     "daggerheart.classes",
@@ -1062,6 +1065,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
                     const docs = await pack.getDocuments();
                     for (const doc of docs) {
+                        if (!VALID_ITEM_TYPES.includes(doc.type)) continue;
                         if (seenNames.has(doc.name)) continue;
                         seenNames.add(doc.name);
                         const isHidden = hiddenItems[doc.name];
@@ -2554,8 +2558,8 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
 
         const partyActors = game.actors.filter(a => a.type === "party").map(a => ({ id: a.id, name: a.name })).sort((a, b) => a.name.localeCompare(b.name));
 
-        // Filter packs that have at least one valid item type (weapon, armor, consumable, loot)
-        const validItemTypes = ["weapon", "armor", "consumable", "loot"];
+        // Filter packs that have at least one valid item type
+        const validItemTypes = VALID_ITEM_TYPES;
         const candidatePacks = game.packs.filter(p =>
             p.documentName === "Item" && !EXCLUDED_SYSTEM_PACKS.includes(p.collection)
         );
@@ -3333,7 +3337,7 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
                     const pack = game.packs.get(packId);
                     if (pack) {
                         const docs = await pack.getDocuments();
-                        itemCount += docs.length;
+                        itemCount += docs.filter(d => VALID_ITEM_TYPES.includes(d.type)).length;
                     }
                 }
             } else {
@@ -3423,6 +3427,7 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
 
                 const docs = await pack.getDocuments();
                 for (const doc of docs) {
+                    if (!VALID_ITEM_TYPES.includes(doc.type)) continue;
                     if (seenNames.has(doc.name)) continue;
                     seenNames.add(doc.name);
 
