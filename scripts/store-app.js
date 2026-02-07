@@ -2381,7 +2381,11 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         }
 
         const isNewDefault = defaultSelection === "__new__";
-        const customContent = `
+        const contentHtml = `
+            <div class="store-dialog-content">
+                <h3 class="store-dialog-header" style="color: #D4AF37;">Save Profile</h3>
+                <p class="store-dialog-description">This will save all current store settings (prices, sales, hidden items, configuration).</p>
+            </div>
             <div class="store-dialog-input-group save-profile-select-row">
                 <label>Profile:</label>
                 <select name="profileSelect" class="save-profile-select">${selectOptions}</select>
@@ -2396,25 +2400,46 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             </div>
         `;
 
-        const result = await showStoreDialog({
-            title: "Save Store Profile",
-            icon: "fas fa-save",
-            headerText: "Save Profile",
-            headerColor: "#D4AF37",
-            description: "This will save all current store settings (prices, sales, hidden items, configuration).",
-            customContent,
-            buttons: {
-                confirm: defaultSelection === "__new__" ? "Create New" : "Overwrite Profile",
-                confirmIcon: "fas fa-save"
-            },
-            onRender: (event, html) => {
-                const select = html.querySelector(".save-profile-select");
-                const nameInput = html.querySelector(".save-profile-name-input");
-                const nameLabel = html.querySelector(".save-profile-name-label");
-                const warning = html.querySelector(".save-profile-overwrite-warning");
-                const confirmBtn = html.querySelector('button[data-action="confirm"]');
+        const result = await new Promise((resolve) => {
+            const dialog = new DialogV2({
+                window: { title: "Save Store Profile", icon: "fas fa-save" },
+                content: contentHtml,
+                classes: ["store-dialog"],
+                modal: true,
+                buttons: [
+                    {
+                        action: "confirm",
+                        label: isNewDefault ? "Create New" : "Overwrite Profile",
+                        icon: "fas fa-save",
+                        callback: (event, button, dialog) => {
+                            const result = { confirmed: true, formData: {} };
+                            const formData = new FormData(button.form);
+                            for (const [key, value] of formData.entries()) {
+                                result.formData[key] = value;
+                            }
+                            resolve(result);
+                        }
+                    },
+                    {
+                        action: "cancel",
+                        label: "Cancel",
+                        icon: "fas fa-times",
+                        callback: () => resolve({ confirmed: false })
+                    }
+                ],
+                close: () => resolve({ confirmed: false })
+            });
 
-                const updateUI = () => {
+            Hooks.once("renderDialogV2", (app, element) => {
+                if (app !== dialog) return;
+
+                const select = element.querySelector(".save-profile-select");
+                const nameInput = element.querySelector(".save-profile-name-input");
+                const nameLabel = element.querySelector(".save-profile-name-label");
+                const warning = element.querySelector(".save-profile-overwrite-warning");
+                const confirmBtn = element.querySelector('button[data-action="confirm"]');
+
+                select.addEventListener("change", () => {
                     const isNew = select.value === "__new__";
                     nameLabel.textContent = isNew ? "Choose the New Profile Name:" : "Update the Name of the Current Profile:";
                     warning.style.display = isNew ? "none" : "flex";
@@ -2429,10 +2454,10 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         nameInput.value = select.value;
                         nameInput.placeholder = "Rename or keep current name";
                     }
-                };
+                });
+            });
 
-                select.addEventListener("change", updateUI);
-            }
+            dialog.render(true);
         });
 
         if (!result.confirmed) return;
