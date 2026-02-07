@@ -584,6 +584,66 @@
 .daggerheart-store .icon-btn.active-block-sale { background: #b8860b; color: white; border-color: #b8860b; }
 .daggerheart-store .icon-btn.active-block-purchase { background: #8b0000; color: white; border-color: #8b0000; }
 .daggerheart-store .icon-btn.active-locked { background: #2c3e50; color: white; border-color: #2c3e50; }
+.daggerheart-store .icon-btn.active-epic { background: #9b59b6; color: white; border-color: #9b59b6; }
+
+.daggerheart-store .epic-badge {
+    font-size: 12px;
+    font-weight: bold;
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+    color: #000;
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid #000;
+    line-height: 1;
+}
+
+.daggerheart-store .epic-badge i {
+    margin-right: 2px;
+}
+
+.daggerheart-store .store-row.epic-row {
+    border-left: 3px solid;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Effect: Shine - light sweeps left to right */
+.daggerheart-store .store-row.epic-fx-shine::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+    animation: epicShine 6s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes epicShine {
+    0%, 70% { left: -100%; }
+    100% { left: 150%; }
+}
+
+/* Effect: Glow - intense light spawns right, sweeps left to right */
+.daggerheart-store .store-row.epic-fx-glow::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    width: 35%;
+    height: 200%;
+    background: radial-gradient(ellipse at center, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.25) 40%, transparent 70%);
+    animation: epicGlow 4s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes epicGlow {
+    0% { left: -35%; opacity: 0; }
+    10% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { left: 110%; opacity: 0; }
+}
 
 .daggerheart-store .reset-price-btn {
     background: none;

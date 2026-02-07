@@ -29,6 +29,23 @@ const CATEGORY_ITEM_TYPE = {
 // Valid item types for store display
 const VALID_ITEM_TYPES = ["weapon", "armor", "consumable", "loot"];
 
+/**
+ * Converts a hex color to a very subtle background tint (10% opacity over #e8e8e8 base)
+ * @param {string} hex - Hex color string (e.g., "#9b59b6")
+ * @returns {string} Blended hex color for subtle background
+ */
+function getEpicBgColor(hex) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    const base = 0xe8;
+    const mix = 0.12;
+    const br = Math.round(base * (1 - mix) + r * mix);
+    const bg = Math.round(base * (1 - mix) + g * mix);
+    const bb = Math.round(base * (1 - mix) + b * mix);
+    return `#${br.toString(16).padStart(2, "0")}${bg.toString(16).padStart(2, "0")}${bb.toString(16).padStart(2, "0")}`;
+}
+
 // System compendiums to exclude from custom compendium selection (already used by default)
 const EXCLUDED_SYSTEM_PACKS = [
     "daggerheart.classes",
@@ -279,7 +296,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             savePreset: DaggerheartStore.prototype._onSavePreset,
             loadPreset: DaggerheartStore.prototype._onLoadPreset,
             deletePreset: DaggerheartStore.prototype._onDeletePreset,
-            transferFunds: DaggerheartStore.prototype._onTransferFunds
+            transferFunds: DaggerheartStore.prototype._onTransferFunds,
+            toggleEpic: DaggerheartStore.prototype._onToggleEpic
         }
     };
 
@@ -1003,7 +1021,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             searchQuery: this.searchQuery,
             activeTab: this.activeTab, 
             presets: profileKeys,
-            currentProfile: currentProfile 
+            currentProfile: currentProfile,
+            epicIcon: game.settings.get(MODULE_ID, "epicIcon")
         };
 
         const priceMod = game.settings.get(MODULE_ID, "priceModifier") / 100;
@@ -1018,6 +1037,11 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const blockedSaleItems = game.settings.get(MODULE_ID, "blockedSaleItems") || {};
         const blockedPurchaseItems = game.settings.get(MODULE_ID, "blockedPurchaseItems") || {};
         const lockedItems = game.settings.get(MODULE_ID, "lockedItems") || {};
+        const epicItems = game.settings.get(MODULE_ID, "epicItems") || {};
+        const epicIcon = game.settings.get(MODULE_ID, "epicIcon");
+        const epicColor = game.settings.get(MODULE_ID, "epicColor");
+        const epicLabel = game.settings.get(MODULE_ID, "epicLabel");
+        const epicEffect = game.settings.get(MODULE_ID, "epicEffect");
 
         // Stock System Validation & Setup (requires Party Actor to be configured)
         const stockEnabled = game.settings.get(MODULE_ID, "stockEnabled") && hasPartyActor;
@@ -1197,7 +1221,13 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             stockEnabled: stockEnabled,
                             showStockQty: showStockQuantity,
                             canCompare: canCompare,
-                            hasEquippedItem: hasEquippedItem
+                            hasEquippedItem: hasEquippedItem,
+                            isEpic: !!epicItems[doc.name],
+                            epicIcon: epicIcon,
+                            epicColor: epicColor,
+                            epicLabel: epicLabel,
+                            epicBgColor: epicItems[doc.name] ? getEpicBgColor(epicColor) : null,
+                            epicEffect: epicEffect
                         });
                     }
                 }
@@ -1458,7 +1488,13 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             stockEnabled: stockEnabled,
                             showStockQty: showStockQuantity,
                             canCompare: canCompare,
-                            hasEquippedItem: hasEquippedItem
+                            hasEquippedItem: hasEquippedItem,
+                            isEpic: !!epicItems[doc.name],
+                            epicIcon: epicIcon,
+                            epicColor: epicColor,
+                            epicLabel: epicLabel,
+                            epicBgColor: epicItems[doc.name] ? getEpicBgColor(epicColor) : null,
+                            epicEffect: epicEffect
                         });
                     }
                 }
@@ -2276,11 +2312,11 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         ChatMessage.create(chatData);
 
         if (game.audio) {
-            foundry.audio.AudioHelper.play({ 
-                src: "modules/daggerheart-store/assets/audio/coins.mp3", 
-                volume: 0.8,
-                loop: false 
-            }, false); 
+            const epicItems = game.settings.get(MODULE_ID, "epicItems") || {};
+            const soundSrc = epicItems[itemName]
+                ? "modules/daggerheart-store/assets/audio/epic.mp3"
+                : "modules/daggerheart-store/assets/audio/coins.mp3";
+            foundry.audio.AudioHelper.play({ src: soundSrc, volume: 0.8, loop: false }, false);
         }
 
         this.render();
@@ -2517,6 +2553,12 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         await game.settings.set(MODULE_ID, "lockedItems", lockedItems);
         this.render();
     }
+    async _onToggleEpic(event, target) {
+        const itemName = target.dataset.name; const epicItems = foundry.utils.deepClone(game.settings.get(MODULE_ID, "epicItems"));
+        if (epicItems[itemName]) { delete epicItems[itemName]; } else { epicItems[itemName] = true; }
+        await game.settings.set(MODULE_ID, "epicItems", epicItems);
+        this.render();
+    }
 
     async _getCurrentTabItemNames() {
         const itemNames = [];
@@ -2642,6 +2684,12 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         const customTabCompendiums = game.settings.get(MODULE_ID, "customTabCompendiums") || [];
         const customTabTierGroup = game.settings.get(MODULE_ID, "customTabTierGroup");
 
+        // Epic Settings
+        const epicIcon = game.settings.get(MODULE_ID, "epicIcon");
+        const epicColor = game.settings.get(MODULE_ID, "epicColor");
+        const epicLabel = game.settings.get(MODULE_ID, "epicLabel");
+        const epicEffect = game.settings.get(MODULE_ID, "epicEffect");
+
         // Stock System Data
         const partyActorId = game.settings.get(MODULE_ID, "partyActorId");
         const hasPartyActor = !!(partyActorId && game.actors.get(partyActorId));
@@ -2748,7 +2796,11 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             hasPartyActor: hasPartyActor,
             stockEnabled: stockEnabled,
             showStockQuantity: showStockQuantity,
-            stockCategoryDefaults: stockCategoryDefaults
+            stockCategoryDefaults: stockCategoryDefaults,
+            epicIcon: epicIcon,
+            epicColor: epicColor,
+            epicLabel: epicLabel,
+            epicEffect: epicEffect
         };
     }
 
@@ -3330,6 +3382,13 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         await game.settings.set(MODULE_ID, "customTabTierGroup", expanded.customTabTierGroup || false);
 
         await game.settings.set(MODULE_ID, "priceModifier", expanded.priceModifier);
+
+        // Epic Settings
+        const epicLabelVal = (expanded.epicLabel || "Epic").slice(0, 15);
+        await game.settings.set(MODULE_ID, "epicLabel", epicLabelVal);
+        await game.settings.set(MODULE_ID, "epicIcon", expanded.epicIcon || "fa-star");
+        await game.settings.set(MODULE_ID, "epicColor", expanded.epicColor || "#9b59b6");
+        await game.settings.set(MODULE_ID, "epicEffect", expanded.epicEffect || "shine");
         await game.settings.set(MODULE_ID, "saleDiscount", expanded.saleDiscount);
 
         // Convert Percentage back to Decimal for Sell Ratio

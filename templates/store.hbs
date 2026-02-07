@@ -156,7 +156,7 @@
                 
                 <div class="item-list">
                     {{#each group.items}}
-                    <div class="store-row {{#if this.isHidden}}gm-hidden-item{{/if}} {{#if this.isSale}}sale-pulse{{/if}}">
+                    <div class="store-row {{#if this.isHidden}}gm-hidden-item{{/if}} {{#if this.isSale}}sale-pulse{{/if}} {{#if this.isEpic}}epic-row epic-fx-{{this.epicEffect}}{{/if}}" {{#if this.isEpic}}style="background: {{this.epicBgColor}}; border-left-color: {{this.epicColor}};"{{/if}}>
 
                         <!-- Left Side: Icon, Name AND Sale Text -->
                         <div class="row-left">
@@ -194,6 +194,14 @@
                             {{#if this.itemSummary}}
                                 <span class="weapon-stats">{{this.itemSummary}}</span>
                             {{/if}}
+
+                            {{#unless ../../../isGM}}
+                                {{#if this.isEpic}}
+                                    <span class="epic-badge" style="background: {{this.epicColor}};">
+                                        <i class="fas {{this.epicIcon}}"></i> {{this.epicLabel}}
+                                    </span>
+                                {{/if}}
+                            {{/unless}}
                         </div>
 
                         <!-- Right Side: Controls -->
@@ -239,6 +247,14 @@
                                                 class="icon-btn {{#if this.isLocked}}active-locked{{/if}}"
                                                 title="Lock Item (Randomizer will skip this item)">
                                             <i class="fas fa-lock{{#unless this.isLocked}}-open{{/unless}}"></i>
+                                        </button>
+
+                                        <button type="button"
+                                                data-action="toggleEpic"
+                                                data-name="{{this.name}}"
+                                                class="icon-btn {{#if this.isEpic}}active-epic{{/if}}"
+                                                title="Mark as Epic">
+                                            <i class="fas {{../../../epicIcon}}"></i>
                                         </button>
 
                                         {{#if this.isOverridden}}

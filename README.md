@@ -118,6 +118,8 @@ Install via the Foundry VTT Module browser or use this manifest link:
 
 * **Assets:** AI Audio and images provided are [CC0 1.0 Universal Public Domain](https://creativecommons.org/publicdomain/zero/1.0/).
 
+* **epic.mp3** [Zapsplat](https://www.zapsplat.com). The audio assets are used in accordance with the Zapsplat Standard License.
+
 **Disclaimer:** This module is an independent creation and is not affiliated with Darrington Press.
 
 # 🧰 My Daggerheart Modules

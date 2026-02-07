@@ -70,6 +70,21 @@ Hooks.once("init", () => {
     game.settings.register(MODULE_ID, "lockedItems", {
         name: "Locked Items", scope: "world", config: false, type: Object, default: {}
     });
+    game.settings.register(MODULE_ID, "epicItems", {
+        name: "Epic Items", scope: "world", config: false, type: Object, default: {}
+    });
+    game.settings.register(MODULE_ID, "epicIcon", {
+        name: "Epic Icon", scope: "world", config: false, type: String, default: "fa-star"
+    });
+    game.settings.register(MODULE_ID, "epicColor", {
+        name: "Epic Color", scope: "world", config: false, type: String, default: "#9b59b6"
+    });
+    game.settings.register(MODULE_ID, "epicLabel", {
+        name: "Epic Label", scope: "world", config: false, type: String, default: "Epic"
+    });
+    game.settings.register(MODULE_ID, "epicEffect", {
+        name: "Epic Effect", scope: "world", config: false, type: String, default: "shine"
+    });
 
     // Party Configuration Setting
     game.settings.register(MODULE_ID, "partyActorId", {

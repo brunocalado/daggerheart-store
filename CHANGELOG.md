@@ -4,6 +4,7 @@
 - custom tab will identify item tier if available.
 - You can now block a item from be affected by Randomizer
 - bug fix: click the itens buttons required to double click sometimes
+- epic itens
 
 # 0.1.5
 - You can organize homebrew loot consumable potions using the tag {{{tierX}}} where X should be 1 2 3 or 4
