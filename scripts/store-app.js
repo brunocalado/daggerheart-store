@@ -1023,6 +1023,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
         const customTabCompendiums = game.settings.get(MODULE_ID, "customTabCompendiums") || [];
         const customTabName = game.settings.get(MODULE_ID, "customTabName");
+        const customTabTierGroup = game.settings.get(MODULE_ID, "customTabTierGroup");
 
         const hasCustomTab = customTabCompendiums.some(p => p && p.trim() !== "");
         if (hasCustomTab) {
@@ -1159,6 +1160,11 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         const canCompare = !isGM && hasActor && this._isComparableCategory(cat.id);
                         const hasEquippedItem = canCompare && !!this._getEquippedItem(userActor, cat.id);
 
+                        // Determine tier for grouping (null if no valid system.tier)
+                        const sysTier = foundry.utils.getProperty(doc, "system.tier");
+                        const parsedTier = parseInt(sysTier);
+                        const itemTier = (parsedTier >= 1 && parsedTier <= 4) ? parsedTier : null;
+
                         customItems.push({
                             id: doc.id,
                             uuid: doc.uuid,
@@ -1179,6 +1185,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             isRecommended: isRecommended,
                             description: cleanedDescription,
                             header: itemHeader,
+                            tier: itemTier,
                             stockQuantity: stockQuantity,
                             stockStatus: stockStatus,
                             stockUnlimited: stockUnlimited,
@@ -1190,32 +1197,86 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     }
                 }
 
-                // Group items by header: items without header go first, then header groups
-                const headerGroups = {};
-                const noHeaderItems = [];
-
-                for (const item of customItems) {
-                    if (item.header) {
-                        if (!headerGroups[item.header]) {
-                            headerGroups[item.header] = [];
-                        }
-                        headerGroups[item.header].push(item);
-                    } else {
-                        noHeaderItems.push(item);
-                    }
-                }
-
                 const groups = [];
-                if (noHeaderItems.length > 0) {
-                    noHeaderItems.sort((a, b) => a.name.localeCompare(b.name));
-                    groups.push({ id: "no-header", label: "", items: noHeaderItems });
-                }
 
-                // Sort headers alphabetically and add their groups
-                Object.keys(headerGroups).sort().forEach(header => {
-                    headerGroups[header].sort((a, b) => a.name.localeCompare(b.name));
-                    groups.push({ id: header, label: header, items: headerGroups[header] });
-                });
+                if (customTabTierGroup) {
+                    // Tier grouping mode: items with system.tier go into tier headers,
+                    // items without tier use header-based grouping
+                    const tierLabels = {
+                        1: "Tier 1 / Common",
+                        2: "Tier 2 / Uncommon",
+                        3: "Tier 3 / Rare",
+                        4: "Tier 4 / Legendary"
+                    };
+                    const tierGroupMap = {};
+                    const noTierHeaderGroups = {};
+                    const noTierNoHeaderItems = [];
+
+                    for (const item of customItems) {
+                        if (item.tier !== null) {
+                            // Build group key: tier + optional header suffix
+                            const suffix = item.header ? ` - ${item.header}` : "";
+                            const groupKey = `tier-${item.tier}${suffix}`;
+                            const groupLabel = `${tierLabels[item.tier]}${suffix}`;
+                            if (!tierGroupMap[groupKey]) {
+                                tierGroupMap[groupKey] = { id: groupKey, label: groupLabel, tier: item.tier, items: [] };
+                            }
+                            tierGroupMap[groupKey].items.push(item);
+                        } else if (item.header) {
+                            if (!noTierHeaderGroups[item.header]) {
+                                noTierHeaderGroups[item.header] = [];
+                            }
+                            noTierHeaderGroups[item.header].push(item);
+                        } else {
+                            noTierNoHeaderItems.push(item);
+                        }
+                    }
+
+                    // Add tier groups sorted by tier, then by suffix
+                    Object.values(tierGroupMap)
+                        .sort((a, b) => a.tier - b.tier || a.label.localeCompare(b.label))
+                        .forEach(group => {
+                            group.items.sort((a, b) => a.name.localeCompare(b.name));
+                            groups.push(group);
+                        });
+
+                    // Add non-tier header groups
+                    Object.keys(noTierHeaderGroups).sort().forEach(header => {
+                        noTierHeaderGroups[header].sort((a, b) => a.name.localeCompare(b.name));
+                        groups.push({ id: header, label: header, items: noTierHeaderGroups[header] });
+                    });
+
+                    // Add non-tier non-header items
+                    if (noTierNoHeaderItems.length > 0) {
+                        noTierNoHeaderItems.sort((a, b) => a.name.localeCompare(b.name));
+                        groups.push({ id: "no-header", label: "", items: noTierNoHeaderItems });
+                    }
+                } else {
+                    // Default mode: group by header only
+                    const headerGroups = {};
+                    const noHeaderItems = [];
+
+                    for (const item of customItems) {
+                        if (item.header) {
+                            if (!headerGroups[item.header]) {
+                                headerGroups[item.header] = [];
+                            }
+                            headerGroups[item.header].push(item);
+                        } else {
+                            noHeaderItems.push(item);
+                        }
+                    }
+
+                    if (noHeaderItems.length > 0) {
+                        noHeaderItems.sort((a, b) => a.name.localeCompare(b.name));
+                        groups.push({ id: "no-header", label: "", items: noHeaderItems });
+                    }
+
+                    Object.keys(headerGroups).sort().forEach(header => {
+                        headerGroups[header].sort((a, b) => a.name.localeCompare(b.name));
+                        groups.push({ id: header, label: header, items: headerGroups[header] });
+                    });
+                }
 
                 context.tabs[cat.id] = groups.length > 0 ? groups : [{ id: "all", label: "", items: [] }];
                 continue;
@@ -2293,6 +2354,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             partyActorId: game.settings.get(MODULE_ID, "partyActorId"),
             customTabName: game.settings.get(MODULE_ID, "customTabName"),
             customTabCompendiums: game.settings.get(MODULE_ID, "customTabCompendiums"),
+            customTabTierGroup: game.settings.get(MODULE_ID, "customTabTierGroup"),
             sellRatio: game.settings.get(MODULE_ID, "sellRatio"),
             stockEnabled: game.settings.get(MODULE_ID, "stockEnabled"),
             showStockQuantity: game.settings.get(MODULE_ID, "showStockQuantity")
@@ -2342,6 +2404,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 partyActorId: "",
                 customTabName: "General",
                 customTabCompendiums: ["daggerheart-store.general-items"],
+                customTabTierGroup: true,
                 sellRatio: 0.5,
                 stockEnabled: false,
                 showStockQuantity: true
@@ -2357,7 +2420,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             "storeName", "priceModifier", "allowedTiers",
             "hiddenCategories", "customCompendiums", "priceOverrides",
             "saleDiscount", "saleItems", "hiddenItems", "blockedSaleItems",
-            "blockedPurchaseItems", "partyActorId", "customTabName", "customTabCompendiums", "sellRatio",
+            "blockedPurchaseItems", "partyActorId", "customTabName", "customTabCompendiums", "customTabTierGroup", "sellRatio",
             "stockEnabled", "showStockQuantity"
         ];
 
@@ -2545,6 +2608,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         const storeName = game.settings.get(MODULE_ID, "storeName");
         const customTabName = game.settings.get(MODULE_ID, "customTabName");
         const customTabCompendiums = game.settings.get(MODULE_ID, "customTabCompendiums") || [];
+        const customTabTierGroup = game.settings.get(MODULE_ID, "customTabTierGroup");
 
         // Stock System Data
         const partyActorId = game.settings.get(MODULE_ID, "partyActorId");
@@ -2635,6 +2699,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             storeName: storeName,
             customTabName: customTabName,
             customTabCompendiums: customTabCompendiums,
+            customTabTierGroup: customTabTierGroup,
             priceModifier: priceMod,
             saleDiscount: saleDiscount,
             sellRatioPercent: Math.round(sellRatio * 100), // Converted to percent for display
@@ -2773,23 +2838,23 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             });
         });
 
-        // Stock Toggle Card Visual
-        const stockToggleCard = html.querySelector(".stock-toggle-card");
-        if (stockToggleCard) {
-            stockToggleCard.addEventListener("click", (e) => {
+        // Toggle Card Visual (Stock, Tier Group, etc.)
+        const toggleCards = html.querySelectorAll(".stock-toggle-card");
+        toggleCards.forEach(card => {
+            card.addEventListener("click", (e) => {
                 e.preventDefault();
                 e.stopPropagation();
 
                 // Don't toggle if disabled
-                if (stockToggleCard.classList.contains("disabled")) return;
+                if (card.classList.contains("disabled")) return;
 
-                const checkbox = stockToggleCard.querySelector("input[type='checkbox']");
+                const checkbox = card.querySelector("input[type='checkbox']");
                 if (checkbox && !checkbox.disabled) {
                     checkbox.checked = !checkbox.checked;
-                    stockToggleCard.classList.toggle("active", checkbox.checked);
+                    card.classList.toggle("active", checkbox.checked);
                 }
             });
-        }
+        });
 
         // Tier Matrix: Tier Button Toggle Visual
         const tierBtns = html.querySelectorAll(".tier-btn");
@@ -3229,6 +3294,8 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             const tabCompendiumArray = Object.values(expanded.customTabCompendiums).filter(v => typeof v === "string");
             await game.settings.set(MODULE_ID, "customTabCompendiums", tabCompendiumArray);
         }
+
+        await game.settings.set(MODULE_ID, "customTabTierGroup", expanded.customTabTierGroup || false);
 
         await game.settings.set(MODULE_ID, "priceModifier", expanded.priceModifier);
         await game.settings.set(MODULE_ID, "saleDiscount", expanded.saleDiscount);

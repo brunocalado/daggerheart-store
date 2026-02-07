@@ -83,6 +83,9 @@ Hooks.once("init", () => {
     game.settings.register(MODULE_ID, "customTabCompendiums", {
         name: "Custom Tab Compendiums", scope: "world", config: false, type: Array, default: []
     });
+    game.settings.register(MODULE_ID, "customTabTierGroup", {
+        name: "Custom Tab Tier Grouping", scope: "world", config: false, type: Boolean, default: true
+    });
 
     // --- PROFILES SETTINGS ---
     game.settings.register(MODULE_ID, "storeProfiles", {
