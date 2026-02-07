@@ -645,6 +645,47 @@
     100% { left: 110%; opacity: 0; }
 }
 
+/* Effect: Pulse - background pulses between base and epic color */
+.daggerheart-store .store-row.epic-fx-pulse {
+    animation: epicPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes epicPulse {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.15); }
+}
+
+/* Effect: Wave - vertical wave from top to bottom */
+.daggerheart-store .store-row.epic-fx-wave::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background: linear-gradient(180deg, transparent, rgba(255,255,255,0.5), transparent);
+    animation: epicWave 3.5s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes epicWave {
+    0%, 60% { top: -50%; }
+    100% { top: 100%; }
+}
+
+/* Effect: Border Glow - pulsing left border */
+.daggerheart-store .store-row.epic-fx-border-glow {
+    animation: epicBorderGlow 1.8s ease-in-out infinite;
+}
+
+@keyframes epicBorderGlow {
+    0%, 100% {
+        box-shadow: inset 4px 0 0 0 currentColor, -2px 0 8px rgba(255,255,255,0.3);
+    }
+    50% {
+        box-shadow: inset 4px 0 0 0 currentColor, -2px 0 20px rgba(255,255,255,0.8), inset 6px 0 20px rgba(255,255,255,0.4);
+    }
+}
+
 .daggerheart-store .reset-price-btn {
     background: none;
     border: none;
