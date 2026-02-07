@@ -34,6 +34,11 @@ const VALID_ITEM_TYPES = ["weapon", "armor", "consumable", "loot"];
  * @param {string} hex - Hex color string (e.g., "#9b59b6")
  * @returns {string} Blended hex color for subtle background
  */
+function getEpicTextColor(hex) {
+    const darkBgColors = ["#9b59b6", "#e91e63", "#e74c3c", "#3498db"];
+    return darkBgColors.includes(hex.toLowerCase()) ? "#e8e8e8" : "#000";
+}
+
 function getEpicBgColor(hex) {
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
@@ -1226,6 +1231,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             epicIcon: epicIcon,
                             epicColor: epicColor,
                             epicLabel: epicLabel,
+                            epicTextColor: getEpicTextColor(epicColor),
                             epicBgColor: epicItems[doc.name] ? getEpicBgColor(epicColor) : null,
                             epicEffect: epicEffect
                         });
@@ -1493,6 +1499,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             epicIcon: epicIcon,
                             epicColor: epicColor,
                             epicLabel: epicLabel,
+                            epicTextColor: getEpicTextColor(epicColor),
                             epicBgColor: epicItems[doc.name] ? getEpicBgColor(epicColor) : null,
                             epicEffect: epicEffect
                         });
