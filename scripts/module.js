@@ -105,6 +105,15 @@ Hooks.once("init", () => {
         name: "Custom Tab Tier Grouping", scope: "world", config: false, type: Boolean, default: true
     });
 
+    // --- RANDOMIZER SETTINGS ---
+    game.settings.register(MODULE_ID, "randomizerSettings", {
+        name: "Randomizer Settings",
+        scope: "world",
+        config: false,
+        type: Object,
+        default: {}
+    });
+
     // --- PROFILES SETTINGS ---
     game.settings.register(MODULE_ID, "storeProfiles", {
         name: "Store Profiles",

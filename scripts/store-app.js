@@ -2508,7 +2508,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             customTabTierGroup: game.settings.get(MODULE_ID, "customTabTierGroup"),
             sellRatio: game.settings.get(MODULE_ID, "sellRatio"),
             stockEnabled: game.settings.get(MODULE_ID, "stockEnabled"),
-            showStockQuantity: game.settings.get(MODULE_ID, "showStockQuantity")
+            showStockQuantity: game.settings.get(MODULE_ID, "showStockQuantity"),
+            randomizerSettings: game.settings.get(MODULE_ID, "randomizerSettings")
         };
 
         profiles[name] = currentSettings;
@@ -2563,7 +2564,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 customTabTierGroup: true,
                 sellRatio: 0.5,
                 stockEnabled: false,
-                showStockQuantity: true
+                showStockQuantity: true,
+                randomizerSettings: {}
             };
         } else {
             const profiles = game.settings.get(MODULE_ID, "storeProfiles");
@@ -2578,7 +2580,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             "saleDiscount", "saleItems", "hiddenItems", "blockedSaleItems",
             "blockedPurchaseItems", "lockedItems", "epicItems", "epicIcon", "epicColor", "epicLabel", "epicEffect",
             "partyActorId", "customTabName", "customTabCompendiums", "customTabTierGroup", "sellRatio",
-            "stockEnabled", "showStockQuantity"
+            "stockEnabled", "showStockQuantity", "randomizerSettings"
         ];
 
         // Migrate old profile format: customTabCompendium (string) -> customTabCompendiums (array)
@@ -3578,6 +3580,36 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
         }
     };
 
+    _onRender(context, options) {
+        super._onRender(context, options);
+        const inputs = this.element.querySelectorAll('.randomizer-inputs-row input[type="number"]');
+        for (const input of inputs) {
+            input.addEventListener("change", () => this._saveRandomizerSettings());
+        }
+    }
+
+    /**
+     * Gathers all randomizer input values and persists them to the setting
+     */
+    _saveRandomizerSettings() {
+        const rows = this.element.querySelectorAll(".category-randomizer-row");
+        const settings = {};
+        for (const row of rows) {
+            const key = row.dataset.category;
+            settings[key] = {
+                minItems: parseInt(row.querySelector(".rand-min-items").value) || 0,
+                maxItems: parseInt(row.querySelector(".rand-max-items").value) || 0,
+                qtyMin: parseInt(row.querySelector(".rand-qty-min").value) || 0,
+                qtyMax: parseInt(row.querySelector(".rand-qty-max").value) || 0,
+                salesMin: parseInt(row.querySelector(".rand-sales-min").value) || 0,
+                salesMax: parseInt(row.querySelector(".rand-sales-max").value) || 0,
+                varMin: parseInt(row.querySelector(".rand-var-min").value) || 0,
+                varMax: parseInt(row.querySelector(".rand-var-max").value) || 0
+            };
+        }
+        game.settings.set(MODULE_ID, "randomizerSettings", settings);
+    }
+
     async _prepareContext(options) {
         const allowedTiers = game.settings.get(MODULE_ID, "allowedTiers");
         const hiddenCategories = game.settings.get(MODULE_ID, "hiddenCategories");
@@ -3672,6 +3704,20 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
             } else {
                 cat.defaultQty = 10;
             }
+        }
+
+        // Attach saved randomizer values to each category
+        const savedRandomizer = game.settings.get(MODULE_ID, "randomizerSettings") || {};
+        for (const cat of categories) {
+            const saved = savedRandomizer[cat.key] || {};
+            cat.savedMinItems = saved.minItems ?? 0;
+            cat.savedMaxItems = saved.maxItems ?? cat.itemCount;
+            cat.savedQtyMin = saved.qtyMin ?? 1;
+            cat.savedQtyMax = saved.qtyMax ?? cat.defaultQty;
+            cat.savedSalesMin = saved.salesMin ?? 0;
+            cat.savedSalesMax = saved.salesMax ?? 0;
+            cat.savedVarMin = saved.varMin ?? 0;
+            cat.savedVarMax = saved.varMax ?? 0;
         }
 
         return {
@@ -3783,12 +3829,25 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     /**
-     * Resets input fields for a specific category to default values
+     * Resets input fields for a specific category to default values.
+     * Uses the current profile's saved randomizer values, or hardcoded defaults for the "Default" profile.
      */
     _onResetCategoryDefaults(event, target) {
         const categoryKey = target.dataset.category;
         const itemCount = parseInt(target.dataset.itemCount) || 0;
         const defaultQty = parseInt(target.dataset.defaultQty) || 10;
+
+        // Determine defaults based on current profile
+        let defaults = { minItems: 0, maxItems: itemCount, qtyMin: 1, qtyMax: defaultQty, salesMin: 0, salesMax: 0, varMin: 0, varMax: 0 };
+
+        const currentProfile = game.settings.get(MODULE_ID, "currentProfile");
+        if (currentProfile !== "Default") {
+            const profiles = game.settings.get(MODULE_ID, "storeProfiles");
+            const profileData = profiles[currentProfile];
+            if (profileData?.randomizerSettings?.[categoryKey]) {
+                defaults = profileData.randomizerSettings[categoryKey];
+            }
+        }
 
         // Find the specific row for this category
         const row = this.element.querySelector(`.category-randomizer-row[data-category="${categoryKey}"]`);
@@ -3805,14 +3864,16 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
         const varMinInput = row.querySelector(".rand-var-min");
         const varMaxInput = row.querySelector(".rand-var-max");
 
-        if (minInput) minInput.value = 0;
-        if (maxInput) maxInput.value = itemCount;
-        if (qtyMinInput) qtyMinInput.value = 1;
-        if (qtyMaxInput) qtyMaxInput.value = defaultQty;
-        if (salesMinInput) salesMinInput.value = 0;
-        if (salesMaxInput) salesMaxInput.value = 0;
-        if (varMinInput) varMinInput.value = 0;
-        if (varMaxInput) varMaxInput.value = 0;
+        if (minInput) minInput.value = defaults.minItems;
+        if (maxInput) maxInput.value = defaults.maxItems;
+        if (qtyMinInput) qtyMinInput.value = defaults.qtyMin;
+        if (qtyMaxInput) qtyMaxInput.value = defaults.qtyMax;
+        if (salesMinInput) salesMinInput.value = defaults.salesMin;
+        if (salesMaxInput) salesMaxInput.value = defaults.salesMax;
+        if (varMinInput) varMinInput.value = defaults.varMin;
+        if (varMaxInput) varMaxInput.value = defaults.varMax;
+
+        this._saveRandomizerSettings();
     }
 
     /**
@@ -3832,6 +3893,8 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
         if (maxInput) {
             maxInput.value = itemCount;
         }
+
+        this._saveRandomizerSettings();
     }
 
     /**

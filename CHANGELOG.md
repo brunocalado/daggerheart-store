@@ -1,5 +1,8 @@
 # 0.1.7
-- Epic items will be saved by profiles
+- Epic items will be saved to profiles.
+- Shortcut to restore maximum items in the randomizer.
+- Randomizer will save your options to your profile.
+- Randomizer will remember your changes.
 
 # 0.1.6
 - you can add multiple compendiums to custom tab
