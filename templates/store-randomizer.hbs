@@ -21,7 +21,12 @@
                     </div>
 
                     <div class="control-group" title="Maximum number of items that will be visible after randomization">
-                        <label>Items Max</label>
+                        <div style="display: flex; align-items: center; gap: 0.25rem;">
+                            <label>Items Max</label>
+                            <button type="button" class="set-max-to-total-btn" data-action="setMaxToTotal" data-category="{{this.key}}" data-item-count="{{this.itemCount}}" title="Set Items Max to total available items" style="padding: 0.25rem 0.4rem; font-size: 0.75rem; min-width: auto;">
+                                <i class="fas fa-fill"></i>
+                            </button>
+                        </div>
                         <input type="number" class="rand-max-items" data-category="{{this.key}}" value="{{this.itemCount}}" min="0" max="999">
                     </div>
 

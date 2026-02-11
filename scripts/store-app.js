@@ -3567,7 +3567,8 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
             randomizeAll: StoreRandomizer.prototype._onRandomizeAll,
             resetAll: StoreRandomizer.prototype._onResetAll,
             resetCategoryDefaults: StoreRandomizer.prototype._onResetCategoryDefaults, // New action
-            openInstructions: StoreRandomizer.prototype._onOpenInstructions // New action for Instructions
+            openInstructions: StoreRandomizer.prototype._onOpenInstructions, // New action for Instructions
+            setMaxToTotal: StoreRandomizer.prototype._onSetMaxToTotal // New action to set Items Max to total
         }
     };
 
@@ -3812,6 +3813,25 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
         if (salesMaxInput) salesMaxInput.value = 0;
         if (varMinInput) varMinInput.value = 0;
         if (varMaxInput) varMaxInput.value = 0;
+    }
+
+    /**
+     * Sets Items Max to the total number of available items in the category
+     */
+    _onSetMaxToTotal(_event, target) {
+        const categoryKey = target.dataset.category;
+        const itemCount = parseInt(target.dataset.itemCount) || 0;
+
+        // Find the specific row for this category
+        const row = this.element.querySelector(`.category-randomizer-row[data-category="${categoryKey}"]`);
+
+        if (!row) return;
+
+        // Set max items to total count
+        const maxInput = row.querySelector(".rand-max-items");
+        if (maxInput) {
+            maxInput.value = itemCount;
+        }
     }
 
     /**
