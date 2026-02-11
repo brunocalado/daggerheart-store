@@ -1,3 +1,6 @@
+# 0.1.7
+- Epic items will be saved by profiles
+
 # 0.1.6
 - you can add multiple compendiums to custom tab
 - only weapon armor loot consumable can be added to custom tab

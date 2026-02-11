@@ -2497,6 +2497,11 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             blockedSaleItems: game.settings.get(MODULE_ID, "blockedSaleItems"),
             blockedPurchaseItems: game.settings.get(MODULE_ID, "blockedPurchaseItems"),
             lockedItems: game.settings.get(MODULE_ID, "lockedItems"),
+            epicItems: game.settings.get(MODULE_ID, "epicItems"),
+            epicIcon: game.settings.get(MODULE_ID, "epicIcon"),
+            epicColor: game.settings.get(MODULE_ID, "epicColor"),
+            epicLabel: game.settings.get(MODULE_ID, "epicLabel"),
+            epicEffect: game.settings.get(MODULE_ID, "epicEffect"),
             partyActorId: game.settings.get(MODULE_ID, "partyActorId"),
             customTabName: game.settings.get(MODULE_ID, "customTabName"),
             customTabCompendiums: game.settings.get(MODULE_ID, "customTabCompendiums"),
@@ -2547,6 +2552,11 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 blockedSaleItems: {},
                 blockedPurchaseItems: {},
                 lockedItems: {},
+                epicItems: {},
+                epicIcon: "fa-star",
+                epicColor: "#9b59b6",
+                epicLabel: "Epic",
+                epicEffect: "shine",
                 partyActorId: "",
                 customTabName: "General",
                 customTabCompendiums: ["daggerheart-store.general-items"],
@@ -2566,7 +2576,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             "storeName", "priceModifier", "allowedTiers",
             "hiddenCategories", "customCompendiums", "priceOverrides",
             "saleDiscount", "saleItems", "hiddenItems", "blockedSaleItems",
-            "blockedPurchaseItems", "lockedItems", "partyActorId", "customTabName", "customTabCompendiums", "customTabTierGroup", "sellRatio",
+            "blockedPurchaseItems", "lockedItems", "epicItems", "epicIcon", "epicColor", "epicLabel", "epicEffect",
+            "partyActorId", "customTabName", "customTabCompendiums", "customTabTierGroup", "sellRatio",
             "stockEnabled", "showStockQuantity"
         ];
 
