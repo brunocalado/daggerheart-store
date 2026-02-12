@@ -1,4 +1,4 @@
-import { DaggerheartStore } from "./store-app.js";
+import { DaggerheartStore, StoreImportExport } from "./store-app.js";
 import { StoreWelcome } from "./store-welcome.js";
 import { StockManager } from "./stock-manager.js";
 
@@ -193,6 +193,16 @@ Hooks.once("init", () => {
         config: false,
         type: Boolean,
         default: true
+    });
+
+    // --- IMPORT / EXPORT MENU ---
+    game.settings.registerMenu(MODULE_ID, "importExport", {
+        name: "Import / Export",
+        label: "Import / Export",
+        hint: "Export or import store configuration as a JSON file.",
+        icon: "fas fa-file-import",
+        type: StoreImportExport,
+        restricted: true
     });
 });
 

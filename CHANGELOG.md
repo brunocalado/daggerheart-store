@@ -3,6 +3,7 @@
 - Shortcut to restore maximum items in the randomizer.
 - Randomizer will save your options to your profile.
 - Randomizer will remember your changes.
+- New Feature: Import/Export
 
 # 0.1.6
 - you can add multiple compendiums to custom tab

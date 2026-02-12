@@ -2600,3 +2600,97 @@
     background: #d4af37;
     box-shadow: 0 0 5px #d4af37;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   IMPORT / EXPORT DIALOG
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.daggerheart-store-import-export .window-header {
+    background: #141414 !important;
+    border-bottom: 1px solid #4a3d1a !important;
+}
+
+.daggerheart-store-import-export .window-header .window-title {
+    color: #ffffff !important;
+}
+
+.daggerheart-store-import-export .window-content {
+    background: #1a1a1a !important;
+    color: #ffffff !important;
+    padding: 16px;
+}
+
+.daggerheart-store-import-export .import-export-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.daggerheart-store-import-export .ie-section {
+    text-align: center;
+}
+
+.daggerheart-store-import-export .ie-section-title {
+    font-family: "Aleo", serif;
+    color: #d4af37;
+    font-size: 1.2em;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+.daggerheart-store-import-export .ie-section-title i {
+    margin-right: 6px;
+}
+
+.daggerheart-store-import-export .ie-description {
+    color: #ccc;
+    font-size: 0.9em;
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
+
+.daggerheart-store-import-export .ie-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    border: 1px solid #555;
+    border-radius: 6px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.daggerheart-store-import-export .ie-btn-export {
+    background: #2d4a2d;
+    color: #d4af37;
+    border-color: #4a7a4a;
+}
+
+.daggerheart-store-import-export .ie-btn-export:hover {
+    background: #3a5c3a;
+    border-color: #d4af37;
+    box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+}
+
+.daggerheart-store-import-export .ie-btn-import {
+    background: #2d3a4a;
+    color: #d4af37;
+    border-color: #4a5a7a;
+}
+
+.daggerheart-store-import-export .ie-btn-import:hover {
+    background: #3a4a5c;
+    border-color: #d4af37;
+    box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+}
+
+.daggerheart-store-import-export .ie-divider {
+    border: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #4a3d1a, transparent);
+    margin: 8px 0;
+}

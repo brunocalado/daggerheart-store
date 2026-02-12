@@ -1,0 +1,29 @@
+<div class="import-export-container">
+
+    {{!-- Export Section --}}
+    <section class="ie-section">
+        <h2 class="ie-section-title"><i class="fas fa-file-export"></i> Export</h2>
+        <p class="ie-description">
+            Download all store settings and profiles as a JSON file.
+            Use this to back up your configuration or transfer it to another world.
+        </p>
+        <button type="button" class="ie-btn ie-btn-export" data-action="exportData">
+            <i class="fas fa-download"></i> Export Configuration
+        </button>
+    </section>
+
+    <hr class="ie-divider">
+
+    {{!-- Import Section --}}
+    <section class="ie-section">
+        <h2 class="ie-section-title"><i class="fas fa-file-import"></i> Import</h2>
+        <p class="ie-description">
+            Load a previously exported JSON file to restore or merge store settings.
+            You will be able to choose how the data is imported.
+        </p>
+        <button type="button" class="ie-btn ie-btn-import" data-action="importData">
+            <i class="fas fa-upload"></i> Import Configuration
+        </button>
+    </section>
+
+</div>
