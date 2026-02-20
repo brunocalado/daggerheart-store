@@ -1,3 +1,6 @@
+# 0.1.8
+- Hidden items go to bottom. Looks better
+
 # 0.1.7
 - Epic items will be saved to profiles.
 - Shortcut to restore maximum items in the randomizer.

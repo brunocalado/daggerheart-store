@@ -151,6 +151,14 @@
 }
 .daggerheart-store .tier-separator:first-child { margin-top: 0; }
 
+.daggerheart-store .tier-separator.hidden-group-separator {
+    background: linear-gradient(to right, #2a0a0a, #1a1a1a);
+    border-color: #5a2020;
+    border-left-color: #7a1d1d;
+    color: #c06060;
+    text-shadow: 0 2px 4px #000000;
+}
+
 .daggerheart-store .store-item-name {
     color: #191919 !important; 
     font-weight: bold;

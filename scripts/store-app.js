@@ -1326,7 +1326,25 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     });
                 }
 
-                context.tabs[cat.id] = groups.length > 0 ? groups : [{ id: "all", label: "", items: [] }];
+                // GM only: move hidden items to a separate group at the bottom
+                if (isGM && groups.length > 0) {
+                    const hiddenGroup = { id: "hidden", label: '<i class="fas fa-eye-slash"></i> Hidden Items', isHiddenGroup: true, items: [] };
+                    for (const group of groups) {
+                        const hidden = group.items.filter(i => i.isHidden);
+                        if (hidden.length > 0) {
+                            group.items = group.items.filter(i => !i.isHidden);
+                            hiddenGroup.items.push(...hidden);
+                        }
+                    }
+                    const filtered = groups.filter(g => g.items.length > 0);
+                    if (hiddenGroup.items.length > 0) {
+                        hiddenGroup.items.sort((a, b) => a.name.localeCompare(b.name));
+                        filtered.push(hiddenGroup);
+                    }
+                    context.tabs[cat.id] = filtered.length > 0 ? filtered : [{ id: "all", label: "", items: [] }];
+                } else {
+                    context.tabs[cat.id] = groups.length > 0 ? groups : [{ id: "all", label: "", items: [] }];
+                }
                 continue;
             }
 
@@ -1514,12 +1532,32 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 }
             }
 
-            context.tabs[cat.id] = Object.values(tierGroups)
+            const standardGroups = Object.values(tierGroups)
                 .filter(g => g.items.length > 0)
                 .map(g => {
                     g.items.sort((a, b) => a.name.localeCompare(b.name));
                     return g;
                 });
+
+            // GM only: move hidden items to a separate group at the bottom
+            if (isGM) {
+                const hiddenGroup = { id: "hidden", label: '<i class="fas fa-eye-slash"></i> Hidden Items', isHiddenGroup: true, items: [] };
+                for (const group of standardGroups) {
+                    const hidden = group.items.filter(i => i.isHidden);
+                    if (hidden.length > 0) {
+                        group.items = group.items.filter(i => !i.isHidden);
+                        hiddenGroup.items.push(...hidden);
+                    }
+                }
+                const result = standardGroups.filter(g => g.items.length > 0);
+                if (hiddenGroup.items.length > 0) {
+                    hiddenGroup.items.sort((a, b) => a.name.localeCompare(b.name));
+                    result.push(hiddenGroup);
+                }
+                context.tabs[cat.id] = result;
+            } else {
+                context.tabs[cat.id] = standardGroups;
+            }
         }
 
         return context;
