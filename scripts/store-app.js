@@ -408,7 +408,27 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             let damageSection = "";
 
             if (weaponCustom) {
-                damageSection = "C";
+                const formula = val.custom?.formula || "C";
+                const typeRaw = part0.type;
+                let typesList = [];
+                if (Array.isArray(typeRaw)) {
+                    typesList = typeRaw;
+                } else if (typeRaw instanceof Set) {
+                    typesList = Array.from(typeRaw);
+                } else if (typeof typeRaw === "string") {
+                    typesList = typeRaw.includes(",") ? typeRaw.split(",") : [typeRaw];
+                } else if (typeRaw && typeof typeRaw === "object") {
+                    typesList = Object.values(typeRaw);
+                }
+                const damageType = typesList
+                    .map(t => {
+                        const s = String(t || "").trim();
+                        if (!s) return "";
+                        return s.length >= 3 ? s.substring(0, 3).toUpperCase() : s.toUpperCase();
+                    })
+                    .filter(t => t)
+                    .join("/");
+                damageSection = damageType ? `${formula}(${damageType})` : formula;
             } else {
                 const weaponDamage = val.dice || ""; 
                 const typeRaw = part0.type;

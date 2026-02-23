@@ -1,3 +1,6 @@
+# 0.1.9
+- Weapon damage description with custom damage will be display damage instead of C
+
 # 0.1.8
 - Hidden items go to bottom. Looks better
 
