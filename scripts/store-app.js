@@ -1485,8 +1485,23 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     // Get and clean description: remove {{{x}}} tags and HTML
                     const desc = foundry.utils.getProperty(doc, "system.description.value") ||
                                  foundry.utils.getProperty(doc, "system.description") || "";
-                    const cleanedDescription = String(desc)
-                        .replace(/\{\{\{\d+\}\}\}/g, '')
+                    const descString = String(desc);
+
+                    // Check for header tag (non-numeric, non-tier content in {{{...}}})
+                    let itemHeader = null;
+                    const allTags = descString.match(/\{\{\{([^}]+)\}\}\}/g);
+                    if (allTags) {
+                        for (const tag of allTags) {
+                            const content = tag.replace(/\{\{\{|\}\}\}/g, '').trim();
+                            if (/^\d+$/.test(content)) continue;
+                            if (/^tier[1-4]$/i.test(content)) continue;
+                            itemHeader = content;
+                            break;
+                        }
+                    }
+
+                    const cleanedDescription = descString
+                        .replace(/\{\{\{[^}]+\}\}\}/g, '')
                         .replace(/<[^>]*>/g, '')
                         .trim();
 
@@ -1547,6 +1562,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             itemSummary: itemSummary,
                             isRecommended: isRecommended,
                             description: cleanedDescription,
+                            header: itemHeader,
                             stockQuantity: stockQuantity,
                             stockStatus: stockStatus,
                             stockUnlimited: stockUnlimited,
@@ -1566,12 +1582,57 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 }
             }
 
-            const standardGroups = Object.values(tierGroups)
-                .filter(g => g.items.length > 0)
-                .map(g => {
-                    g.items.sort((a, b) => a.name.localeCompare(b.name));
-                    return g;
-                });
+            // Build groups with tier + header support
+            const tierLabels = {
+                1: "Tier 1 / Common",
+                2: "Tier 2 / Uncommon",
+                3: "Tier 3 / Rare",
+                4: "Tier 4 / Legendary"
+            };
+            const groupMap = {};
+
+            for (const tier of [1, 2, 3, 4]) {
+                const items = tierGroups[tier].items;
+                if (items.length === 0) continue;
+
+                // Check if any item in this tier has a header
+                const hasHeaders = items.some(i => i.header);
+
+                if (!hasHeaders) {
+                    // No headers in this tier: single group as before
+                    items.sort((a, b) => a.name.localeCompare(b.name));
+                    groupMap[`tier-${tier}`] = { id: `tier-${tier}`, label: tierLabels[tier], tier: tier, items: items };
+                } else {
+                    // Split into sub-groups by header
+                    const noHeaderItems = [];
+                    const headerGroups = {};
+
+                    for (const item of items) {
+                        if (item.header) {
+                            if (!headerGroups[item.header]) headerGroups[item.header] = [];
+                            headerGroups[item.header].push(item);
+                        } else {
+                            noHeaderItems.push(item);
+                        }
+                    }
+
+                    // Items without header go into the base tier group
+                    if (noHeaderItems.length > 0) {
+                        noHeaderItems.sort((a, b) => a.name.localeCompare(b.name));
+                        groupMap[`tier-${tier}`] = { id: `tier-${tier}`, label: tierLabels[tier], tier: tier, items: noHeaderItems };
+                    }
+
+                    // Items with headers get "Tier X / Rarity - Header" groups
+                    Object.keys(headerGroups).sort().forEach(header => {
+                        const key = `tier-${tier}-${header}`;
+                        headerGroups[header].sort((a, b) => a.name.localeCompare(b.name));
+                        groupMap[key] = { id: key, label: `${tierLabels[tier]} - ${header}`, tier: tier, items: headerGroups[header] };
+                    });
+                }
+            }
+
+            const standardGroups = Object.values(groupMap)
+                .sort((a, b) => a.tier - b.tier || a.label.localeCompare(b.label));
 
             // GM only: move hidden items to a separate group at the bottom
             if (isGM) {
