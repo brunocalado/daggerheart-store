@@ -1210,9 +1210,22 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             }
                         }
 
-                        // Item Comparison: Only for players in comparable categories
-                        const canCompare = !isGM && hasActor && this._isComparableCategory(cat.id);
-                        const hasEquippedItem = canCompare && !!this._getEquippedItem(userActor, cat.id);
+                        // Item Comparison: For custom tab, determine per-item based on type
+                        let canCompare = false;
+                        let hasEquippedItem = false;
+                        let compareCategory = null;
+                        if (!isGM && hasActor) {
+                            if (doc.type === "weapon") {
+                                const isSecondary = foundry.utils.getProperty(doc, "system.secondary") === true;
+                                compareCategory = isSecondary ? "secondary" : "primary";
+                                canCompare = true;
+                                hasEquippedItem = !!this._getEquippedItem(userActor, compareCategory);
+                            } else if (doc.type === "armor") {
+                                compareCategory = "armors";
+                                canCompare = true;
+                                hasEquippedItem = !!this._getEquippedItem(userActor, compareCategory);
+                            }
+                        }
 
                         // Determine tier for grouping: system.tier first, then {{{tierX}}} tag
                         let itemTier = null;
@@ -1254,6 +1267,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             showStockQty: showStockQuantity,
                             canCompare: canCompare,
                             hasEquippedItem: hasEquippedItem,
+                            compareCategory: compareCategory,
                             isEpic: !!epicItems[doc.name],
                             epicIcon: epicIcon,
                             epicColor: epicColor,

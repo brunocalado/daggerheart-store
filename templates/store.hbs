@@ -325,7 +325,7 @@
                                         <button type="button"
                                                 class="compare-btn"
                                                 data-item-uuid="{{this.uuid}}"
-                                                data-category="{{../../../activeTab}}"
+                                                data-category="{{#if this.compareCategory}}{{this.compareCategory}}{{else}}{{../../../activeTab}}{{/if}}"
                                                 title="Compare with equipped">
                                             <i class="fas fa-scale-unbalanced"></i>
                                         </button>
