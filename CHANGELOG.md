@@ -1,6 +1,7 @@
 # 0.2.0
-- Preview will show up in general tab
+- Preview will show up in the general tab
 - Tag headers are supported in the other tabs
+- Items without a header will be added to a header to improve visuals
 
 # 0.1.9
 - Weapon damage description with custom damage will be display damage instead of C

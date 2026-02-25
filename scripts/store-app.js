@@ -1331,7 +1331,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     // Add non-tier non-header items
                     if (noTierNoHeaderItems.length > 0) {
                         noTierNoHeaderItems.sort((a, b) => a.name.localeCompare(b.name));
-                        groups.push({ id: "no-header", label: "", items: noTierNoHeaderItems });
+                        const hasOtherGroups = groups.length > 0;
+                        groups.push({ id: "no-header", label: hasOtherGroups ? "Other" : "", items: noTierNoHeaderItems });
                     }
                 } else {
                     // Default mode: group by header only
@@ -1351,7 +1352,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
                     if (noHeaderItems.length > 0) {
                         noHeaderItems.sort((a, b) => a.name.localeCompare(b.name));
-                        groups.push({ id: "no-header", label: "", items: noHeaderItems });
+                        const noHeaderLabel = Object.keys(headerGroups).length > 0 ? "Other" : "";
+                        groups.push({ id: "no-header", label: noHeaderLabel, items: noHeaderItems });
                     }
 
                     Object.keys(headerGroups).sort().forEach(header => {
