@@ -1,3 +1,7 @@
+# 0.2.1
+- CSS Refactor
+- Support for weird entity types in settings.
+
 # 0.2.0
 - Preview will show up in the general tab
 - Tag headers are supported in the other tabs

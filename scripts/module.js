@@ -105,6 +105,16 @@ Hooks.once("init", () => {
         name: "Custom Tab Tier Grouping", scope: "world", config: false, type: Boolean, default: true
     });
 
+    // Extra Item Types for General Tab
+    game.settings.register(MODULE_ID, "extraItemTypes", {
+        name: "Extra Item Types (General Tab)",
+        hint: "Add custom item types so they can appear in the General tab. Separate multiple types with semicolons (;). Example: hotpot-daggerheart.ingredient; another-module.mytype — Leave empty to use only the default types (weapon, armor, consumable, loot).",
+        scope: "world",
+        config: true,
+        type: String,
+        default: ""
+    });
+
     // --- RANDOMIZER SETTINGS ---
     game.settings.register(MODULE_ID, "randomizerSettings", {
         name: "Randomizer Settings",

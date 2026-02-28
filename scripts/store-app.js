@@ -30,6 +30,16 @@ const CATEGORY_ITEM_TYPE = {
 const VALID_ITEM_TYPES = ["weapon", "armor", "consumable", "loot"];
 
 /**
+ * Returns the full list of valid item types, including any extra types from settings.
+ */
+function getValidItemTypes() {
+    const extra = game.settings.get(MODULE_ID, "extraItemTypes") || "";
+    if (!extra.trim()) return VALID_ITEM_TYPES;
+    const extraTypes = extra.split(";").map(t => t.trim()).filter(t => t.length > 0);
+    return [...VALID_ITEM_TYPES, ...extraTypes];
+}
+
+/**
  * Converts a hex color to a very subtle background tint (10% opacity over #e8e8e8 base)
  * @param {string} hex - Hex color string (e.g., "#9b59b6")
  * @returns {string} Blended hex color for subtle background
@@ -1119,7 +1129,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
                     const docs = await pack.getDocuments();
                     for (const doc of docs) {
-                        if (!VALID_ITEM_TYPES.includes(doc.type)) continue;
+                        if (!getValidItemTypes().includes(doc.type)) continue;
                         if (seenNames.has(doc.name)) continue;
                         seenNames.add(doc.name);
                         const isHidden = hiddenItems[doc.name];
@@ -2953,7 +2963,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         const partyActors = game.actors.filter(a => a.type === "party").map(a => ({ id: a.id, name: a.name })).sort((a, b) => a.name.localeCompare(b.name));
 
         // Filter packs that have at least one valid item type
-        const validItemTypes = VALID_ITEM_TYPES;
+        const validItemTypes = getValidItemTypes();
         const candidatePacks = game.packs.filter(p =>
             p.documentName === "Item" && !EXCLUDED_SYSTEM_PACKS.includes(p.collection)
         );
@@ -3776,7 +3786,7 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
                     const pack = game.packs.get(packId);
                     if (pack) {
                         const docs = await pack.getDocuments();
-                        itemCount += docs.filter(d => VALID_ITEM_TYPES.includes(d.type)).length;
+                        itemCount += docs.filter(d => getValidItemTypes().includes(d.type)).length;
                     }
                 }
             } else {
@@ -3880,7 +3890,7 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
 
                 const docs = await pack.getDocuments();
                 for (const doc of docs) {
-                    if (!VALID_ITEM_TYPES.includes(doc.type)) continue;
+                    if (!getValidItemTypes().includes(doc.type)) continue;
                     if (seenNames.has(doc.name)) continue;
                     seenNames.add(doc.name);
 
