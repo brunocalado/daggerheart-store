@@ -1087,6 +1087,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const customTabCompendiums = game.settings.get(MODULE_ID, "customTabCompendiums") || [];
         const customTabName = game.settings.get(MODULE_ID, "customTabName");
         const customTabTierGroup = game.settings.get(MODULE_ID, "customTabTierGroup");
+        const useDefaultCompendiums = game.settings.get(MODULE_ID, "useDefaultCompendiums");
 
         const hasCustomTab = customTabCompendiums.some(p => p && p.trim() !== "");
         if (hasCustomTab) {
@@ -1402,7 +1403,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             };
 
             const packsToScan = [];
-            if (PACK_MAPPING[cat.key]) packsToScan.push({ id: PACK_MAPPING[cat.key], isDefault: true });
+            if (useDefaultCompendiums && PACK_MAPPING[cat.key]) packsToScan.push({ id: PACK_MAPPING[cat.key], isDefault: true });
             customCompendiums.forEach(custom => {
                 if (custom.category === cat.key) packsToScan.push({ id: custom.pack, isDefault: false });
             });
@@ -2651,6 +2652,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             customTabName: game.settings.get(MODULE_ID, "customTabName"),
             customTabCompendiums: game.settings.get(MODULE_ID, "customTabCompendiums"),
             customTabTierGroup: game.settings.get(MODULE_ID, "customTabTierGroup"),
+            useDefaultCompendiums: game.settings.get(MODULE_ID, "useDefaultCompendiums"),
             sellRatio: game.settings.get(MODULE_ID, "sellRatio"),
             stockEnabled: game.settings.get(MODULE_ID, "stockEnabled"),
             showStockQuantity: game.settings.get(MODULE_ID, "showStockQuantity"),
@@ -2707,6 +2709,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 customTabName: "General",
                 customTabCompendiums: ["daggerheart-store.general-items"],
                 customTabTierGroup: true,
+                useDefaultCompendiums: true,
                 sellRatio: 0.5,
                 stockEnabled: false,
                 showStockQuantity: true,
@@ -2724,8 +2727,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             "hiddenCategories", "customCompendiums", "priceOverrides",
             "saleDiscount", "saleItems", "hiddenItems", "blockedSaleItems",
             "blockedPurchaseItems", "lockedItems", "epicItems", "epicIcon", "epicColor", "epicLabel", "epicEffect",
-            "partyActorId", "customTabName", "customTabCompendiums", "customTabTierGroup", "sellRatio",
-            "stockEnabled", "showStockQuantity", "randomizerSettings"
+            "partyActorId", "customTabName", "customTabCompendiums", "customTabTierGroup",
+            "useDefaultCompendiums", "sellRatio", "stockEnabled", "showStockQuantity", "randomizerSettings"
         ];
 
         // Migrate old profile format: customTabCompendium (string) -> customTabCompendiums (array)
@@ -2943,6 +2946,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         const customTabName = game.settings.get(MODULE_ID, "customTabName");
         const customTabCompendiums = game.settings.get(MODULE_ID, "customTabCompendiums") || [];
         const customTabTierGroup = game.settings.get(MODULE_ID, "customTabTierGroup");
+        const useDefaultCompendiums = game.settings.get(MODULE_ID, "useDefaultCompendiums");
 
         // Epic Settings
         const epicIcon = game.settings.get(MODULE_ID, "epicIcon");
@@ -3040,6 +3044,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             customTabName: customTabName,
             customTabCompendiums: customTabCompendiums,
             customTabTierGroup: customTabTierGroup,
+            useDefaultCompendiums: useDefaultCompendiums,
             priceModifier: priceMod,
             saleDiscount: saleDiscount,
             sellRatioPercent: Math.round(sellRatio * 100), // Converted to percent for display
@@ -3506,8 +3511,9 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             : (storeActor?.getFlag(MODULE_ID, "stock.categoryDefaults") || StockManager._getDefaultCategorySettings());
 
         // Build a map of item name -> uuid from all packs
+        const useDefaultCompendiums = game.settings.get(MODULE_ID, "useDefaultCompendiums");
         const itemUuidMap = new Map();
-        for (const packId of Object.values(PACK_MAPPING)) {
+        for (const packId of (useDefaultCompendiums ? Object.values(PACK_MAPPING) : [])) {
             const pack = game.packs.get(packId);
             if (pack) {
                 const docs = await pack.getDocuments();
@@ -3640,6 +3646,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         }
 
         await game.settings.set(MODULE_ID, "customTabTierGroup", expanded.customTabTierGroup || false);
+        await game.settings.set(MODULE_ID, "useDefaultCompendiums", expanded.useDefaultCompendiums !== false);
 
         await game.settings.set(MODULE_ID, "priceModifier", expanded.priceModifier);
 
@@ -3761,6 +3768,7 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
         const customTabCompendiums = game.settings.get(MODULE_ID, "customTabCompendiums") || [];
         const customTabName = game.settings.get(MODULE_ID, "customTabName");
         const customCompendiums = game.settings.get(MODULE_ID, "customCompendiums") || [];
+        const useDefaultCompendiums = game.settings.get(MODULE_ID, "useDefaultCompendiums");
 
         let categories = foundry.utils.deepClone(STANDARD_CATEGORIES);
 
@@ -3794,16 +3802,18 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
                 const priceList = PRICE_DATA[cat.key] || {};
 
                 // Count items from default pack
-                const defaultPackId = PACK_MAPPING[cat.key];
-                if (defaultPackId) {
-                    const pack = game.packs.get(defaultPackId);
-                    if (pack) {
-                        const docs = await pack.getDocuments();
-                        for (const doc of docs) {
-                            if (priceList.hasOwnProperty(doc.name)) {
-                                const tier = priceList[doc.name].tier;
-                                if (catConfig[tier]) {
-                                    itemCount++;
+                if (useDefaultCompendiums) {
+                    const defaultPackId = PACK_MAPPING[cat.key];
+                    if (defaultPackId) {
+                        const pack = game.packs.get(defaultPackId);
+                        if (pack) {
+                            const docs = await pack.getDocuments();
+                            for (const doc of docs) {
+                                if (priceList.hasOwnProperty(doc.name)) {
+                                    const tier = priceList[doc.name].tier;
+                                    if (catConfig[tier]) {
+                                        itemCount++;
+                                    }
                                 }
                             }
                         }
@@ -3913,21 +3923,24 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
             const priceList = PRICE_DATA[categoryKey] || {};
 
             // Get items from default pack
-            const defaultPackId = PACK_MAPPING[categoryKey];
-            if (defaultPackId) {
-                const pack = game.packs.get(defaultPackId);
-                if (pack) {
-                    const docs = await pack.getDocuments();
-                    for (const doc of docs) {
-                        if (priceList.hasOwnProperty(doc.name)) {
-                            const tier = priceList[doc.name].tier;
-                            if (catConfig[tier]) {
-                                const basePrice = Math.ceil(priceList[doc.name].price * priceMod);
-                                items.push({
-                                    name: doc.name,
-                                    uuid: doc.uuid,
-                                    basePrice: basePrice
-                                });
+            const useDefaultCompendiums = game.settings.get(MODULE_ID, "useDefaultCompendiums");
+            if (useDefaultCompendiums) {
+                const defaultPackId = PACK_MAPPING[categoryKey];
+                if (defaultPackId) {
+                    const pack = game.packs.get(defaultPackId);
+                    if (pack) {
+                        const docs = await pack.getDocuments();
+                        for (const doc of docs) {
+                            if (priceList.hasOwnProperty(doc.name)) {
+                                const tier = priceList[doc.name].tier;
+                                if (catConfig[tier]) {
+                                    const basePrice = Math.ceil(priceList[doc.name].price * priceMod);
+                                    items.push({
+                                        name: doc.name,
+                                        uuid: doc.uuid,
+                                        basePrice: basePrice
+                                    });
+                                }
                             }
                         }
                     }
@@ -4266,7 +4279,7 @@ const EXPORTABLE_SETTINGS = [
     "hiddenItems", "blockedSaleItems", "blockedPurchaseItems", "lockedItems",
     "epicItems", "epicIcon", "epicColor", "epicLabel", "epicEffect",
     "partyActorId", "customTabName", "customTabCompendiums", "customTabTierGroup",
-    "sellRatio", "stockEnabled", "showStockQuantity", "randomizerSettings",
+    "useDefaultCompendiums", "sellRatio", "stockEnabled", "showStockQuantity", "randomizerSettings",
     "currencyMode", "chatPrivacy", "chatMessageStyle"
 ];
 

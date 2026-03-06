@@ -237,7 +237,24 @@
 
     <!-- Tab: Custom Compendiums -->
     <div class="tab-content {{#if (eq activeTab 'compendiums')}}active{{/if}}" data-tab="compendiums">
-        
+
+        <label class="stock-toggle-card {{#if useDefaultCompendiums}}active{{/if}}">
+            <input type="checkbox" name="useDefaultCompendiums" {{checked useDefaultCompendiums}}>
+            <div class="card-content">
+                <i class="fas fa-database stock-icon"></i>
+                <div class="stock-text">
+                    <strong>Use Default Compendiums</strong>
+                    <span class="stock-description">
+                        Include the system's built-in compendiums (Weapons, Armors, Consumables, Loot) in the store. Disable to use only your own material.
+                    </span>
+                </div>
+            </div>
+            <div class="toggle-switch">
+                <div class="toggle-track"></div>
+                <div class="toggle-thumb"></div>
+            </div>
+        </label>
+
         <h3 style="margin-top:0;">Custom Tab Configuration</h3>
         <p class="notes">Create a special tab (e.g., "Merchant" or "Magic Items") linked to one or more compendiums.</p>
 

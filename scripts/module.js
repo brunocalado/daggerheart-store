@@ -91,6 +91,11 @@ Hooks.once("init", () => {
         name: "Party Actor ID", scope: "world", config: false, type: String, default: ""
     });
 
+    // Use Default Compendiums
+    game.settings.register(MODULE_ID, "useDefaultCompendiums", {
+        name: "Use Default Compendiums", scope: "world", config: false, type: Boolean, default: true
+    });
+
     // Custom Tab Configuration
     game.settings.register(MODULE_ID, "customTabName", {
         name: "Custom Tab Name", scope: "world", config: false, type: String, default: "General"

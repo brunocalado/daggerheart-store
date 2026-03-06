@@ -1,4 +1,5 @@
 # 0.2.2
+- You can disable SRD compendiums. This make easier to homebrew.
 - CSS split
 
 # 0.2.1
