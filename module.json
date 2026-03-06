@@ -1,7 +1,7 @@
 {
   "id": "daggerheart-store",
   "title": "Daggerheart: Store",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "compatibility": {
     "minimum": "13",
     "verified": "13"
@@ -36,7 +36,13 @@
     "scripts/module.js"
   ],
   "styles": [
-    "styles/store.css"
+    "styles/variables.css",
+    "styles/store.css",
+    "styles/config.css",
+    "styles/welcome.css",
+    "styles/randomizer.css",
+    "styles/tooltips.css",
+    "styles/dialogs.css"
   ],
   "packs": [
     {

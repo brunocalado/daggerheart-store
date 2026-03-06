@@ -1,0 +1,256 @@
+/* Specific fix for Randomizer Window Padding */
+#daggerheart-store-randomizer .window-content {
+    padding: 0 !important;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* ==================================================== */
+/* STORE RANDOMIZER                                     */
+/* ==================================================== */
+
+.daggerheart-store-randomizer {
+    background: var(--dhs-bg);
+    color: var(--dhs-text);
+    padding: 15px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    & .randomizer-header {
+        text-align: center;
+        margin-bottom: 10px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid var(--dhs-gold-border);
+        flex-shrink: 0;
+        position: relative;
+
+        & h2 {
+            color: var(--dhs-gold);
+            font-family: var(--dhs-font-heading);
+            font-size: 1.5em;
+            margin: 0 0 5px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+
+            & i {
+                margin-right: 8px;
+            }
+        }
+    }
+
+    & .notes {
+        color: var(--dhs-text-white);
+        font-size: 0.9em;
+        margin: 0;
+    }
+
+    & .randomizer-content {
+        flex: 1;
+        overflow-y: auto;
+        padding-right: 5px;
+        min-height: 0;
+        scrollbar-width: thin;
+        scrollbar-color: var(--dhs-gold) var(--dhs-bg);
+    }
+
+    & .category-randomizer-row {
+        display: flex;
+        flex-direction: row;
+        padding: 5px;
+        align-items: stretch;
+        gap: 10px;
+        background: var(--dhs-bg-light);
+        border: 1px solid var(--dhs-border-mid);
+        border-radius: 5px;
+        margin-bottom: 8px;
+        transition: border-color 0.2s;
+
+        &:hover {
+            border-color: var(--dhs-gold);
+        }
+    }
+
+    & .randomizer-config-col {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        flex: 1;
+        gap: 5px;
+    }
+
+    & .category-name {
+        margin-bottom: 2px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        & strong {
+            color: var(--dhs-gold);
+            font-family: var(--dhs-font-heading);
+            font-size: 1.1em;
+            text-transform: uppercase;
+        }
+    }
+
+    & .item-count {
+        color: var(--dhs-text-white);
+        font-size: 0.85em;
+    }
+
+    & .randomizer-inputs-row {
+        display: flex;
+        gap: 8px;
+        align-items: flex-end;
+    }
+
+    & .control-group {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        width: max-content;
+        min-width: 60px;
+
+        & label {
+            font-size: 0.75em;
+            color: var(--dhs-text-white);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        & input[type="number"] {
+            width: 100%;
+            padding: 4px 2px;
+            background: var(--dhs-bg);
+            border: 1px solid var(--dhs-border-light);
+            border-radius: 3px;
+            color: var(--dhs-text-white);
+            text-align: center;
+            font-size: 0.95em;
+
+            &:focus {
+                border-color: var(--dhs-gold);
+                outline: none;
+            }
+        }
+    }
+
+    & .randomizer-action-col {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        width: 100px;
+        flex-shrink: 0;
+    }
+
+    & .randomize-btn,
+    & .default-btn {
+        padding: 8px 14px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        font-family: var(--dhs-font-body);
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        justify-content: center;
+        margin: 0;
+        flex: 1;
+        width: 100%;
+    }
+
+    & .randomize-btn {
+        background: linear-gradient(to bottom, #034003, #1a4a1a);
+        color: var(--dhs-text-white);
+        border: 1px solid #3a7a3a;
+
+        &:hover {
+            background: linear-gradient(to bottom, #3a7a3a, #2a6a2a);
+            box-shadow: 0 0 8px #3a7a3a;
+            border-color: #5a9a5a;
+        }
+
+        & i {
+            font-size: 1.1em;
+        }
+    }
+
+    & .default-btn {
+        background: var(--dhs-border);
+        color: var(--dhs-text-light);
+        border: 1px solid var(--dhs-border-light);
+        font-size: 0.9em;
+
+        &:hover {
+            background: var(--dhs-border-mid);
+            color: var(--dhs-text-white);
+            border-color: var(--dhs-border-lighter);
+        }
+
+        & i {
+            font-size: 1.1em;
+        }
+    }
+
+    & .randomizer-footer {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid var(--dhs-border-mid);
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        flex-shrink: 0;
+    }
+
+    /* Primary button - dark/gold theme (Randomize All) */
+    & .randomizer-btn-primary {
+        background: linear-gradient(to bottom, #3a3015, #2d230a);
+        color: var(--dhs-gold-light);
+        border: 1px solid var(--dhs-gold-dark);
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        font-family: var(--dhs-font-heading);
+        font-size: 1em;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+
+        &:hover {
+            background: linear-gradient(to bottom, #4a4025, #3d331a);
+            box-shadow: 0 0 10px var(--dhs-gold-dark);
+            border-color: var(--dhs-gold);
+            color: var(--dhs-text-white);
+        }
+    }
+
+    /* Secondary buttons - dark gray theme (Reset All, Instructions) */
+    & .randomizer-btn-secondary {
+        background: var(--dhs-border);
+        color: var(--dhs-text);
+        border: 1px solid var(--dhs-border-light);
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        font-family: var(--dhs-font-body);
+        font-size: 1em;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+
+        &:hover {
+            background: var(--dhs-border-mid);
+            border-color: #888;
+            color: var(--dhs-text-white);
+        }
+    }
+}

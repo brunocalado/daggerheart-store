@@ -1,3 +1,6 @@
+# 0.2.2
+- CSS split
+
 # 0.2.1
 - CSS Refactor
 - Support for weird entity types in settings.

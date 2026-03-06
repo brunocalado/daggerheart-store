@@ -1,0 +1,44 @@
+/* ==================================================== */
+/* CSS CUSTOM PROPERTIES                                */
+/* ==================================================== */
+
+:root {
+    /* Gold Theme */
+    --dhs-gold: #d4af37;
+    --dhs-gold-bright: #FFD700;
+    --dhs-gold-light: #f5e6b8;
+    --dhs-gold-dark: #6b582a;
+    --dhs-gold-border: #4a3d1a;
+
+    /* Backgrounds */
+    --dhs-bg-darkest: #0d0d0d;
+    --dhs-bg-darker: #111;
+    --dhs-bg-dark: #141414;
+    --dhs-bg: #1a1a1a;
+    --dhs-bg-mid: #1e1e1e;
+    --dhs-bg-light: #252525;
+    --dhs-bg-lighter: #2a2a2a;
+
+    /* Text */
+    --dhs-text: #e0e0e0;
+    --dhs-text-white: #fff;
+    --dhs-text-muted: #aaa;
+    --dhs-text-light: #ccc;
+
+    /* Borders */
+    --dhs-border: #333;
+    --dhs-border-mid: #444;
+    --dhs-border-light: #555;
+    --dhs-border-lighter: #777;
+
+    /* Status */
+    --dhs-green: #27ae60;
+    --dhs-green-dark: #1a5c1a;
+    --dhs-red: #7a1d1d;
+    --dhs-red-light: #ff5555;
+    --dhs-sell: #8b3333;
+
+    /* Fonts */
+    --dhs-font-heading: "Aleo", serif;
+    --dhs-font-body: "Lato", sans-serif;
+}
