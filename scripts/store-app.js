@@ -1748,14 +1748,32 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 if (tooltipTimeout) clearTimeout(tooltipTimeout);
 
                 // Delay before showing tooltip (600ms)
-                tooltipTimeout = setTimeout(() => {
+                tooltipTimeout = setTimeout(async () => {
                     // Remove any existing tooltip
                     document.querySelectorAll(".daggerheart-store-tooltip").forEach(t => t.remove());
+
+                    // Resolve @UUID[...] references to display item names
+                    let resolvedText = text;
+                    const uuidPattern = /@UUID\[([^\]]+)\](?:\{([^}]+)\})?/g;
+                    const matches = [...text.matchAll(uuidPattern)];
+                    for (const match of matches) {
+                        const [full, uuid, label] = match;
+                        if (label) {
+                            resolvedText = resolvedText.replace(full, label);
+                        } else {
+                            try {
+                                const doc = await fromUuid(uuid);
+                                resolvedText = resolvedText.replace(full, doc?.name ?? uuid);
+                            } catch {
+                                resolvedText = resolvedText.replace(full, uuid);
+                            }
+                        }
+                    }
 
                     // Create tooltip element
                     const tooltip = document.createElement("div");
                     tooltip.className = "daggerheart-store-tooltip";
-                    tooltip.textContent = text;
+                    tooltip.textContent = resolvedText;
                     document.body.appendChild(tooltip);
 
                     // Position tooltip near the element
