@@ -108,6 +108,9 @@
         <div class="tab" data-tab="{{cat.id}}" style="display: {{#if (eq cat.id ../activeTab)}}block{{else}}none{{/if}};">
             
             <div class="search-container">
+                <button type="button" class="clear-search-btn" data-action="clearSearch" title="Clear Search">
+                    <i class="fas fa-times"></i>
+                </button>
                 <input type="text" class="store-search" placeholder="Search..." autocomplete="off">
                 {{#if ../isGM}}
                 <div class="bulk-actions">

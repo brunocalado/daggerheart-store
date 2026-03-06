@@ -1,4 +1,5 @@
 # 0.2.2
+- Clear Search Button added
 - You can disable SRD compendiums. This make easier to homebrew.
 - CSS split
 

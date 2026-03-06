@@ -312,7 +312,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             loadPreset: DaggerheartStore.prototype._onLoadPreset,
             deletePreset: DaggerheartStore.prototype._onDeletePreset,
             transferFunds: DaggerheartStore.prototype._onTransferFunds,
-            toggleEpic: DaggerheartStore.prototype._onToggleEpic
+            toggleEpic: DaggerheartStore.prototype._onToggleEpic,
+            clearSearch: DaggerheartStore.prototype._onClearSearch
         }
     };
 
@@ -1922,6 +1923,15 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             if (name.includes(query)) row.style.display = "flex"; 
             else row.style.display = "none";
         });
+    }
+
+    _onClearSearch(event, target) {
+        this.searchQuery = "";
+        const input = target.closest(".search-container")?.querySelector(".store-search");
+        if (input) {
+            input.value = "";
+            this._applySearch(input);
+        }
     }
 
     async _onBuyItem(event, target) {
