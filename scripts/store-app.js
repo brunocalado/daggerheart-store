@@ -569,9 +569,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         if (!html) return "";
         return String(html)
             .replace(/\{\{\{[^}]+\}\}\}/g, '')
-            .replace(/<[^>]*>/g, '')
+            .replace(/<(?!\/?(?:p|br)\b)[^>]*>/gi, '')
             .trim()
-            .substring(0, 200);
+            .substring(0, 300);
     }
 
     /**
@@ -1184,10 +1184,10 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         const combinedWealth = partyGold + userGold;
                         const canBuyParty = hasPartyActor && hasActor && (combinedWealth >= finalPrice) && !isPurchaseBlocked;
 
-                        // Clean description: remove all {{{...}}} tags (price and header) and HTML
+                        // Clean description: remove all {{{...}}} tags (price and header) and unsafe HTML
                         const cleanedDescription = descString
                             .replace(/\{\{\{[^}]+\}\}\}/g, '')
-                            .replace(/<[^>]*>/g, '')
+                            .replace(/<(?!\/?(?:p|br)\b)[^>]*>/gi, '')
                             .trim();
 
                         let itemSummary = "";
@@ -1516,7 +1516,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
                     const cleanedDescription = descString
                         .replace(/\{\{\{[^}]+\}\}\}/g, '')
-                        .replace(/<[^>]*>/g, '')
+                        .replace(/<(?!\/?(?:p|br)\b)[^>]*>/gi, '')
                         .trim();
 
                     let itemSummary = "";
@@ -1773,7 +1773,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     // Create tooltip element
                     const tooltip = document.createElement("div");
                     tooltip.className = "daggerheart-store-tooltip";
-                    tooltip.textContent = resolvedText;
+                    // Sanitize HTML: allow only safe tags for formatting
+                    const sanitized = resolvedText.replace(/<(?!\/?(?:p|br|b|i|em|strong|ul|ol|li|span|hr)\b)[^>]*>/gi, "");
+                    tooltip.innerHTML = sanitized;
                     document.body.appendChild(tooltip);
 
                     // Position tooltip near the element
