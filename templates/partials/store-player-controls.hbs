@@ -1,0 +1,88 @@
+<div class="player-controls">
+    <!-- Stock Display (Players) -->
+    {{#if this.stockEnabled}}
+        {{#if (eq this.stockStatus "out")}}
+            <div class="stock-display">
+                <span class="stock-count stock-out">Out of Stock</span>
+            </div>
+        {{/if}}
+    {{/if}}
+
+    <div class="price-display">
+        {{#if this.isSale}}
+            <span class="item-price sale">
+                <i class="fas fa-coins price-coin-icon"></i>
+                <span class="original">{{this.originalPrice}}</span>
+                <span class="new">{{this.price}}</span>
+            </span>
+        {{else}}
+            <span class="item-price">
+            <i class="fas fa-coins price-coin-icon"></i>
+            {{this.price}}</span>
+        {{/if}}
+    </div>
+
+    <!-- Compare Button (Players Only) -->
+    {{#if this.hasEquippedItem}}
+        <button type="button"
+                class="compare-btn"
+                data-item-uuid="{{this.uuid}}"
+                data-category="{{#if this.compareCategory}}{{this.compareCategory}}{{else}}{{@root.activeTab}}{{/if}}"
+                title="Compare with equipped">
+            <i class="fas fa-scale-unbalanced"></i>
+        </button>
+    {{/if}}
+
+    <!-- Sell Button -->
+    <button type="button"
+            class="sell-btn"
+            data-action="sellItem"
+            data-name="{{this.name}}"
+            data-uuid="{{this.uuid}}"
+            data-price="{{this.sellPrice}}"
+            title="Sell Item for {{this.sellPrice}}"
+            {{#unless this.canSell}}disabled{{/unless}}>
+        <i class="fas fa-sack-dollar"></i> Sell
+    </button>
+
+    <!-- Buy Buttons -->
+    {{#if @root.hasPartyActor}}
+        <button type="button"
+                class="buy-btn"
+                data-action="buyItem"
+                data-source="personal"
+                data-id="{{this.id}}"
+                data-uuid="{{this.uuid}}"
+                data-price="{{this.price}}"
+                data-name="{{this.name}}"
+                title="Buy with your own funds"
+                {{#if (or (not this.canBuyPersonal) (eq this.stockStatus "out"))}}disabled{{/if}}>
+            <i class="fas fa-hand-holding-dollar"></i>
+        </button>
+
+        <button type="button"
+                class="buy-btn party-btn"
+                data-action="buyItem"
+                data-source="party"
+                data-id="{{this.id}}"
+                data-uuid="{{this.uuid}}"
+                data-price="{{this.price}}"
+                data-name="{{this.name}}"
+                title="Split Payment with Party Funds"
+                {{#if (or (not this.canBuyParty) (eq this.stockStatus "out"))}}disabled{{/if}}>
+            <i class="fas fa-users"></i>
+        </button>
+    {{else}}
+        <button type="button"
+                class="buy-btn"
+                data-action="buyItem"
+                data-source="personal"
+                data-id="{{this.id}}"
+                data-uuid="{{this.uuid}}"
+                data-price="{{this.price}}"
+                data-name="{{this.name}}"
+                {{#if (or (not this.canBuyPersonal) (eq this.stockStatus "out"))}}disabled{{/if}}>
+            <i class="fas fa-hand-holding-dollar"></i> Buy
+        </button>
+    {{/if}}
+</div>

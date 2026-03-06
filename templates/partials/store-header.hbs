@@ -1,0 +1,87 @@
+<header class="store-header">
+    {{#if isGM}}
+    <div class="header-left">
+        <strong>Daggerheart Store Manager</strong>
+    </div>
+    <div class="header-right">
+        <!-- Randomizer Button -->
+        <button type="button" class="config-btn" data-action="openRandomizer" title="Store Randomizer">
+            <i class="fas fa-dice"></i>
+        </button>
+
+        <span class="header-separator">|</span>
+
+        <!-- Config Button -->
+        <button type="button" class="config-btn" data-action="openConfig" title="GM Configuration">
+            <i class="fas fa-cog"></i> Config
+        </button>
+
+        <span class="header-separator">|</span>
+
+        <!-- Presets Combo & Buttons -->
+        <select class="preset-select" name="storePreset">
+            {{#each presets}}
+            <option value="{{this}}" {{#if (eq this ../currentProfile)}}selected{{/if}}>{{this}}</option>
+            {{/each}}
+        </select>
+
+        <button type="button" class="config-btn icon-only" data-action="savePreset" title="Save Preset">
+            <i class="fas fa-save"></i>
+        </button>
+
+        <button type="button" class="config-btn icon-only" data-action="loadPreset" title="Load Preset">
+            <i class="fas fa-folder-open"></i>
+        </button>
+
+        <button type="button" class="config-btn icon-only" data-action="deletePreset" title="Delete Selected Profile" style="color: #ff9999; border-color: #8b3333;">
+            <i class="fas fa-trash"></i>
+        </button>
+
+        <span class="header-separator">|</span>
+
+        <!-- Share Buttons -->
+        <button type="button" class="config-btn" data-action="showToAll" title="Show to Everyone">
+            <i class="fas fa-globe"></i>
+        </button>
+        <button type="button" class="config-btn" data-action="showToPlayer" title="Show to Player">
+            <i class="fas fa-user"></i>
+        </button>
+    </div>
+    {{else}}
+        {{#if hasPartyActor}}
+            <!-- Party Actor Selected: Layout Split -->
+            <div class="header-left">
+                <label>Character:</label> <strong>{{actorName}}</strong>
+            </div>
+            <div class="header-right">
+                <!-- Transfer Funds Button -->
+                <button type="button" class="config-btn" data-action="transferFunds" title="Transfer Funds">
+                    <i class="fas fa-exchange-alt"></i> Transfer
+                </button>
+
+                <!-- Separator -->
+                <span style="margin: 0 10px; opacity: 0.5;">|</span>
+
+                <!-- PC Wealth -->
+                <label>PC Wealth:</label>
+                <span class="gold-display"><i class="fas fa-coins"></i> {{userGold}} {{currency}}</span>
+
+                <!-- Separator -->
+                <span style="margin: 0 10px; opacity: 0.5;">|</span>
+
+                <!-- Party Wealth -->
+                <label>Party Wealth:</label>
+                <span class="gold-display"><i class="fas fa-users"></i> {{partyGold}} {{currency}}</span>
+            </div>
+        {{else}}
+            <!-- No Party Actor: Standard Display -->
+            <div class="header-left">
+                <label>Character:</label> <strong>{{actorName}}</strong>
+            </div>
+            <div class="header-right">
+                <label>PC Wealth:</label>
+                <span class="gold-display"><i class="fas fa-coins"></i> {{userGold}} {{currency}}</span>
+            </div>
+        {{/if}}
+    {{/if}}
+</header>

@@ -219,6 +219,33 @@ Hooks.once("init", () => {
         type: StoreImportExport,
         restricted: true
     });
+
+    // --- PRELOAD TEMPLATE PARTIALS ---
+    loadTemplates([
+        "modules/daggerheart-store/templates/partials/store-header.hbs",
+        "modules/daggerheart-store/templates/partials/store-search-bar.hbs",
+        "modules/daggerheart-store/templates/partials/store-item-row.hbs",
+        "modules/daggerheart-store/templates/partials/store-gm-controls.hbs",
+        "modules/daggerheart-store/templates/partials/store-player-controls.hbs",
+        "modules/daggerheart-store/templates/partials/config-general-tab.hbs",
+        "modules/daggerheart-store/templates/partials/config-categories-tab.hbs",
+        "modules/daggerheart-store/templates/partials/config-tiers-tab.hbs",
+        "modules/daggerheart-store/templates/partials/config-compendiums-tab.hbs",
+        "modules/daggerheart-store/templates/partials/config-stock-tab.hbs",
+    ]);
+
+    // --- HANDLEBARS HELPERS FOR COMPARISON ---
+    Handlebars.registerHelper("compareClass", (direction) => {
+        if (direction === "up") return "compare-better";
+        if (direction === "down") return "compare-worse";
+        return "";
+    });
+
+    Handlebars.registerHelper("compareIcon", (direction) => {
+        if (direction === "up") return new Handlebars.SafeString('<i class="fas fa-caret-up"></i>');
+        if (direction === "down") return new Handlebars.SafeString('<i class="fas fa-caret-down"></i>');
+        return "";
+    });
 });
 
 // Singleton Instance Holder

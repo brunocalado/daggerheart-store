@@ -1,0 +1,57 @@
+<div class="store-row {{#if this.isHidden}}gm-hidden-item{{/if}} {{#if this.isSale}}sale-pulse{{/if}} {{#if this.isEpic}}epic-row epic-fx-{{this.epicEffect}}{{/if}}" {{#if this.isEpic}}style="background: {{this.epicBgColor}}; border-left-color: {{this.epicColor}};"{{/if}}>
+
+    <!-- Left Side: Icon, Name AND Sale Text -->
+    <div class="row-left">
+        <div class="item-icon-wrapper">
+            <img src="{{this.img}}" title="Click to view details" class="item-image" data-uuid="{{this.uuid}}" width="36" height="36"/>
+            {{#unless @root.isGM}}
+                {{#if this.stockEnabled}}
+                    {{#if this.stockUnlimited}}
+                        <span class="item-quantity-badge unlimited"><i class="fas fa-infinity"></i></span>
+                    {{else if this.stockQuantity}}
+                        <span class="item-quantity-badge">{{this.stockQuantity}}</span>
+                    {{else}}
+                        {{#if (eq this.stockStatus "out")}}
+                            <span class="item-quantity-badge out-of-stock"><i class="fas fa-times"></i></span>
+                        {{/if}}
+                    {{/if}}
+                {{/if}}
+            {{/unless}}
+        </div>
+
+        <!-- Recommendation Crown -->
+        {{#if this.isRecommended}}
+            <i class="fas fa-crown recommended-icon" title="Recommended for your highest Trait"></i>
+        {{/if}}
+
+        <span class="store-item-name" {{#if this.description}}data-item-desc="{{this.description}}"{{/if}}>{{this.name}}</span>
+
+        {{#unless @root.isGM}}
+            {{#if this.isSale}}
+                <span class="sale-badge">(SALE)</span>
+            {{/if}}
+        {{/unless}}
+
+        <!-- Item Summary -->
+        {{#if this.itemSummary}}
+            <span class="weapon-stats">{{this.itemSummary}}</span>
+        {{/if}}
+
+        {{#unless @root.isGM}}
+            {{#if this.isEpic}}
+                <span class="epic-badge" style="background: {{this.epicColor}}; color: {{this.epicTextColor}};">
+                    <i class="fas {{this.epicIcon}}"></i> {{this.epicLabel}}
+                </span>
+            {{/if}}
+        {{/unless}}
+    </div>
+
+    <!-- Right Side: Controls -->
+    <div class="row-right">
+        {{#if @root.isGM}}
+            {{> "modules/daggerheart-store/templates/partials/store-gm-controls.hbs"}}
+        {{else}}
+            {{> "modules/daggerheart-store/templates/partials/store-player-controls.hbs"}}
+        {{/if}}
+    </div>
+</div>

@@ -1,0 +1,44 @@
+<div class="search-container">
+    <button type="button" class="clear-search-btn" data-action="clearSearch" title="Clear Search">
+        <i class="fas fa-times"></i>
+    </button>
+    <input type="text" class="store-search" placeholder="Search..." autocomplete="off">
+    {{#if @root.isGM}}
+    <div class="bulk-actions">
+        <button type="button" class="bulk-btn" data-action="markAllOnSale" title="Mark All as On Sale">
+            <i class="fas fa-tag"></i>
+        </button>
+        <button type="button" class="bulk-btn" data-action="removeAllFromSale" title="Remove All from Sale">
+            <i class="fas fa-tag" style="opacity: 0.4;"></i>
+        </button>
+        <span class="bulk-separator"></span>
+        <button type="button" class="bulk-btn" data-action="showAllItems" title="Show All Items">
+            <i class="fas fa-eye"></i>
+        </button>
+        <button type="button" class="bulk-btn" data-action="hideAllItems" title="Hide All Items">
+            <i class="fas fa-eye-slash"></i>
+        </button>
+        <span class="bulk-separator"></span>
+        <button type="button" class="bulk-btn" data-action="makeAllPurchasable" title="Make All Purchasable">
+            <i class="fas fa-cart-arrow-down"></i>
+        </button>
+        <button type="button" class="bulk-btn" data-action="disableAllPurchase" title="Disable Purchase for All">
+            <i class="fas fa-cart-arrow-down" style="opacity: 0.4;"></i>
+        </button>
+        <span class="bulk-separator"></span>
+        <button type="button" class="bulk-btn" data-action="makeAllSellable" title="Set All as Sellable">
+            <i class="fas fa-hand-holding-usd"></i>
+        </button>
+        <button type="button" class="bulk-btn" data-action="disableAllSale" title="Disable Sale for All">
+            <i class="fas fa-hand-holding-usd" style="opacity: 0.4;"></i>
+        </button>
+        <span class="bulk-separator"></span>
+        <button type="button" class="bulk-btn" data-action="lockAllItems" title="Lock All Items">
+            <i class="fas fa-lock"></i>
+        </button>
+        <button type="button" class="bulk-btn" data-action="unlockAllItems" title="Unlock All Items">
+            <i class="fas fa-lock-open"></i>
+        </button>
+    </div>
+    {{/if}}
+</div>

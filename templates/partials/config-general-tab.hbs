@@ -1,0 +1,113 @@
+<div class="form-group inline-group">
+    <label>Store Window Name</label>
+    <input type="text" name="storeName" value="{{storeName}}">
+    <p class="notes">Sets the title of the main store window.</p>
+</div>
+
+<hr>
+
+<div class="form-group inline-group">
+    <label>Party Actor</label>
+    <select name="partyActorId">
+        <option value="">None</option>
+        {{#each partyActors}}
+        <option value="{{this.id}}" {{#if (eq this.id ../selectedPartyActor)}}selected{{/if}}>{{this.name}}</option>
+        {{/each}}
+    </select>
+    <span class="ownership-info" {{#unless selectedPartyActor}}style="display: none;"{{/unless}}>
+        <span class="config-separator">|</span>
+        <span class="ownership-label">Ownership:</span>
+        <span class="ownership-value">{{partyActorOwnership}}</span>
+        <span class="config-separator">|</span>
+        <span class="ownership-status {{#if partyActorOwnershipOk}}status-ok{{else}}status-warning{{/if}}">
+            Status: {{#if partyActorOwnershipOk}}OK{{else}}WARNING (Read Docs){{/if}}
+        </span>
+    </span>
+</div>
+<p class="notes">Select a party actor to enable shared wealth, stock management, and randomizer features.</p>
+
+<hr>
+
+<h3 style="margin-top: 5px;">Epic Items</h3>
+
+<div class="form-group inline-group">
+    <label>Label</label>
+    <input type="text" name="epicLabel" value="{{epicLabel}}" placeholder="Epic" maxlength="15">
+    <p class="notes">Custom label displayed on epic items (max 15 characters).</p>
+</div>
+
+<div class="form-group inline-group">
+    <label>Icon</label>
+    <select name="epicIcon">
+        <option value="fa-star" {{#if (eq epicIcon 'fa-star')}}selected{{/if}}>Star</option>
+        <option value="fa-gem" {{#if (eq epicIcon 'fa-gem')}}selected{{/if}}>Gem</option>
+        <option value="fa-dragon" {{#if (eq epicIcon 'fa-dragon')}}selected{{/if}}>Dragon</option>
+        <option value="fa-trophy" {{#if (eq epicIcon 'fa-trophy')}}selected{{/if}}>Trophy</option>
+        <option value="fa-fire" {{#if (eq epicIcon 'fa-fire')}}selected{{/if}}>Fire</option>
+        <option value="fa-bolt" {{#if (eq epicIcon 'fa-bolt')}}selected{{/if}}>Bolt</option>
+        <option value="fa-shield-halved" {{#if (eq epicIcon 'fa-shield-halved')}}selected{{/if}}>Shield</option>
+    </select>
+    <p class="notes">FontAwesome icon displayed alongside epic items.</p>
+</div>
+
+<div class="form-group inline-group">
+    <label>Color</label>
+    <select name="epicColor">
+        <option value="#9b59b6" {{#if (eq epicColor '#9b59b6')}}selected{{/if}}>Purple</option>
+        <option value="#f39c12" {{#if (eq epicColor '#f39c12')}}selected{{/if}}>Gold</option>
+        <option value="#e67e22" {{#if (eq epicColor '#e67e22')}}selected{{/if}}>Orange</option>
+        <option value="#e74c3c" {{#if (eq epicColor '#e74c3c')}}selected{{/if}}>Red</option>
+        <option value="#3498db" {{#if (eq epicColor '#3498db')}}selected{{/if}}>Blue</option>
+        <option value="#1abc9c" {{#if (eq epicColor '#1abc9c')}}selected{{/if}}>Teal</option>
+        <option value="#2ecc71" {{#if (eq epicColor '#2ecc71')}}selected{{/if}}>Green</option>
+        <option value="#e91e63" {{#if (eq epicColor '#e91e63')}}selected{{/if}}>Pink</option>
+    </select>
+    <p class="notes">Color used for the epic badge tag and subtle row highlight.</p>
+</div>
+
+<div class="form-group inline-group">
+    <label>Effect</label>
+    <select name="epicEffect">
+        <option value="none" {{#if (eq epicEffect 'none')}}selected{{/if}}>None</option>
+        <option value="shine" {{#if (eq epicEffect 'shine')}}selected{{/if}}>Shine - Light</option>
+        <option value="glow" {{#if (eq epicEffect 'glow')}}selected{{/if}}>Shine - Strong</option>
+        <option value="pulse" {{#if (eq epicEffect 'pulse')}}selected{{/if}}>Pulse</option>
+        <option value="wave" {{#if (eq epicEffect 'wave')}}selected{{/if}}>Wave</option>
+        <option value="border-glow" {{#if (eq epicEffect 'border-glow')}}selected{{/if}}>Border Glow</option>
+    </select>
+    <p class="notes">Visual effect applied to epic item rows.</p>
+</div>
+
+<hr>
+
+<h3 style="margin-top: 5px;">Price Modifiers</h3>
+
+<!-- Global Price Multiplier Slider -->
+<div class="form-group">
+    <label>Global Price Multiplier</label>
+    <div class="form-fields">
+        <input type="range" name="priceModifier" value="{{priceModifier}}" min="50" max="300" step="1">
+        <span class="range-value">{{priceModifier}}%</span>
+    </div>
+    <p class="notes">Adjusts all prices globally (50% to 300%). 100% = Normal.</p>
+</div>
+
+<!-- Sale Discount Slider -->
+<div class="form-group">
+    <label>Sale Discount</label>
+    <div class="form-fields">
+        <input type="range" name="saleDiscount" value="{{saleDiscount}}" min="0" max="100" step="1">
+        <span class="range-value">{{saleDiscount}}%</span>
+    </div>
+    <p class="notes">Percentage off for items marked as "On Sale".</p>
+</div>
+
+<!-- Sell Ratio Slider -->
+<div class="form-group">
+    <label>Sell Ratio</label>
+    <div class="form-fields">
+        <input type="range" name="sellRatioPercent" value="{{sellRatioPercent}}" min="0" max="100" step="1">
+        <span class="range-value">{{sellRatioPercent}}%</span>
+    </div>
+    <p class="notes">Percentage of the item's value returned when selling (e.g., 50%).</p>
+</div>

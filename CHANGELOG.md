@@ -5,6 +5,10 @@
 - You can disable SRD compendiums. This make easier to homebrew.
 - CSS split
 
+## [Changed]
+- Templates refactored into Handlebars partials for maintainability (store.hbs, store-config.hbs, item-comparison.hbs)
+- Added `compareClass` and `compareIcon` Handlebars helpers to reduce template duplication
+
 # 0.2.1
 - CSS Refactor
 - Support for weird entity types in settings.

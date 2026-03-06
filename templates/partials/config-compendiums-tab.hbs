@@ -1,0 +1,93 @@
+<label class="stock-toggle-card {{#if useDefaultCompendiums}}active{{/if}}">
+    <input type="checkbox" name="useDefaultCompendiums" {{checked useDefaultCompendiums}}>
+    <div class="card-content">
+        <i class="fas fa-database stock-icon"></i>
+        <div class="stock-text">
+            <strong>Use Default Compendiums</strong>
+            <span class="stock-description">
+                Include the system's built-in compendiums (Weapons, Armors, Consumables, Loot) in the store. Disable to use only your own material.
+            </span>
+        </div>
+    </div>
+    <div class="toggle-switch">
+        <div class="toggle-track"></div>
+        <div class="toggle-thumb"></div>
+    </div>
+</label>
+
+<h3 style="margin-top:0;">Custom Tab Configuration</h3>
+<p class="notes">Create a special tab (e.g., "Merchant" or "Magic Items") linked to one or more compendiums.</p>
+
+<div class="form-group">
+    <label>Custom Tab Name</label>
+    <input type="text" name="customTabName" value="{{customTabName}}" placeholder="General">
+</div>
+
+<label class="stock-toggle-card {{#if customTabTierGroup}}active{{/if}}" style="margin-top: 10px;">
+    <input type="checkbox" name="customTabTierGroup" {{checked customTabTierGroup}}>
+    <div class="card-content">
+        <i class="fas fa-layer-group stock-icon"></i>
+        <div class="stock-text">
+            <strong>Group Items by Tier</strong>
+            <span class="stock-description">
+                Items with a tier field will be grouped into Tier 1 / Common, Tier 2 / Uncommon, etc.
+            </span>
+        </div>
+    </div>
+    <div class="toggle-switch">
+        <div class="toggle-track"></div>
+        <div class="toggle-thumb"></div>
+    </div>
+</label>
+
+<p class="notes" style="margin-top: 10px;">Select compendiums to display in the custom tab.</p>
+<button type="button" data-action="addCustomTabCompendium" class="add-compendium" style="margin: 10px 0;"><i class="fas fa-plus"></i> Add Compendium</button>
+
+<div class="custom-tab-compendiums-list">
+    {{#each customTabCompendiums}}
+    <div class="compendium-row form-group" style="display:flex; gap:10px; align-items:center; margin-bottom:5px;">
+        <select name="customTabCompendiums.{{@index}}" style="flex:2">
+            <option value="">-- Select Compendium --</option>
+            {{#each ../availablePacks}}
+            <option value="{{this.id}}" {{#if (eq this.id ..)}}selected{{/if}}>{{this.label}}</option>
+            {{/each}}
+        </select>
+        <button type="button"
+                data-action="removeCustomTabCompendium"
+                data-index="{{@index}}"
+                style="width: 30px; height: 30px; color: red;">
+            <i class="fas fa-trash"></i>
+        </button>
+    </div>
+    {{/each}}
+</div>
+
+<hr style="border-top: 1px solid #444; margin: 15px 0;">
+
+<h3>Merged Compendiums</h3>
+<p class="notes">Add additional compendiums to be merged into the standard categories (e.g. Loot, Weapons).</p>
+<button type="button" data-action="addCompendium" class="add-compendium" style="margin: 10px 0;"><i class="fas fa-plus"></i> Add Compendium</button>
+
+<div class="compendiums-list">
+    {{#each customCompendiums}}
+    <div class="compendium-row form-group" style="display:flex; gap:10px; align-items:center; margin-bottom:5px;">
+        <select name="customCompendiums.{{@index}}.pack" style="flex:2">
+            <option value="">Select a Compendium...</option>
+            {{#each ../availablePacks}}
+            <option value="{{this.id}}" {{#if (eq this.id ../pack)}}selected{{/if}}>{{this.label}}</option>
+            {{/each}}
+        </select>
+        <select name="customCompendiums.{{@index}}.category" style="flex:1">
+            {{#each ../availableCategories}}
+            <option value="{{this}}" {{#if (eq this ../category)}}selected{{/if}}>{{this}}</option>
+            {{/each}}
+        </select>
+        <button type="button"
+                data-action="removeCompendium"
+                data-index="{{@index}}"
+                style="width: 30px; height: 30px; color: red;">
+            <i class="fas fa-trash"></i>
+        </button>
+    </div>
+    {{/each}}
+</div>

@@ -1,0 +1,85 @@
+<div class="gm-controls">
+    <div class="gm-buttons">
+        <button type="button"
+                data-action="toggleSale"
+                data-name="{{this.name}}"
+                class="icon-btn {{#if this.isSale}}active-sale{{/if}}"
+                title="Toggle Sale">
+            <i class="fas fa-tag"></i>
+        </button>
+
+        <button type="button"
+                data-action="toggleHidden"
+                data-name="{{this.name}}"
+                class="icon-btn {{#if this.isHidden}}active-hidden{{/if}}"
+                title="Hide Item (Item will not appear for players)">
+            <i class="fas fa-eye{{#if this.isHidden}}-slash{{/if}}"></i>
+        </button>
+
+        <button type="button"
+                data-action="toggleBlockPurchase"
+                data-name="{{this.name}}"
+                class="icon-btn {{#if this.isPurchaseBlocked}}active-block-purchase{{/if}}"
+                title="Block Purchase (Players cannot buy this item)">
+            <i class="fas fa-cart-arrow-down"></i>
+        </button>
+
+        <button type="button"
+                data-action="toggleBlockSale"
+                data-name="{{this.name}}"
+                class="icon-btn {{#if this.isSaleBlocked}}active-block-sale{{/if}}"
+                title="Block Sale (Players cannot sell this item)">
+            <i class="fas fa-hand-holding-usd"></i>
+        </button>
+
+        <button type="button"
+                data-action="toggleLock"
+                data-name="{{this.name}}"
+                class="icon-btn {{#if this.isLocked}}active-locked{{/if}}"
+                title="Lock Item (Randomizer will skip this item)">
+            <i class="fas fa-lock{{#unless this.isLocked}}-open{{/unless}}"></i>
+        </button>
+
+        <button type="button"
+                data-action="toggleEpic"
+                data-name="{{this.name}}"
+                class="icon-btn {{#if this.isEpic}}active-epic{{/if}}"
+                title="Mark as Epic">
+            <i class="fas {{@root.epicIcon}}"></i>
+        </button>
+
+        {{#if this.isOverridden}}
+        <button type="button"
+                class="reset-price-btn"
+                data-action="resetPrice"
+                data-name="{{this.name}}"
+                title="Reset to Default Price">
+            <i class="fas fa-undo"></i>
+        </button>
+        {{/if}}
+    </div>
+
+    <div class="gm-input-group">
+        <span class="gm-input-label">Price</span>
+        <input type="number"
+               class="gm-price-input"
+               value="{{this.price}}"
+               data-name="{{this.name}}"
+               min="0" step="1"
+               title="Item Price">
+    </div>
+
+    {{#if this.stockEnabled}}
+        <div class="gm-input-group">
+            <span class="gm-input-label">Stock</span>
+            <input type="number"
+                   class="gm-stock-input"
+                   value="{{this.stockQuantity}}"
+                   data-uuid="{{this.uuid}}"
+                   min="0"
+                   max="9999"
+                   placeholder="∞"
+                   title="Stock Quantity (empty = unlimited)">
+        </div>
+    {{/if}}
+</div>

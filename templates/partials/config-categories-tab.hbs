@@ -1,0 +1,17 @@
+<p class="notes">Toggle to show or hide categories in the store.</p>
+
+<div class="category-grid">
+    {{#each categories}}
+    <label class="category-card {{#if this.isVisible}}active{{/if}}">
+        <input type="checkbox" name="visibility.{{this.key}}" {{checked this.isVisible}}>
+        <div class="card-content">
+            <i class="fas {{this.icon}} category-icon"></i>
+            <span class="category-name">{{this.label}}</span>
+        </div>
+        <div class="toggle-switch">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+        </div>
+    </label>
+    {{/each}}
+</div>

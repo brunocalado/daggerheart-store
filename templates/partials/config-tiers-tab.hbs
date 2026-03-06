@@ -1,0 +1,77 @@
+<p class="notes">Configure which tiers are available for each category. Click column headers to toggle all.</p>
+
+<div class="tiers-matrix-container">
+    <table class="tiers-matrix">
+        <thead>
+            <tr>
+                <th class="category-col">Category</th>
+                <th class="tier-col tier-1-header">
+                    <div class="th-content">
+                        <span>Tier 1</span>
+                        <input type="checkbox" class="bulk-col-toggle" data-tier="1" title="Toggle All Tier 1">
+                    </div>
+                </th>
+                <th class="tier-col tier-2-header">
+                    <div class="th-content">
+                        <span>Tier 2</span>
+                        <input type="checkbox" class="bulk-col-toggle" data-tier="2" title="Toggle All Tier 2">
+                    </div>
+                </th>
+                <th class="tier-col tier-3-header">
+                    <div class="th-content">
+                        <span>Tier 3</span>
+                        <input type="checkbox" class="bulk-col-toggle" data-tier="3" title="Toggle All Tier 3">
+                    </div>
+                </th>
+                <th class="tier-col tier-4-header">
+                    <div class="th-content">
+                        <span>Tier 4</span>
+                        <input type="checkbox" class="bulk-col-toggle" data-tier="4" title="Toggle All Tier 4">
+                    </div>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each categories}}
+            {{#if (ne this.key "CustomTab")}}
+            <tr>
+                <td class="category-cell">
+                    <label class="row-label">
+                        <input type="checkbox" class="bulk-row-toggle" data-category="{{this.key}}" title="Toggle All Tiers for {{this.label}}">
+                        <i class="fas {{this.icon}}"></i> {{this.label}}
+                    </label>
+                </td>
+
+                <td class="tier-cell">
+                    <label class="tier-btn t1 {{#if (lookup this.tiers '1')}}active{{/if}}">
+                        <input type="checkbox" name="tiers.{{this.key}}.1" {{checked (lookup this.tiers "1")}}>
+                        <span>I</span>
+                    </label>
+                </td>
+
+                <td class="tier-cell">
+                    <label class="tier-btn t2 {{#if (lookup this.tiers '2')}}active{{/if}}">
+                        <input type="checkbox" name="tiers.{{this.key}}.2" {{checked (lookup this.tiers "2")}}>
+                        <span>II</span>
+                    </label>
+                </td>
+
+                <td class="tier-cell">
+                    <label class="tier-btn t3 {{#if (lookup this.tiers '3')}}active{{/if}}">
+                        <input type="checkbox" name="tiers.{{this.key}}.3" {{checked (lookup this.tiers "3")}}>
+                        <span>III</span>
+                    </label>
+                </td>
+
+                <td class="tier-cell">
+                    <label class="tier-btn t4 {{#if (lookup this.tiers '4')}}active{{/if}}">
+                        <input type="checkbox" name="tiers.{{this.key}}.4" {{checked (lookup this.tiers "4")}}>
+                        <span>IV</span>
+                    </label>
+                </td>
+            </tr>
+            {{/if}}
+            {{/each}}
+        </tbody>
+    </table>
+</div>

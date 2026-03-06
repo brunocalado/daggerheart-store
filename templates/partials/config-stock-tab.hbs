@@ -1,0 +1,73 @@
+<label class="stock-toggle-card {{#if stockEnabled}}active{{/if}} {{#unless stockReady}}disabled{{/unless}}">
+    <input type="checkbox" id="stockEnabledCheckbox" name="stockEnabled" {{checked stockEnabled}} {{#unless stockReady}}disabled{{/unless}}>
+    <div class="card-content">
+        <i class="fas fa-boxes stock-icon"></i>
+        <div class="stock-text">
+            <strong>Enable Limited Stock System</strong>
+            <span class="stock-description">
+                {{#if stockReady}}
+                    Tracks item quantities and prevents purchases when out of stock.
+                {{else}}
+                    <em class="warning">Requires Party Actor with Owner permission.</em>
+                {{/if}}
+            </span>
+        </div>
+    </div>
+    <div class="toggle-switch">
+        <div class="toggle-track"></div>
+        <div class="toggle-thumb"></div>
+    </div>
+</label>
+
+<h3 style="margin-top: 5px;">Quick Stock Configuration</h3>
+<p class="notes" style="margin-bottom: 8px;">Set default quantities per category and tier.</p>
+
+<!-- Stock Table -->
+<div class="stock-table-container" style="overflow-x: auto;">
+    <table class="stock-config-table" style="width: 100%; border-collapse: collapse; background: rgba(0,0,0,0.2); border-radius: 4px;">
+        <thead>
+            <tr style="background: rgba(212, 175, 55, 0.2);">
+                <th style="padding: 6px 10px; text-align: left; border-bottom: 1px solid #444; color: #d4af37; min-width: 130px;">Category</th>
+                <th style="padding: 6px 8px; text-align: center; border-bottom: 1px solid #444; color: #d4af37; width: 60px;">Tier 1</th>
+                <th style="padding: 6px 8px; text-align: center; border-bottom: 1px solid #444; color: #d4af37; width: 60px;">Tier 2</th>
+                <th style="padding: 6px 8px; text-align: center; border-bottom: 1px solid #444; color: #d4af37; width: 60px;">Tier 3</th>
+                <th style="padding: 6px 8px; text-align: center; border-bottom: 1px solid #444; color: #d4af37; width: 60px;">Tier 4</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each stockCategoryDefaults}}
+            <tr style="border-bottom: 1px solid #333;">
+                <td style="padding: 4px 10px; color: #ccc;">{{this.label}}</td>
+                <td style="padding: 3px;">
+                    <input type="number" name="stockDefaults.{{this.key}}.tier1" value="{{this.tier1}}" min="0" class="stock-tier-input">
+                </td>
+                <td style="padding: 3px;">
+                    <input type="number" name="stockDefaults.{{this.key}}.tier2" value="{{this.tier2}}" min="0" class="stock-tier-input">
+                </td>
+                <td style="padding: 3px;">
+                    <input type="number" name="stockDefaults.{{this.key}}.tier3" value="{{this.tier3}}" min="0" class="stock-tier-input">
+                </td>
+                <td style="padding: 3px;">
+                    <input type="number" name="stockDefaults.{{this.key}}.tier4" value="{{this.tier4}}" min="0" class="stock-tier-input">
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
+
+<h3 style="margin-top: 15px;">Stock Actions</h3>
+<div class="stock-actions" style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <span class="notes" style="margin: 0; flex: 1;">Set stock quantities based on the table above:</span>
+        <button type="button" data-action="applyStockDefaults" class="config-btn">
+            <i class="fas fa-magic"></i> Apply Defaults
+        </button>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <span class="notes" style="margin: 0; flex: 1;">Reset all items to their default stock quantities:</span>
+        <button type="button" data-action="restockAll" class="config-btn">
+            <i class="fas fa-redo"></i> Restock All
+        </button>
+    </div>
+</div>
