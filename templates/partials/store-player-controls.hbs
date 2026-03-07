@@ -85,4 +85,13 @@
             <i class="fas fa-hand-holding-dollar"></i> Buy
         </button>
     {{/if}}
+
+    <!-- Favorite Bookmark -->
+    <button type="button"
+            class="fav-btn {{#if this.isFavorited}}active{{/if}}"
+            data-action="toggleFavorite"
+            data-item-name="{{this.name}}"
+            title="{{#if this.isFavorited}}Remove from Favorites{{else}}Add to Favorites{{/if}}">
+        <i class="fas fa-bookmark"></i>
+    </button>
 </div>

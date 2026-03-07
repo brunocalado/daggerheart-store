@@ -23,6 +23,10 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         super(options);
         this.searchQuery = "";
         this.activeTab = "primary";
+        /** @type {Object<string, boolean>} Per-user favorited items keyed by item name */
+        this.favoritedItems = {};
+        /** @type {boolean} Whether the favorites-only filter is active */
+        this.showFavoritesOnly = false;
         this.options.window.title = game.settings.get(MODULE_ID, "storeName");
 
         // Listen for actor item updates to refresh compare buttons
@@ -82,7 +86,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             deletePreset: DaggerheartStore.prototype._onDeletePreset,
             transferFunds: DaggerheartStore.prototype._onTransferFunds,
             toggleEpic: DaggerheartStore.prototype._onToggleEpic,
-            clearSearch: DaggerheartStore.prototype._onClearSearch
+            clearSearch: DaggerheartStore.prototype._onClearSearch,
+            toggleFavorite: DaggerheartStore.prototype._onToggleFavorite,
+            toggleFavoriteFilter: DaggerheartStore.prototype._onToggleFavoriteFilter
         }
     };
 
@@ -556,7 +562,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             basePrice, isOverridden, isGM, userActor, hasActor, userGold, partyGold,
             hasPartyActor, saleItems, saleDiscount, sellRatio, hiddenItems, blockedSaleItems,
             blockedPurchaseItems, lockedItems, epicItems, epicIcon, epicColor, epicLabel,
-            epicEffect, stockEnabled, showStockQuantity, bestTraits,
+            epicEffect, stockEnabled, showStockQuantity, bestTraits, favoritedItems = {},
             canCompare = false, hasEquippedItem = false, compareCategory = null,
             header = null, tier = null
         } = opts;
@@ -619,7 +625,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             epicIcon, epicColor, epicLabel,
             epicTextColor: getEpicTextColor(epicColor),
             epicBgColor: epicItems[doc.name] ? getEpicBgColor(epicColor) : null,
-            epicEffect
+            epicEffect,
+            isFavorited: !isGM && !!favoritedItems[doc.name]
         };
     }
 
@@ -756,7 +763,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             activeTab: this.activeTab,
             presets: profileKeys,
             currentProfile,
-            epicIcon: game.settings.get(MODULE_ID, "epicIcon")
+            epicIcon: game.settings.get(MODULE_ID, "epicIcon"),
+            showFavoritesOnly: this.showFavoritesOnly
         };
 
         // Load all needed settings once
@@ -786,7 +794,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             isGM, userActor, hasActor, userGold, partyGold, hasPartyActor,
             saleItems, saleDiscount, sellRatio, hiddenItems, blockedSaleItems,
             blockedPurchaseItems, lockedItems, epicItems, epicIcon, epicColor,
-            epicLabel, epicEffect, stockEnabled, showStockQuantity, bestTraits
+            epicLabel, epicEffect, stockEnabled, showStockQuantity, bestTraits,
+            favoritedItems: this.favoritedItems
         };
 
         let categories = foundry.utils.deepClone(STANDARD_CATEGORIES);
@@ -1110,6 +1119,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
         if (this.window) this.window.title = this.options.window.title;
 
+        // Load user favorites from flags for DOM-based filtering
+        this.favoritedItems = game.user.getFlag(MODULE_ID, "favorites") ?? {};
+
         this._setupSearchInputs(html);
         this._setupSliders(html);
         this._setupPriceInputs(html);
@@ -1124,10 +1136,12 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const searchInputs = html.querySelectorAll(".store-search");
         searchInputs.forEach(searchInput => {
             searchInput.value = this.searchQuery;
-            this._applySearch(searchInput);
+            const tabContent = searchInput.closest(".tab");
+            if (tabContent) this._applyRowFilters(tabContent);
             searchInput.addEventListener("input", (e) => {
                 this.searchQuery = e.target.value;
-                this._applySearch(e.target);
+                const tab = e.target.closest(".tab");
+                if (tab) this._applyRowFilters(tab);
             });
         });
     }
@@ -1321,21 +1335,70 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         }
     }
 
-    _applySearch(input) {
-        const query = input.value.toLowerCase();
-        const tabContent = input.closest(".tab");
-        if (!tabContent) return;
+    /**
+     * Applies combined search text and favorites filter to item rows via DOM manipulation.
+     * Called from _setupSearchInputs, clearSearch, toggleFavorite, and toggleFavoriteFilter.
+     * @param {HTMLElement} tabContent - The .tab container element
+     */
+    _applyRowFilters(tabContent) {
+        const query = tabContent.querySelector(".store-search")?.value.toLowerCase() ?? "";
         const rows = tabContent.querySelectorAll(".store-row");
         rows.forEach(row => {
-            const name = row.querySelector(".store-item-name").innerText.toLowerCase();
-            row.style.display = name.includes(query) ? "flex" : "none";
+            const name = row.querySelector(".store-item-name")?.innerText.toLowerCase() ?? "";
+            const matchesSearch = name.includes(query);
+            const matchesFav = !this.showFavoritesOnly || !!this.favoritedItems[row.dataset.itemName];
+            row.style.display = (matchesSearch && matchesFav) ? "flex" : "none";
         });
     }
 
     _onClearSearch(event, target) {
         this.searchQuery = "";
-        const input = target.closest(".search-container")?.querySelector(".store-search");
-        if (input) { input.value = ""; this._applySearch(input); }
+        const container = target.closest(".search-container");
+        const input = container?.querySelector(".store-search");
+        if (input) input.value = "";
+        const tabContent = target.closest(".tab");
+        if (tabContent) this._applyRowFilters(tabContent);
+    }
+
+    // --- Favorites Actions (Players Only) ---
+
+    /**
+     * Toggles an item's favorited state in user flags and updates the DOM.
+     * Triggered by the bookmark button on each item row (data-action="toggleFavorite").
+     * @param {Event} event - The click event
+     * @param {HTMLElement} target - The button element with data-item-name
+     */
+    async _onToggleFavorite(event, target) {
+        const itemName = target.dataset.itemName;
+        if (!itemName) return;
+        const current = foundry.utils.deepClone(game.user.getFlag(MODULE_ID, "favorites") ?? {});
+        if (current[itemName]) {
+            delete current[itemName];
+            await game.user.unsetFlag(MODULE_ID, "favorites");
+            if (Object.keys(current).length > 0) await game.user.setFlag(MODULE_ID, "favorites", current);
+        } else {
+            current[itemName] = true;
+            await game.user.setFlag(MODULE_ID, "favorites", current);
+        }
+        this.favoritedItems = current;
+        target.classList.toggle("active", !!current[itemName]);
+        if (this.showFavoritesOnly) {
+            const tabContent = target.closest(".tab");
+            if (tabContent) this._applyRowFilters(tabContent);
+        }
+    }
+
+    /**
+     * Toggles the favorites-only filter and re-applies row visibility.
+     * Triggered by the filter button in the search bar (data-action="toggleFavoriteFilter").
+     * @param {Event} event - The click event
+     * @param {HTMLElement} target - The filter button element
+     */
+    _onToggleFavoriteFilter(event, target) {
+        this.showFavoritesOnly = !this.showFavoritesOnly;
+        target.classList.toggle("active", this.showFavoritesOnly);
+        const tabContent = target.closest(".tab");
+        if (tabContent) this._applyRowFilters(tabContent);
     }
 
     // --- Buy / Sell / Transfer Actions ---

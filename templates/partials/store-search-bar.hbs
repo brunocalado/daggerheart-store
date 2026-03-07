@@ -3,6 +3,14 @@
         <i class="fas fa-times"></i>
     </button>
     <input type="text" class="store-search" placeholder="Search..." autocomplete="off">
+    {{#unless @root.isGM}}
+    <button type="button"
+            class="fav-filter-btn {{#if @root.showFavoritesOnly}}active{{/if}}"
+            data-action="toggleFavoriteFilter"
+            title="Show Favorites Only">
+        <i class="fas fa-bookmark"></i>
+    </button>
+    {{/unless}}
     {{#if @root.isGM}}
     <div class="bulk-actions">
         <button type="button" class="bulk-btn" data-action="markAllOnSale" title="Mark All as On Sale">

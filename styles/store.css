@@ -548,7 +548,7 @@
     & .player-controls {
         display: flex;
         align-items: center;
-        gap: 15px;
+        gap: 10px;
     }
 
     & .price-display {
@@ -831,6 +831,55 @@
             background: #8a9299;
             box-shadow: 0 0 5px #71797E;
             border-color: var(--dhs-gold);
+        }
+    }
+}
+
+/* ---- FAVORITES ---- */
+
+.daggerheart-store {
+
+    & .fav-btn {
+        background: none;
+        border: none;
+        color: #666;
+        font-size: 0.85rem;
+        padding: 0 4px;
+        cursor: pointer;
+        opacity: 0.35;
+        transition: opacity 0.15s, color 0.15s;
+
+        &:hover {
+            opacity: 0.7;
+        }
+
+        &.active {
+            color: var(--dhs-gold, #c8a951);
+            opacity: 1;
+            outline: none;
+            box-shadow: none;
+        }
+    }
+
+    & .fav-filter-btn {
+        background: none;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        color: #666;
+        padding: 4px 8px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        transition: color 0.15s, border-color 0.15s;
+
+        &:hover {
+            color: var(--dhs-gold, #c8a951);
+        }
+
+        &.active {
+            color: var(--dhs-gold, #c8a951);
+            border-color: var(--dhs-gold, #c8a951);
+            outline: none;
+            box-shadow: none;
         }
     }
 }

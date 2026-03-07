@@ -1,15 +1,12 @@
 # 0.2.2
+- Player Favorites
 - tooltip description will take in an account line breaks
 - UUID will not show up in the description
 - Clear Search Button added
 - You can disable SRD compendiums. This make easier to homebrew.
 - CSS split
-
-## [Changed]
-- Templates refactored into Handlebars partials for maintainability (store.hbs, store-config.hbs, item-comparison.hbs)
-- Added `compareClass` and `compareIcon` Handlebars helpers to reduce template duplication
-- Codebase restructured: split monolithic `store-app.js` into `store-constants.js`, `store-utils.js`, `store-config.js`, `store-randomizer.js`, `store-import-export.js`, and a leaner `store-app.js`
-- Deduplicated currency operations, chat card generation, item building, and damage type parsing into shared utilities
+- Templates refactored
+- Codebase restructured
 
 # 0.2.1
 - CSS Refactor
