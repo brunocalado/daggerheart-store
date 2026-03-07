@@ -1,4 +1,5 @@
-import { DaggerheartStore, StoreImportExport } from "./store-app.js";
+import { DaggerheartStore } from "./store-app.js";
+import { StoreImportExport } from "./store-import-export.js";
 import { StoreWelcome } from "./store-welcome.js";
 import { StockManager } from "./stock-manager.js";
 
