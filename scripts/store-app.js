@@ -846,12 +846,13 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
                         if (hiddenItems[doc.name] && !isGM) continue;
 
-                        let basePrice = extractPriceFromDescription(doc);
+                        const cleanBasePrice = extractPriceFromDescription(doc);
+                        let basePrice = cleanBasePrice;
                         let isOverridden = false;
 
                         if (priceOverrides.hasOwnProperty(doc.name)) {
                             basePrice = priceOverrides[doc.name];
-                            isOverridden = true;
+                            isOverridden = (basePrice !== cleanBasePrice);
                         }
 
                         const desc = foundry.utils.getProperty(doc, "system.description.value") ||
@@ -943,35 +944,36 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
                     if (hiddenItems[doc.name] && !isGM) continue;
 
+                    let cleanBasePrice = 0;
                     let basePrice = 0;
                     let tier = 1;
                     let knownItem = false;
-                    let isOverridden = false;
 
                     if (priceList.hasOwnProperty(doc.name)) {
-                        basePrice = Math.ceil(priceList[doc.name].price * priceMod);
+                        cleanBasePrice = Math.ceil(priceList[doc.name].price * priceMod);
+                        basePrice = cleanBasePrice;
                         tier = priceList[doc.name].tier;
                         knownItem = true;
                     }
 
                     if (packInfo.isDefault && !knownItem) continue;
 
-                    if (priceOverrides.hasOwnProperty(doc.name)) {
-                        basePrice = priceOverrides[doc.name];
-                        isOverridden = true;
-                    }
-
                     if (!packInfo.isDefault) {
                         knownItem = true;
                         if (!priceList.hasOwnProperty(doc.name)) {
                              tier = getItemTier(doc);
-                             if (!isOverridden) {
-                                 const extracted = extractPriceFromDescription(doc);
-                                 if (extracted > 0) {
-                                     basePrice = Math.ceil(extracted * priceMod);
-                                 }
+                             const extracted = extractPriceFromDescription(doc);
+                             if (extracted > 0) {
+                                 cleanBasePrice = Math.ceil(extracted * priceMod);
+                                 basePrice = cleanBasePrice;
                              }
                         }
+                    }
+
+                    let isOverridden = false;
+                    if (priceOverrides.hasOwnProperty(doc.name)) {
+                        basePrice = priceOverrides[doc.name];
+                        isOverridden = (basePrice !== cleanBasePrice);
                     }
 
                     if (!knownItem) continue;
