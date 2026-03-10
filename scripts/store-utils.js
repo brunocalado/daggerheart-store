@@ -38,6 +38,20 @@ export function getItemTier(item) {
     return 1;
 }
 
+/**
+ * Extracts price from {{{number}}} tag in an item's description.
+ * Used as a fallback when the item is not in PRICE_DATA.
+ * @param {Object} item - The item document
+ * @returns {number} Price value or 0 if not found
+ */
+export function extractPriceFromDescription(item) {
+    const desc = foundry.utils.getProperty(item, "system.description.value") ||
+                 foundry.utils.getProperty(item, "system.description") || "";
+    const descString = String(desc);
+    const priceMatch = descString.match(/\{\{\{(\d+)\}\}\}/);
+    return priceMatch ? parseInt(priceMatch[1], 10) : 0;
+}
+
 // --- Currency Helpers ---
 
 /**

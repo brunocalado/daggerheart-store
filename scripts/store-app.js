@@ -6,8 +6,8 @@ import {
     MODULE_ID, STANDARD_CATEGORIES, CATEGORY_ITEM_TYPE
 } from "./store-constants.js";
 import {
-    getValidItemTypes, getItemTier, getSystemCurrency,
-    getActorWealth, deductGold, addGold,
+    getValidItemTypes, getItemTier, extractPriceFromDescription,
+    getSystemCurrency, getActorWealth, deductGold, addGold,
     getChatWhisperRecipients, buildChatCard,
     getEpicTextColor, getEpicBgColor,
     showStoreDialog
@@ -845,19 +845,17 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
                         if (hiddenItems[doc.name] && !isGM) continue;
 
-                        let basePrice = 0;
+                        let basePrice = extractPriceFromDescription(doc);
                         let isOverridden = false;
-                        const desc = foundry.utils.getProperty(doc, "system.description.value") ||
-                                     foundry.utils.getProperty(doc, "system.description") || "";
-                        const descString = String(desc);
-                        const priceMatch = descString.match(/\{\{\{(\d+)\}\}\}/);
-                        if (priceMatch) basePrice = parseInt(priceMatch[1], 10);
 
                         if (priceOverrides.hasOwnProperty(doc.name)) {
                             basePrice = priceOverrides[doc.name];
                             isOverridden = true;
                         }
 
+                        const desc = foundry.utils.getProperty(doc, "system.description.value") ||
+                                     foundry.utils.getProperty(doc, "system.description") || "";
+                        const descString = String(desc);
                         const header = this._extractHeaderTag(descString);
 
                         // Determine tier for grouping
@@ -967,11 +965,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         if (!priceList.hasOwnProperty(doc.name)) {
                              tier = getItemTier(doc);
                              if (!isOverridden) {
-                                 const descForPrice = foundry.utils.getProperty(doc, "system.description.value") ||
-                                                      foundry.utils.getProperty(doc, "system.description") || "";
-                                 const priceTagMatch = String(descForPrice).match(/\{\{\{(\d+)\}\}\}/);
-                                 if (priceTagMatch) {
-                                     basePrice = Math.ceil(parseInt(priceTagMatch[1], 10) * priceMod);
+                                 const extracted = extractPriceFromDescription(doc);
+                                 if (extracted > 0) {
+                                     basePrice = Math.ceil(extracted * priceMod);
                                  }
                              }
                         }

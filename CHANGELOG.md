@@ -1,3 +1,7 @@
+# 0.2.5
+- [Fixed] Custom compendium items getting price 0/1 during randomization instead of respecting {{{price}}} tags
+- [Changed] Centralized price extraction from description into `extractPriceFromDescription()` helper (DRY)
+
 # 0.2.4
 - Small CSS fix
 

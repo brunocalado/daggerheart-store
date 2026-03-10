@@ -1,7 +1,7 @@
 import { PRICE_DATA, PACK_MAPPING } from "./price-data.js";
 import { StockManager } from "./stock-manager.js";
 import { MODULE_ID, STANDARD_CATEGORIES, CATEGORY_ITEM_TYPE } from "./store-constants.js";
-import { getValidItemTypes, getItemTier, showStoreDialog } from "./store-utils.js";
+import { getValidItemTypes, getItemTier, extractPriceFromDescription, showStoreDialog } from "./store-utils.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -205,12 +205,7 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
                     if (seenNames.has(doc.name)) continue;
                     seenNames.add(doc.name);
 
-                    let basePrice = 0;
-                    const desc = foundry.utils.getProperty(doc, "system.description.value") ||
-                                 foundry.utils.getProperty(doc, "system.description") || "";
-                    const descString = String(desc);
-                    const priceMatch = descString.match(/\{\{\{(\d+)\}\}\}/);
-                    if (priceMatch) basePrice = parseInt(priceMatch[1], 10);
+                    let basePrice = extractPriceFromDescription(doc);
 
                     items.push({
                         name: doc.name,
@@ -241,6 +236,19 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
                                         basePrice: basePrice
                                     });
                                 }
+                            } else {
+                                // Fallback for items not in PRICE_DATA (e.g. custom items in default packs)
+                                const tier = getItemTier(doc);
+                                if (catConfig[tier]) {
+                                    const extracted = extractPriceFromDescription(doc);
+                                    if (extracted > 0) {
+                                        items.push({
+                                            name: doc.name,
+                                            uuid: doc.uuid,
+                                            basePrice: Math.ceil(extracted * priceMod)
+                                        });
+                                    }
+                                }
                             }
                         }
                     }
@@ -267,6 +275,12 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
                                 let basePrice = 0;
                                 if (priceList.hasOwnProperty(doc.name)) {
                                     basePrice = Math.ceil(priceList[doc.name].price * priceMod);
+                                } else {
+                                    // Fallback: extract price from {{{number}}} tag
+                                    const extracted = extractPriceFromDescription(doc);
+                                    if (extracted > 0) {
+                                        basePrice = Math.ceil(extracted * priceMod);
+                                    }
                                 }
                                 items.push({
                                     name: doc.name,
