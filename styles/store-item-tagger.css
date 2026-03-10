@@ -47,6 +47,13 @@
     position: relative;
 }
 
+.item-preview.drag-over {
+    border-color: #d4af37;
+    background: rgba(212, 175, 55, 0.15);
+    outline: 2px dashed #d4af37;
+    cursor: copy;
+}
+
 .item-preview img {
     width: 48px;
     height: 48px;
@@ -95,6 +102,11 @@
     color: #fff;
     padding: 8px;
     border-radius: 4px;
+}
+
+.form-group select {
+    height: 36px;
+    line-height: 1.4;
 }
 
 .form-group .hint {

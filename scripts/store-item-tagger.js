@@ -1,4 +1,4 @@
-import { MODULE_ID } from "./store-constants.js";
+import { MODULE_ID, VALID_ITEM_TYPES } from "./store-constants.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -60,11 +60,18 @@ export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
                 e.preventDefault();
                 dropZone.classList.add("hover");
             });
-            dropZone.addEventListener("dragleave", (e) => {
-                e.preventDefault();
-                dropZone.classList.remove("hover");
-            });
+            dropZone.addEventListener("dragleave", () => dropZone.classList.remove("hover"));
             dropZone.addEventListener("drop", this._onDrop.bind(this));
+        }
+
+        const itemPreview = html.querySelector(".item-preview");
+        if (itemPreview) {
+            itemPreview.addEventListener("dragover", (e) => {
+                e.preventDefault();
+                itemPreview.classList.add("drag-over");
+            });
+            itemPreview.addEventListener("dragleave", () => itemPreview.classList.remove("drag-over"));
+            itemPreview.addEventListener("drop", this._onDrop.bind(this));
         }
 
         // Live Preview Listeners
@@ -96,6 +103,8 @@ export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
         event.preventDefault();
         const dropZone = this.element.querySelector(".drop-zone");
         if (dropZone) dropZone.classList.remove("hover");
+        const itemPreview = this.element.querySelector(".item-preview");
+        if (itemPreview) itemPreview.classList.remove("drag-over");
 
         // Use the modern UX path for TextEditor in v13+.
         const data = foundry.applications.ux.TextEditor.getDragEventData(event);
@@ -103,6 +112,11 @@ export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
 
         const item = await fromUuid(data.uuid);
         if (!item) return;
+
+        if (!VALID_ITEM_TYPES.includes(item.type)) {
+            ui.notifications.warn(`Invalid item type. Only ${VALID_ITEM_TYPES.join(", ")} are allowed.`);
+            return;
+        }
 
         this.item = item;
         this._parseTags(item);
