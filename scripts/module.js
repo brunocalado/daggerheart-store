@@ -441,7 +441,7 @@ Hooks.on("renderDaggerheartMenu", (app, html, data) => {
     myButton.type = "button";
     myButton.innerHTML = `<i class="fas fa-balance-scale"></i> Open Store`;
     myButton.classList.add("dh-custom-btn"); 
-    myButton.style.marginTop = "10px";
+    myButton.style.marginTop = "0px";
     myButton.style.width = "100%";
 
     myButton.onclick = (event) => {

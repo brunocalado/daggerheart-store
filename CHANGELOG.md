@@ -1,3 +1,6 @@
+# 0.2.4
+- Small CSS fix
+
 # 0.2.3
 - Small fix, removed deprecated
 
