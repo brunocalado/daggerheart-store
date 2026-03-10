@@ -38,7 +38,7 @@ export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
 
     static PARTS = {
         main: {
-            template: "modules/daggerheart-store/templates/store-item-tagger.hbs"
+            template: "modules/daggerheart-store/templates/item-tagger.hbs"
         }
     };
 

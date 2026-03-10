@@ -1,0 +1,141 @@
+.daggerheart-store-tagger {
+    & .window-content {
+        background: #1a1a1a;
+        color: #e0e0e0;
+        padding: 0;
+    }
+
+    & .store-tagger-container {
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        height: 100%;
+    }
+
+    & .drop-zone {
+        border: 2px dashed #444;
+        border-radius: 8px;
+        height: 200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #888;
+        transition: all 0.2s;
+        background: rgba(255, 255, 255, 0.02);
+
+        &.hover {
+            border-color: #d4af37;
+            background: rgba(212, 175, 55, 0.1);
+            color: #d4af37;
+        }
+
+        & i {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+    }
+
+    & .item-preview {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #252525;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #333;
+        position: relative;
+
+        &.drag-over {
+            border-color: #d4af37;
+            background: rgba(212, 175, 55, 0.15);
+            outline: 2px dashed #d4af37;
+            cursor: copy;
+        }
+
+        & img {
+            width: 48px;
+            height: 48px;
+            border: 1px solid #000;
+            border-radius: 4px;
+        }
+
+        & .item-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            flex: 1;
+        }
+    }
+
+    & .clear-btn {
+        background: none;
+        border: none;
+        color: #888;
+        cursor: pointer;
+        padding: 5px;
+
+        &:hover {
+            color: #ff5555;
+        }
+    }
+
+    & .tag-inputs {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    & .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        & label {
+            font-weight: bold;
+            color: #d4af37;
+        }
+
+        & input, & select {
+            background: #111;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        & select {
+            height: 36px;
+            line-height: 1.4;
+        }
+
+        & .hint {
+            font-size: 0.8em;
+            color: #666;
+            margin: 0;
+        }
+
+        & code {
+            background: #333;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    }
+
+    & .save-btn {
+        background: #d4af37;
+        color: #000;
+        border: none;
+        padding: 10px;
+        width: 100%;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: background 0.2s;
+
+        &:hover {
+            background: #f1c40f;
+        }
+    }
+}
