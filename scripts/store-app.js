@@ -79,6 +79,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             disableAllPurchase: DaggerheartStore.prototype._onDisableAllPurchase,
             makeAllSellable: DaggerheartStore.prototype._onMakeAllSellable,
             disableAllSale: DaggerheartStore.prototype._onDisableAllSale,
+            resetAllPrices: DaggerheartStore.prototype._onResetAllPrices,
             showToAll: DaggerheartStore.prototype._onShowToAll,
             showToPlayer: DaggerheartStore.prototype._onShowToPlayer,
             savePreset: DaggerheartStore.prototype._onSavePreset,
@@ -2035,5 +2036,21 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
     async _onUnlockAllItems(event, target) {
         const itemNames = await this._getCurrentTabItemNames(); const lockedItems = foundry.utils.deepClone(game.settings.get(MODULE_ID, "lockedItems"));
         itemNames.forEach(name => delete lockedItems[name]); await game.settings.set(MODULE_ID, "lockedItems", lockedItems);
+    }
+
+    /**
+     * Resets all price overrides across every tab, reverting items to their base prices.
+     * Triggered by the "Reset All Prices" bulk-action button via AppV2 data-action binding.
+     * @param {PointerEvent} event - The originating click event
+     * @param {HTMLElement} target - The button element that was clicked
+     * @returns {Promise<void>}
+     */
+    async _onResetAllPrices(event, target) {
+        try {
+            await game.settings.set(MODULE_ID, "priceOverrides", {});
+        } catch (err) {
+            console.error(`${MODULE_ID} | Failed to reset all prices`, err);
+            ui.notifications.error("Failed to reset all prices.");
+        }
     }
 }
