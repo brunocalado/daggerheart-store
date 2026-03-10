@@ -1,3 +1,6 @@
+# 0.2.3
+- Small fix, removed deprecated
+
 # 0.2.2
 - Player Favorites
 - tooltip description will take in an account line breaks

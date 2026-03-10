@@ -222,7 +222,7 @@ Hooks.once("init", () => {
     });
 
     // --- PRELOAD TEMPLATE PARTIALS ---
-    loadTemplates([
+    foundry.applications.handlebars.loadTemplates([
         "modules/daggerheart-store/templates/partials/store-header.hbs",
         "modules/daggerheart-store/templates/partials/store-search-bar.hbs",
         "modules/daggerheart-store/templates/partials/store-item-row.hbs",
