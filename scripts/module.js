@@ -465,6 +465,20 @@ Hooks.on("renderDaggerheartMenu", (app, html, data) => {
         else ui.notifications.warn("Store module is not ready yet.");
     };
 
+    let taggerButton;
+    if (game.user.isGM) {
+        taggerButton = document.createElement("button");
+        taggerButton.type = "button";
+        taggerButton.innerHTML = `<i class="fas fa-tags"></i> Item Tagger`;
+        taggerButton.classList.add("dh-custom-btn");
+        taggerButton.style.marginTop = "5px";
+        taggerButton.style.width = "100%";
+        taggerButton.onclick = (event) => {
+            event.preventDefault();
+            if (globalThis.Store) globalThis.Store.EditTags();
+        };
+    }
+
     const fieldset = element.querySelector("fieldset");
     if (fieldset) {
         const newFieldset = document.createElement("fieldset");
@@ -472,8 +486,10 @@ Hooks.on("renderDaggerheartMenu", (app, html, data) => {
         legend.innerText = "Store";
         newFieldset.appendChild(legend);
         newFieldset.appendChild(myButton);
+        if (taggerButton) newFieldset.appendChild(taggerButton);
         fieldset.after(newFieldset);
     } else {
         element.appendChild(myButton);
+        if (taggerButton) element.appendChild(taggerButton);
     }
 });
