@@ -1,4 +1,5 @@
 # 0.2.5
+- Item Tag Editor
 - Reset All Prices for All Items Button
 - Changed price detection fixed
 - [Fixed] Custom compendium items getting price 0/1 during randomization instead of respecting {{{price}}} tags

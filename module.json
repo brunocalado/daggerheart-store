@@ -42,7 +42,8 @@
     "styles/welcome.css",
     "styles/randomizer.css",
     "styles/tooltips.css",
-    "styles/dialogs.css"
+    "styles/dialogs.css",
+    "styles/store-item-tagger.css"
   ],
   "packs": [
     {

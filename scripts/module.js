@@ -1,5 +1,6 @@
 import { DaggerheartStore } from "./store-app.js";
 import { StoreImportExport } from "./store-import-export.js";
+import { StoreItemTagger } from "./store-item-tagger.js";
 import { StoreWelcome } from "./store-welcome.js";
 import { StockManager } from "./stock-manager.js";
 
@@ -247,6 +248,14 @@ Hooks.once("init", () => {
         if (direction === "down") return new Handlebars.SafeString('<i class="fas fa-caret-down"></i>');
         return "";
     });
+
+    Handlebars.registerHelper("eq", (a, b) => {
+        return a == b;
+    });
+
+    Handlebars.registerHelper("tier", (val) => {
+        return `{{{tier${val}}}}`;
+    });
 });
 
 // Singleton Instance Holder
@@ -346,6 +355,12 @@ Hooks.once("ready", async () => {
                 target: targetId,
                 time: Date.now()
             });
+        },
+        EditTags: () => {
+            if (!game.user.isGM) {
+                return ui.notifications.warn("Only GMs can use the Item Tagger.");
+            }
+            new StoreItemTagger().render(true);
         }
     };
 

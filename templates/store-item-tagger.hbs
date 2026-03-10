@@ -1,0 +1,46 @@
+<div class="store-tagger-container">
+    {{#if hasItem}}
+        <div class="item-preview">
+            <img src="{{item.img}}" class="item-image" />
+            <div class="item-name">{{item.name}}</div>
+            <button type="button" class="clear-btn" data-action="clearItem"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div class="tag-inputs">
+            <div class="form-group">
+                <label><i class="fas fa-coins"></i> Price</label>
+                <input type="number" name="price" value="{{tags.price}}" placeholder="e.g. 50" min="0" step="1">
+                <p class="hint">Generates <code class="preview-price">{{#if tags.price}}{{{tags.price}}}{{else}}{{{Price}}}{{/if}}</code></p>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-layer-group"></i> Tier</label>
+                <select name="tier">
+                    <option value="">None</option>
+                    <option value="1" {{#if (eq tags.tier 1)}}selected{{/if}}>Tier 1 (Common)</option>
+                    <option value="2" {{#if (eq tags.tier 2)}}selected{{/if}}>Tier 2 (Uncommon)</option>
+                    <option value="3" {{#if (eq tags.tier 3)}}selected{{/if}}>Tier 3 (Rare)</option>
+                    <option value="4" {{#if (eq tags.tier 4)}}selected{{/if}}>Tier 4 (Legendary)</option>
+                </select>
+                <p class="hint">Generates <code class="preview-tier">{{#if tags.tier}}{{{tier tags.tier}}}{{else}}{{{tierX}}}{{/if}}</code></p>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-heading"></i> Header</label>
+                <input type="text" name="header" value="{{tags.header}}" placeholder="e.g. Potions">
+                <p class="hint">Generates <code class="preview-header">{{#if tags.header}}{{{tags.header}}}{{else}}{{{Header}}}{{/if}}</code></p>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button type="button" class="save-btn" data-action="saveTags">
+                <i class="fas fa-save"></i> Update Item Description
+            </button>
+        </div>
+    {{else}}
+        <div class="drop-zone">
+            <i class="fas fa-cloud-download-alt"></i>
+            <p>Drag and drop an Item here to edit its Store Tags</p>
+        </div>
+    {{/if}}
+</div>
