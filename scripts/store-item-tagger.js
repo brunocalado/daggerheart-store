@@ -149,33 +149,42 @@ export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
         let desc = foundry.utils.getProperty(this.item, "system.description.value") || 
                    foundry.utils.getProperty(this.item, "system.description") || "";
 
-        // 1. Price
-        if (/\{\{\{(\d+)\}\}\}/.test(desc)) {
-            desc = desc.replace(/\{\{\{(\d+)\}\}\}/, newPrice ? `{{{${newPrice}}}}` : "");
-        } else if (newPrice) {
-            desc = `<p>{{{${newPrice}}}}</p>` + desc;
-        }
+        // Remove existing tags to ensure we don't duplicate and can move them to the end
+        
+        // 1. Remove Price tags: {{{123}}}
+        desc = desc.replace(/\{\{\{(\d+)\}\}\}/g, "");
 
-        // 2. Tier
-        if (/\{\{\{tier([1-4])\}\}\}/i.test(desc)) {
-            desc = desc.replace(/\{\{\{tier([1-4])\}\}\}/i, newTier ? `{{{tier${newTier}}}}` : "");
-        } else if (newTier) {
-            desc = `<p>{{{tier${newTier}}}}</p>` + desc;
-        }
+        // 2. Remove Tier tags: {{{tierX}}}
+        desc = desc.replace(/\{\{\{tier([1-4])\}\}\}/gi, "");
 
-        // 3. Header
+        // 3. Remove Header tag (only the one we detected previously)
         const oldHeader = this.tags.header;
         if (oldHeader) {
             const escaped = oldHeader.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             const re = new RegExp(`\\{\\{\\{${escaped}\\}\\}\\}`);
             desc = desc.replace(re, "");
         }
+
+        // Clean up empty paragraphs left behind by removals
+        desc = desc.replace(/<p>\s*<\/p>/g, "");
+        desc = desc.trim();
+
+        // Append new tags at the end
+        let tagsBlock = "";
+        
+        if (newPrice) {
+            tagsBlock += `<p>{{{${newPrice}}}}</p>`;
+        }
+        if (newTier) {
+            tagsBlock += `<p>{{{tier${newTier}}}}</p>`;
+        }
         if (newHeader && newHeader.trim() !== "") {
-            desc = `<p>{{{${newHeader.trim()}}}}</p>` + desc;
+            tagsBlock += `<p>{{{${newHeader.trim()}}}}</p>`;
         }
 
-        // Clean up empty paragraphs
-        desc = desc.replace(/<p>\s*<\/p>/g, "");
+        if (tagsBlock) {
+            desc += tagsBlock;
+        }
 
         if (this.item.system.description.value !== undefined) {
             await this.item.update({ "system.description.value": desc });

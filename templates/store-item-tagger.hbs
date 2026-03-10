@@ -10,7 +10,7 @@
             <div class="form-group">
                 <label><i class="fas fa-coins"></i> Price</label>
                 <input type="number" name="price" value="{{tags.price}}" placeholder="e.g. 50" min="0" step="1">
-                <p class="hint">Generates <code class="preview-price">{{#if tags.price}}{{{tags.price}}}{{else}}{{{Price}}}{{/if}}</code></p>
+                <p class="hint">Generates <code class="preview-price">{{#if tags.price}}&#123;&#123;&#123;{{tags.price}}&#125;&#125;&#125;{{else}}&#123;&#123;&#123;Price&#125;&#125;&#125;{{/if}}</code></p>
             </div>
 
             <div class="form-group">
@@ -27,8 +27,8 @@
 
             <div class="form-group">
                 <label><i class="fas fa-heading"></i> Header</label>
-                <input type="text" name="header" value="{{tags.header}}" placeholder="e.g. Potions">
-                <p class="hint">Generates <code class="preview-header">{{#if tags.header}}{{{tags.header}}}{{else}}{{{Header}}}{{/if}}</code></p>
+                <input type="text" name="header" value="{{tags.header}}" placeholder="e.g. Potions" maxlength="60">
+                <p class="hint">Generates <code class="preview-header">{{#if tags.header}}&#123;&#123;&#123;{{tags.header}}&#125;&#125;&#125;{{else}}&#123;&#123;&#123;Header&#125;&#125;&#125;{{/if}}</code></p>
             </div>
         </div>
 
