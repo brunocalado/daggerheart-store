@@ -1,3 +1,7 @@
+# 0.3.2
+- [Fixed] Favorites filter showing phantom items due to `unsetFlag` wiping the entire favorites object and causing a race condition
+- [Fixed] Favorite bookmark icons not matching filter state due to stale `favoritedItems` read in `_onRender`
+
 # 0.3.1
 - [Fixed] Item Tagger now reads/writes `system.tier` for weapon and armor items instead of incorrectly using a module flag
 - [Fixed] Stale tier flags on weapon/armor items are cleaned up automatically on drop

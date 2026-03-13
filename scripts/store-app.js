@@ -707,6 +707,13 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
         const userActor = game.user.character;
         const isGM = game.user.isGM;
+
+        // Sync favorites from flags at the start of every render cycle
+        // so _prepareContext and _applyRowFilters use the same authoritative state
+        if (!isGM) {
+            this.favoritedItems = game.user.getFlag(MODULE_ID, "favorites") ?? {};
+        }
+
         const hasActor = !!userActor;
 
         const partyActorId = game.settings.get(MODULE_ID, "partyActorId");
@@ -1100,9 +1107,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
         if (this.window) this.window.title = this.options.window.title;
 
-        // Load user favorites from flags for DOM-based filtering
-        this.favoritedItems = game.user.getFlag(MODULE_ID, "favorites") ?? {};
-
         this._setupSearchInputs(html);
         this._setupSliders(html);
         this._setupPriceInputs(html);
@@ -1323,11 +1327,12 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
      */
     _applyRowFilters(tabContent) {
         const query = tabContent.querySelector(".store-search")?.value.toLowerCase() ?? "";
+        const favs = this.favoritedItems ?? {};
         const rows = tabContent.querySelectorAll(".store-row");
         rows.forEach(row => {
             const name = row.querySelector(".store-item-name")?.innerText.toLowerCase() ?? "";
             const matchesSearch = name.includes(query);
-            const matchesFav = !this.showFavoritesOnly || !!this.favoritedItems[row.dataset.itemName];
+            const matchesFav = !this.showFavoritesOnly || !!favs[row.dataset.itemName];
             row.style.display = (matchesSearch && matchesFav) ? "flex" : "none";
         });
     }
@@ -1352,17 +1357,22 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
     async _onToggleFavorite(event, target) {
         const itemName = target.dataset.itemName;
         if (!itemName) return;
+
         const current = foundry.utils.deepClone(game.user.getFlag(MODULE_ID, "favorites") ?? {});
-        if (current[itemName]) {
+        const isCurrentlyFavorited = !!current[itemName];
+
+        if (isCurrentlyFavorited) {
+            // Must unsetFlag on the specific sub-path — setFlag with a missing key does NOT delete it
+            await game.user.unsetFlag(MODULE_ID, `favorites.${itemName}`);
             delete current[itemName];
-            await game.user.unsetFlag(MODULE_ID, "favorites");
-            if (Object.keys(current).length > 0) await game.user.setFlag(MODULE_ID, "favorites", current);
         } else {
             current[itemName] = true;
             await game.user.setFlag(MODULE_ID, "favorites", current);
         }
+
         this.favoritedItems = current;
-        target.classList.toggle("active", !!current[itemName]);
+        target.classList.toggle("active", !isCurrentlyFavorited);
+
         if (this.showFavoritesOnly) {
             const tabContent = target.closest(".tab");
             if (tabContent) this._applyRowFilters(tabContent);
