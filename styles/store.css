@@ -569,15 +569,27 @@
     }
 
     & .sale-badge {
-        color: var(--dhs-green);
-        font-family: var(--dhs-font-heading);
+        /* Structure mirrors .epic-badge */
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
         font-weight: bold;
-        font-size: 0.9em;
-        margin-left: 10px;
-        letter-spacing: 1px;
+        letter-spacing: 0.5px;
+        padding: 3px 5px;
+        border-radius: 3px;
+        border: 1px solid #006400;
+        line-height: 1.1;
+        white-space: nowrap;
+        flex-shrink: 0;
+
+        /* Hardcoded sale color */
+        background: #1a4d1a;
+        color: #7fff7f;
+
+        /* Keep pulse animation */
         animation: saleTextPulse 2s infinite ease-in-out;
-        display: inline-block;
-        text-shadow: 0 0 1px #1a5a3a;
     }
 
     /* ---- ICON BUTTONS ---- */
@@ -893,9 +905,9 @@
 }
 
 @keyframes saleTextPulse {
-    0% { opacity: 0.7; transform: scale(1); text-shadow: 0 0 2px #1a5a3a; }
-    50% { opacity: 1; transform: scale(1.1); text-shadow: 0 0 8px #3a8a5a; }
-    100% { opacity: 0.7; transform: scale(1); text-shadow: 0 0 2px #1a5a3a; }
+    0%   { opacity: 0.75; box-shadow: 0 0 2px #1a5a3a; }
+    50%  { opacity: 1;    box-shadow: 0 0 7px #3a8a5a; }
+    100% { opacity: 0.75; box-shadow: 0 0 2px #1a5a3a; }
 }
 
 @keyframes epicShine {

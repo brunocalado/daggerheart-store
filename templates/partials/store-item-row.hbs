@@ -26,16 +26,16 @@
 
         <span class="store-item-name" {{#if this.description}}data-item-desc="{{this.description}}"{{/if}}>{{this.name}}</span>
 
-        {{#unless @root.isGM}}
-            {{#if this.isSale}}
-                <span class="sale-badge">(SALE)</span>
-            {{/if}}
-        {{/unless}}
-
         <!-- Item Summary -->
         {{#if this.itemSummary}}
             <span class="weapon-stats">{{this.itemSummary}}</span>
         {{/if}}
+
+        {{#unless @root.isGM}}
+            {{#if this.isSale}}
+                <span class="sale-badge" aria-label="SALE">S<br>A<br>L<br>E</span>
+            {{/if}}
+        {{/unless}}
 
         {{#unless @root.isGM}}
             {{#if this.isEpic}}

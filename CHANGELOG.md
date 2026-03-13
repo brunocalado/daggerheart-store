@@ -1,3 +1,7 @@
+# 0.3.3
+- [Changed] SALE badge redesigned as a vertical pill (S/A/L/E stacked) matching epic badge structure
+- [Fixed] SALE badge now appears after item summary instead of before it
+
 # 0.3.2
 - [Fixed] Favorites filter showing phantom items due to `unsetFlag` wiping the entire favorites object and causing a race condition
 - [Fixed] Favorite bookmark icons not matching filter state due to stale `favoritedItems` read in `_onRender`
