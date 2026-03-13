@@ -1,4 +1,5 @@
 # 0.3.3
+- [Changed] Pack loading in `_prepareContext` now fetches compendium documents in parallel via `Promise.all` for both standard and custom-tab loops
 - [Changed] SALE badge redesigned as a vertical pill (S/A/L/E stacked) matching epic badge structure
 - [Fixed] SALE badge now appears after item summary instead of before it
 - [Fixed] Race condition on stock decrement/increment and party fund transfers when multiple players act simultaneously

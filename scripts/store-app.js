@@ -833,12 +833,21 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 const customItems = [];
                 const seenNames = new Set();
 
-                for (const packId of customTabCompendiums) {
-                    if (!packId || packId.trim() === "") continue;
-                    const pack = game.packs.get(packId);
-                    if (!pack) continue;
+                const validPackIds = customTabCompendiums.filter(p => p && p.trim() !== "");
 
-                    const docs = await pack.getDocuments();
+                const customPackResults = await Promise.all(
+                    validPackIds.map(async (packId) => {
+                        const pack = game.packs.get(packId);
+                        if (!pack) return null;
+                        const docs = await pack.getDocuments();
+                        return { docs };
+                    })
+                );
+
+                for (const result of customPackResults) {
+                    if (!result) continue;
+                    const { docs } = result;
+
                     for (const doc of docs) {
                         if (!getValidItemTypes().includes(doc.type)) continue;
                         if (seenNames.has(doc.name)) continue;
@@ -915,11 +924,18 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             const catConfig = allowedTiers[cat.key] || {1:true, 2:true, 3:true, 4:true};
             const priceList = PRICE_DATA[cat.key] || {};
 
-            for (const packInfo of packsToScan) {
-                const pack = game.packs.get(packInfo.id);
-                if (!pack) continue;
+            const packResults = await Promise.all(
+                packsToScan.map(async (packInfo) => {
+                    const pack = game.packs.get(packInfo.id);
+                    if (!pack) return null;
+                    const docs = await pack.getDocuments();
+                    return { packInfo, docs };
+                })
+            );
 
-                const docs = await pack.getDocuments();
+            for (const result of packResults) {
+                if (!result) continue;
+                const { packInfo, docs } = result;
 
                 for (const doc of docs) {
                     if (!packInfo.isDefault) {
