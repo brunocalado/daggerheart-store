@@ -12,6 +12,7 @@ import {
     getEpicTextColor, getEpicBgColor,
     showStoreDialog
 } from "./store-utils.js";
+import { queryDepositToParty, queryWithdrawFromParty } from "./socket.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api;
 
@@ -1535,12 +1536,23 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
                         if (direction === "deposit") {
                             if (amount > userWealth) return ui.notifications.warn("Insufficient funds.");
+                            // Deduct from own actor first (player has Owner on their own actor)
                             await deductGold(userActor, amount);
-                            await addGold(partyActor, amount);
+                            // Deposit to Party Actor via GM query
+                            const depositResult = await queryDepositToParty(partyActor.id, amount);
+                            if (!depositResult.ok) {
+                                // Rollback: refund the player
+                                await addGold(userActor, amount);
+                                return ui.notifications.error("Failed to deposit funds. Your gold has been refunded.");
+                            }
                             storeApp._createTransferChatMessage(userActor, partyActor, amount, "deposit", currency);
                         } else {
-                            if (amount > partyWealth) return ui.notifications.warn("Insufficient party funds.");
-                            await deductGold(partyActor, amount);
+                            // Balance check happens server-side in the GM handler against live data
+                            const withdrawResult = await queryWithdrawFromParty(partyActor.id, amount);
+                            if (!withdrawResult.ok) {
+                                if (withdrawResult.reason === "insufficient_funds") return ui.notifications.warn("Insufficient party funds.");
+                                return ui.notifications.error("Failed to withdraw funds. Please try again.");
+                            }
                             await addGold(userActor, amount);
                             storeApp._createTransferChatMessage(userActor, partyActor, amount, "withdraw", currency);
                         }
@@ -1688,8 +1700,18 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
         const currency = getSystemCurrency();
 
+        const partyId = game.settings.get(MODULE_ID, "partyActorId");
         for (const payer of payers) {
-            if (payer.amount > 0) await deductGold(payer.actor, payer.amount);
+            if (payer.amount <= 0) continue;
+            // Party Actor writes go through GM query to avoid race conditions
+            if (payer.actor.id === partyId) {
+                const result = await queryWithdrawFromParty(payer.actor.id, payer.amount);
+                if (!result.ok) {
+                    return ui.notifications.error("Failed to deduct party funds. Purchase cancelled.");
+                }
+            } else {
+                await deductGold(payer.actor, payer.amount);
+            }
         }
 
         const itemData = itemFromPack.toObject();

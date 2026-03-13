@@ -1,7 +1,10 @@
+import { queryDecrementStock, queryIncrementStock } from "./socket.js";
+
 /**
- * StockManager - Gerencia sistema de estoque limitado
- * Usa Actor Flags no Party Actor configurado para armazenar dados de estoque
- * Players precisam de permissão Owner no Party Actor para decrementar stock
+ * StockManager - Manages the limited stock system.
+ * Uses Actor Flags on the configured Party Actor to store stock data.
+ * Stock writes are delegated to the GM via the query system (socket.js).
+ * Players do NOT need Owner permission on the Party Actor.
  *
  * Estrutura de dados:
  * stock: {
@@ -164,100 +167,33 @@ export class StockManager {
     }
 
     /**
-     * Decrementa estoque de um item
-     * Player precisa de permissão Owner no Party Actor
-     * @param {string} itemUuid - UUID do item
-     * @param {number} amount - Quantidade a decrementar
-     * @returns {boolean} Sucesso
+     * Decrements stock for an item via GM query to avoid race conditions.
+     * @param {string} itemUuid - Item UUID
+     * @param {number} amount - Quantity to decrement
+     * @returns {Promise<boolean>} Whether the decrement succeeded
      */
     static async decrementStock(itemUuid, amount = 1) {
         if (!this.isStockEnabled()) return true;
-
         const actor = this.getStoreActor();
-        if (!actor) return true; // Sem actor = permite compra
+        if (!actor) return true;
 
-        // Verificar se o usuário pode atualizar o actor
-        if (!actor.canUserModify(game.user, "update")) {
-            console.warn(`${this.MODULE_ID} | User lacks permission to update Party Actor. Stock will not be decremented.`);
-            // Permitir compra mesmo sem decrementar stock
-            // O GM pode dar permissão Owner no Party Actor para habilitar stock tracking
-            return true;
-        }
-
-        const key = this.sanitizeKey(itemUuid);
-        const stockData = actor.getFlag(this.MODULE_ID, "stock.items") || {};
-        const itemStock = stockData[key];
-
-        // Se ilimitado ou não rastreado, permitir
-        if (!itemStock?.stockpile || itemStock.stockpile.u) return true;
-
-        const currentQty = itemStock.stockpile.q ?? 0;
-        if (currentQty < amount) return false; // Sem estoque suficiente
-
-        try {
-            // Update the item stock
-            stockData[key].stockpile.q = currentQty - amount;
-
-            const version = actor.getFlag(this.MODULE_ID, "stock.version") || 1;
-            await actor.update({
-                [`flags.${this.MODULE_ID}.stock.items`]: stockData,
-                [`flags.${this.MODULE_ID}.stock.version`]: version + 1
-            });
-
-            return true;
-        } catch (err) {
-            console.error(`${this.MODULE_ID} | Error decrementing stock for "${itemUuid}":`, err);
-            return false;
-        }
+        const result = await queryDecrementStock(itemUuid, amount);
+        return result.ok;
     }
 
     /**
-     * Incrementa estoque de um item (quando jogador vende para a loja)
-     * Player precisa de permissão Owner no Party Actor
-     * @param {string} itemUuid - UUID do item
-     * @param {number} amount - Quantidade a incrementar
-     * @returns {boolean} Sucesso
+     * Increments stock for an item via GM query to avoid race conditions.
+     * @param {string} itemUuid - Item UUID
+     * @param {number} amount - Quantity to increment
+     * @returns {Promise<boolean>} Whether the increment succeeded
      */
     static async incrementStock(itemUuid, amount = 1) {
         if (!this.isStockEnabled()) return true;
-
         const actor = this.getStoreActor();
-        if (!actor) return true; // Sem actor = permite venda
+        if (!actor) return true;
 
-        // Verificar se o usuário pode atualizar o actor
-        if (!actor.canUserModify(game.user, "update")) {
-            console.warn(`${this.MODULE_ID} | User lacks permission to update Party Actor. Stock will not be incremented.`);
-            return true;
-        }
-
-        const key = this.sanitizeKey(itemUuid);
-        const stockData = actor.getFlag(this.MODULE_ID, "stock.items") || {};
-        const itemStock = stockData[key];
-
-        // Se explicitamente ilimitado, não incrementar
-        if (itemStock?.stockpile?.u) return true;
-
-        const currentQty = itemStock?.stockpile?.q;
-
-        try {
-            // Se item não existe, ou stockpile não existe, ou q é null/undefined (empty)
-            if (!stockData[key] || !stockData[key].stockpile || currentQty === null || currentQty === undefined) {
-                stockData[key] = { stockpile: { q: amount, r: 0, u: false } };
-            } else {
-                stockData[key].stockpile.q = currentQty + amount;
-            }
-
-            const version = actor.getFlag(this.MODULE_ID, "stock.version") || 1;
-            await actor.update({
-                [`flags.${this.MODULE_ID}.stock.items`]: stockData,
-                [`flags.${this.MODULE_ID}.stock.version`]: version + 1
-            });
-
-            return true;
-        } catch (err) {
-            console.error(`${this.MODULE_ID} | Error incrementing stock for "${itemUuid}":`, err);
-            return false;
-        }
+        const result = await queryIncrementStock(itemUuid, amount);
+        return result.ok;
     }
 
     /**

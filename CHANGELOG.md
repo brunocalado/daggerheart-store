@@ -1,6 +1,8 @@
 # 0.3.3
 - [Changed] SALE badge redesigned as a vertical pill (S/A/L/E stacked) matching epic badge structure
 - [Fixed] SALE badge now appears after item summary instead of before it
+- [Fixed] Race condition on stock decrement/increment and party fund transfers when multiple players act simultaneously
+- [Added] GM-serialized query system (`scripts/socket.js`) using Foundry v13 `CONFIG.queries` for all shared Party Actor writes
 
 # 0.3.2
 - [Fixed] Favorites filter showing phantom items due to `unsetFlag` wiping the entire favorites object and causing a race condition

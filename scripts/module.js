@@ -4,6 +4,7 @@ import { StoreItemTagger } from "./store-item-tagger.js";
 import { StoreWelcome } from "./store-welcome.js";
 import { StockManager } from "./stock-manager.js";
 import { migrateTags } from "./store-migration.js";
+import { registerQueryHandlers } from "./socket.js";
 
 const MODULE_ID = "daggerheart-store";
 const { DialogV2 } = foundry.applications.api;
@@ -222,6 +223,9 @@ Hooks.once("init", () => {
         type: StoreImportExport,
         restricted: true
     });
+
+    // Register query handlers for GM-serialized writes (stock, party funds)
+    registerQueryHandlers();
 
     // --- PRELOAD TEMPLATE PARTIALS ---
     foundry.applications.handlebars.loadTemplates([
