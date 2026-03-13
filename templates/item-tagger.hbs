@@ -15,14 +15,25 @@
 
             <div class="form-group">
                 <label><i class="fas fa-layer-group"></i> Tier</label>
-                <select name="tier">
-                    <option value="">None</option>
-                    <option value="1" {{#if (eq tags.tier 1)}}selected{{/if}}>Tier 1 (Common)</option>
-                    <option value="2" {{#if (eq tags.tier 2)}}selected{{/if}}>Tier 2 (Uncommon)</option>
-                    <option value="3" {{#if (eq tags.tier 3)}}selected{{/if}}>Tier 3 (Rare)</option>
-                    <option value="4" {{#if (eq tags.tier 4)}}selected{{/if}}>Tier 4 (Legendary)</option>
-                </select>
-                <p class="hint"><code class="preview-tier">{{#if tags.tier}}Tier: {{tags.tier}}{{else}}(not set){{/if}}</code></p>
+                {{#if isSystemTierType}}
+                    {{!-- For weapon/armor, tier is a system field — editable but sourced from system.tier --}}
+                    <select name="tier">
+                        <option value="1" {{#if (eq tags.tier 1)}}selected{{/if}}>Tier 1 (Common)</option>
+                        <option value="2" {{#if (eq tags.tier 2)}}selected{{/if}}>Tier 2 (Uncommon)</option>
+                        <option value="3" {{#if (eq tags.tier 3)}}selected{{/if}}>Tier 3 (Rare)</option>
+                        <option value="4" {{#if (eq tags.tier 4)}}selected{{/if}}>Tier 4 (Legendary)</option>
+                    </select>
+                    <p class="hint"><em>Reads and writes <code>system.tier</code> (not a flag).</em></p>
+                {{else}}
+                    <select name="tier">
+                        <option value="">None</option>
+                        <option value="1" {{#if (eq tags.tier 1)}}selected{{/if}}>Tier 1 (Common)</option>
+                        <option value="2" {{#if (eq tags.tier 2)}}selected{{/if}}>Tier 2 (Uncommon)</option>
+                        <option value="3" {{#if (eq tags.tier 3)}}selected{{/if}}>Tier 3 (Rare)</option>
+                        <option value="4" {{#if (eq tags.tier 4)}}selected{{/if}}>Tier 4 (Legendary)</option>
+                    </select>
+                    <p class="hint"><code class="preview-tier">{{#if tags.tier}}Tier: {{tags.tier}}{{else}}(not set){{/if}}</code></p>
+                {{/if}}
             </div>
 
             <div class="form-group">

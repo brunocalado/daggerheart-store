@@ -1,3 +1,7 @@
+# 0.3.1
+- [Fixed] Item Tagger now reads/writes `system.tier` for weapon and armor items instead of incorrectly using a module flag
+- [Fixed] Stale tier flags on weapon/armor items are cleaned up automatically on drop
+
 # 0.3.0
 YOU MUST READ THIS: https://github.com/brunocalado/daggerheart-store/wiki/Tag-Migration-Guide
 

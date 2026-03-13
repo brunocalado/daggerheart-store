@@ -2,6 +2,9 @@ import { MODULE_ID, VALID_ITEM_TYPES, STORE_FLAGS } from "./store-constants.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
+/** Item types whose tier is stored in system.tier, not in module flags */
+const SYSTEM_TIER_TYPES = ["weapon", "armor"];
+
 /**
  * Store Item Tagger Application
  * Allows dragging and dropping items to edit their Store tags (Price, Tier, Header).
@@ -42,11 +45,18 @@ export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
         }
     };
 
+    /**
+     * Prepares context data for the Handlebars template.
+     * Exposes isSystemTierType so the template can branch tier UI for weapon/armor.
+     * @param {object} options - Render options from AppV2 lifecycle
+     * @returns {Promise<object>} Template context
+     */
     async _prepareContext(options) {
         return {
             item: this.item,
             tags: this.tags,
-            hasItem: !!this.item
+            hasItem: !!this.item,
+            isSystemTierType: this.item ? SYSTEM_TIER_TYPES.includes(this.item.type) : false
         };
     }
 
@@ -119,19 +129,36 @@ export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
         }
 
         this.item = item;
+
+        // If weapon/armor has a stale tier flag from before this fix, clean it up silently.
+        if (SYSTEM_TIER_TYPES.includes(item.type)) {
+            const staleFlag = item.getFlag(MODULE_ID, STORE_FLAGS.tier);
+            if (staleFlag !== undefined) {
+                await item.unsetFlag(MODULE_ID, STORE_FLAGS.tier);
+            }
+        }
+
         this._parseTags(item);
         this.render();
     }
 
     /**
      * Reads store metadata from item flags into local tag state.
+     * For weapon/armor, tier is read from system.tier instead of a module flag.
      * Called after drop and after save to refresh the UI.
-     * @param {Object} item - The item document
+     * @param {Item} item - The item document
      */
     _parseTags(item) {
         this.tags.price  = item.getFlag(MODULE_ID, STORE_FLAGS.price)  ?? null;
-        this.tags.tier   = item.getFlag(MODULE_ID, STORE_FLAGS.tier)   ?? null;
         this.tags.header = item.getFlag(MODULE_ID, STORE_FLAGS.header) ?? null;
+
+        if (SYSTEM_TIER_TYPES.includes(item.type)) {
+            // For weapon/armor, tier comes from the system data field, never from a flag.
+            const raw = item.system?.tier;
+            this.tags.tier = (raw !== undefined && raw !== null && raw !== "") ? parseInt(raw) : null;
+        } else {
+            this.tags.tier = item.getFlag(MODULE_ID, STORE_FLAGS.tier) ?? null;
+        }
     }
 
     /**
@@ -157,10 +184,18 @@ export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
             await this.item.unsetFlag(MODULE_ID, STORE_FLAGS.price);
         }
 
-        if (newTier) {
-            await this.item.setFlag(MODULE_ID, STORE_FLAGS.tier, parseInt(newTier));
-        } else {
+        if (SYSTEM_TIER_TYPES.includes(this.item.type)) {
+            // Weapon/armor: write to system.tier only when a valid tier is selected; never wipe it.
+            if (newTier) {
+                await this.item.update({ "system.tier": parseInt(newTier) });
+            }
             await this.item.unsetFlag(MODULE_ID, STORE_FLAGS.tier);
+        } else {
+            if (newTier) {
+                await this.item.setFlag(MODULE_ID, STORE_FLAGS.tier, parseInt(newTier));
+            } else {
+                await this.item.unsetFlag(MODULE_ID, STORE_FLAGS.tier);
+            }
         }
 
         if (newHeader) {
