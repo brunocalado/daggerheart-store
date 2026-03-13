@@ -1,3 +1,7 @@
+# 0.3.4
+- [Fixed] Stock data collision when multiple store profiles share the same Party Actor — stock is now namespaced per profile (`stock_<ProfileName>`)
+- [Added] One-time migration moves legacy `stock` flag to `stock_Default` so existing worlds retain their data
+
 # 0.3.3
 - [Changed] Pack loading in `_prepareContext` now fetches compendium documents in parallel via `Promise.all` for both standard and custom-tab loops
 - [Changed] SALE badge redesigned as a vertical pill (S/A/L/E stacked) matching epic badge structure

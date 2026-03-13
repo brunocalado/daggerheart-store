@@ -1951,6 +1951,12 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             if (profileData.hasOwnProperty(key)) await game.settings.set(MODULE_ID, key, profileData[key]);
         }
         await game.settings.set(MODULE_ID, "currentProfile", profileName);
+
+        // Initialize stock bucket for the newly loaded profile if absent
+        if (game.user.isGM) {
+            await StockManager.initializeStockData();
+        }
+
         this.render();
     }
 

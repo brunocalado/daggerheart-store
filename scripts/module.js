@@ -401,8 +401,13 @@ Hooks.on("updateActor", (actor, changes, options, userId) => {
     const partyActorId = game.settings.get(MODULE_ID, "partyActorId");
     if (!partyActorId || actor.id !== partyActorId) return;
 
-    // Check if stock data changed
-    const stockChanged = foundry.utils.hasProperty(changes, `flags.${MODULE_ID}.stock`);
+    // Check if stock data changed for any profile namespace.
+    // The changes object may arrive flat (dot-notation keys) or nested,
+    // so check both: hasProperty for nested, and key prefix scan for flat.
+    const moduleFlags = foundry.utils.getProperty(changes, `flags.${MODULE_ID}`) || {};
+    const stockPrefix = "stock_";
+    const stockChanged = Object.keys(moduleFlags).some(k => k.startsWith(stockPrefix))
+        || Object.keys(changes).some(k => k.startsWith(`flags.${MODULE_ID}.${stockPrefix}`));
     if (!stockChanged) return;
 
     // Refresh store if open

@@ -65,7 +65,8 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         const showStockQuantity = game.settings.get(MODULE_ID, "showStockQuantity");
 
         const storeActor = StockManager.getStoreActor();
-        const categoryDefaults = storeActor?.getFlag(MODULE_ID, "stock.categoryDefaults") ||
+        const stockKey = StockManager.getStockKey();
+        const categoryDefaults = storeActor?.getFlag(MODULE_ID, `${stockKey}.categoryDefaults`) ||
             StockManager._getDefaultCategorySettings();
 
         const partyActors = game.actors.filter(a => a.type === "party").map(a => ({ id: a.id, name: a.name })).sort((a, b) => a.name.localeCompare(b.name));
@@ -560,15 +561,16 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             });
 
             if (Object.keys(categoryDefaults).length > 0) {
+                const applyStockKey = StockManager.getStockKey();
                 await storeActor.update({
-                    [`flags.${MODULE_ID}.stock.categoryDefaults`]: categoryDefaults
+                    [`flags.${MODULE_ID}.${applyStockKey}.categoryDefaults`]: categoryDefaults
                 });
             }
         }
 
         const finalDefaults = Object.keys(categoryDefaults).length > 0
             ? categoryDefaults
-            : (storeActor?.getFlag(MODULE_ID, "stock.categoryDefaults") || StockManager._getDefaultCategorySettings());
+            : (storeActor?.getFlag(MODULE_ID, `${StockManager.getStockKey()}.categoryDefaults`) || StockManager._getDefaultCategorySettings());
 
         const useDefaultCompendiums = game.settings.get(MODULE_ID, "useDefaultCompendiums");
         const itemUuidMap = new Map();
@@ -591,7 +593,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         let customItemCount = 0;
 
         if (customCompendiums.length > 0) {
-            const stockItems = storeActor.getFlag(MODULE_ID, "stock.items") || {};
+            const stockItems = storeActor.getFlag(MODULE_ID, `${StockManager.getStockKey()}.items`) || {};
 
             for (const custom of customCompendiums) {
                 const categoryKey = custom.category;
@@ -626,10 +628,11 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             }
 
             if (customItemCount > 0) {
-                const version = storeActor.getFlag(MODULE_ID, "stock.version") || 1;
+                const customStockKey = StockManager.getStockKey();
+                const version = storeActor.getFlag(MODULE_ID, `${customStockKey}.version`) || 1;
                 await storeActor.update({
-                    [`flags.${MODULE_ID}.stock.items`]: stockItems,
-                    [`flags.${MODULE_ID}.stock.version`]: version + 1
+                    [`flags.${MODULE_ID}.${customStockKey}.items`]: stockItems,
+                    [`flags.${MODULE_ID}.${customStockKey}.version`]: version + 1
                 });
             }
         }
@@ -728,8 +731,9 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         if (expanded.stockDefaults) {
             const actor = StockManager.getStoreActor();
             if (actor) {
+                const settingsStockKey = StockManager.getStockKey();
                 await actor.update({
-                    [`flags.${MODULE_ID}.stock.categoryDefaults`]: expanded.stockDefaults
+                    [`flags.${MODULE_ID}.${settingsStockKey}.categoryDefaults`]: expanded.stockDefaults
                 });
             }
         }

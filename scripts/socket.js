@@ -44,7 +44,8 @@ export function registerQueryHandlers() {
         if (!StockManager.isStockEnabled()) return { ok: true };
 
         const key = StockManager.sanitizeKey(uuid);
-        const stockData = actor.getFlag(MODULE_ID, "stock.items") || {};
+        const stockKey = StockManager.getStockKey();
+        const stockData = actor.getFlag(MODULE_ID, `${stockKey}.items`) || {};
         const itemStock = stockData[key];
 
         if (!itemStock?.stockpile || itemStock.stockpile.u) return { ok: true };
@@ -53,12 +54,12 @@ export function registerQueryHandlers() {
         if (currentQty < amount) return { ok: false, reason: "out_of_stock" };
 
         stockData[key].stockpile.q = currentQty - amount;
-        const version = actor.getFlag(MODULE_ID, "stock.version") || 1;
+        const version = actor.getFlag(MODULE_ID, `${stockKey}.version`) || 1;
 
         try {
             await actor.update({
-                [`flags.${MODULE_ID}.stock.items`]: stockData,
-                [`flags.${MODULE_ID}.stock.version`]: version + 1
+                [`flags.${MODULE_ID}.${stockKey}.items`]: stockData,
+                [`flags.${MODULE_ID}.${stockKey}.version`]: version + 1
             });
             return { ok: true };
         } catch (err) {
@@ -77,7 +78,8 @@ export function registerQueryHandlers() {
         if (!StockManager.isStockEnabled()) return { ok: true };
 
         const key = StockManager.sanitizeKey(uuid);
-        const stockData = actor.getFlag(MODULE_ID, "stock.items") || {};
+        const stockKey = StockManager.getStockKey();
+        const stockData = actor.getFlag(MODULE_ID, `${stockKey}.items`) || {};
         const itemStock = stockData[key];
 
         if (itemStock?.stockpile?.u) return { ok: true };
@@ -91,10 +93,10 @@ export function registerQueryHandlers() {
                 stockData[key].stockpile.q = currentQty + amount;
             }
 
-            const version = actor.getFlag(MODULE_ID, "stock.version") || 1;
+            const version = actor.getFlag(MODULE_ID, `${stockKey}.version`) || 1;
             await actor.update({
-                [`flags.${MODULE_ID}.stock.items`]: stockData,
-                [`flags.${MODULE_ID}.stock.version`]: version + 1
+                [`flags.${MODULE_ID}.${stockKey}.items`]: stockData,
+                [`flags.${MODULE_ID}.${stockKey}.version`]: version + 1
             });
             return { ok: true };
         } catch (err) {

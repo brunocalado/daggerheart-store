@@ -153,7 +153,8 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
             cat.itemCount = itemCount;
 
             const storeActor = StockManager.getStoreActor();
-            const categoryDefaults = storeActor?.getFlag(MODULE_ID, "stock.categoryDefaults") || StockManager._getDefaultCategorySettings();
+            const stockKey = StockManager.getStockKey();
+            const categoryDefaults = storeActor?.getFlag(MODULE_ID, `${stockKey}.categoryDefaults`) || StockManager._getDefaultCategorySettings();
             const catDefaults = categoryDefaults[cat.key];
             if (catDefaults) {
                 cat.defaultQty = Math.max(catDefaults.tier1 || 0, catDefaults.tier2 || 0, catDefaults.tier3 || 0, catDefaults.tier4 || 0);
@@ -480,7 +481,8 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
         if (stockEnabled && qtyMax > 0) {
             const actor = StockManager.getStoreActor();
             if (actor) {
-                const stockItems = actor.getFlag(MODULE_ID, "stock.items") || {};
+                const stockKey = StockManager.getStockKey();
+                const stockItems = actor.getFlag(MODULE_ID, `${stockKey}.items`) || {};
                 const effectiveQtyMin = Math.max(1, qtyMin);
                 const effectiveQtyMax = Math.max(effectiveQtyMin, qtyMax);
 
@@ -500,10 +502,10 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
                     };
                 }
 
-                const version = actor.getFlag(MODULE_ID, "stock.version") || 1;
+                const version = actor.getFlag(MODULE_ID, `${stockKey}.version`) || 1;
                 await actor.update({
-                    [`flags.${MODULE_ID}.stock.items`]: stockItems,
-                    [`flags.${MODULE_ID}.stock.version`]: version + 1
+                    [`flags.${MODULE_ID}.${stockKey}.items`]: stockItems,
+                    [`flags.${MODULE_ID}.${stockKey}.version`]: version + 1
                 });
             }
         }

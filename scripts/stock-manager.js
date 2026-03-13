@@ -42,6 +42,18 @@ export class StockManager {
     }
 
     /**
+     * Returns the active stock namespace key for the current profile.
+     * Namespaces stock data per-profile so multiple profiles on the same
+     * Party Actor don't collide in a single flag bucket.
+     * @returns {string} e.g. "stock_Default", "stock_Blacksmith"
+     */
+    static getStockKey() {
+        const profile = game.settings.get(this.MODULE_ID, "currentProfile") || "Default";
+        const safeProfile = profile.replace(/[^a-zA-Z0-9_-]/g, "_");
+        return `stock_${safeProfile}`;
+    }
+
+    /**
      * Obtém o actor de inventário da loja (Party Actor configurado)
      * @returns {Actor|null}
      */
@@ -63,18 +75,30 @@ export class StockManager {
         const actor = this.getStoreActor();
         if (!actor) return false;
 
-        // Só GM pode inicializar
         if (!game.user.isGM) return false;
 
-        const existingStock = actor.getFlag(this.MODULE_ID, "stock");
+        // One-time migration: move legacy "stock" flag to "stock_Default"
+        const legacyStock = actor.getFlag(this.MODULE_ID, "stock");
+        const defaultKey = "stock_Default";
+        if (legacyStock && !actor.getFlag(this.MODULE_ID, defaultKey)) {
+            await actor.update({
+                [`flags.${this.MODULE_ID}.${defaultKey}`]: legacyStock,
+                [`flags.${this.MODULE_ID}.-=stock`]: null
+            });
+            console.log(`${this.MODULE_ID} | Migrated legacy stock to ${defaultKey}`);
+        }
+
+        // Initialize stock bucket for the active profile if absent
+        const stockKey = this.getStockKey();
+        const existingStock = actor.getFlag(this.MODULE_ID, stockKey);
         if (!existingStock) {
             try {
-                await actor.setFlag(this.MODULE_ID, "stock", {
+                await actor.setFlag(this.MODULE_ID, stockKey, {
                     version: 1,
                     items: {},
                     categoryDefaults: this._getDefaultCategorySettings()
                 });
-                console.log(`${this.MODULE_ID} | Stock data initialized on Party Actor`);
+                console.log(`${this.MODULE_ID} | Stock data initialized for profile "${stockKey}"`);
             } catch (err) {
                 console.error(`${this.MODULE_ID} | Error initializing stock data:`, err);
                 return false;
@@ -103,7 +127,7 @@ export class StockManager {
         const actor = this.getStoreActor();
         if (!actor) return null;
 
-        const stockData = actor.getFlag(this.MODULE_ID, "stock.items") || {};
+        const stockData = actor.getFlag(this.MODULE_ID, `${this.getStockKey()}.items`) || {};
         const key = this.sanitizeKey(itemUuid);
         const itemStock = stockData[key];
 
@@ -122,7 +146,7 @@ export class StockManager {
         const actor = this.getStoreActor();
         if (!actor) return false;
 
-        const stockData = actor.getFlag(this.MODULE_ID, "stock.items") || {};
+        const stockData = actor.getFlag(this.MODULE_ID, `${this.getStockKey()}.items`) || {};
         const key = this.sanitizeKey(itemUuid);
         const itemStock = stockData[key];
 
@@ -147,7 +171,8 @@ export class StockManager {
 
         try {
             const key = this.sanitizeKey(itemUuid);
-            const stockItems = actor.getFlag(this.MODULE_ID, "stock.items") || {};
+            const stockKey = this.getStockKey();
+            const stockItems = actor.getFlag(this.MODULE_ID, `${stockKey}.items`) || {};
             const existingRestock = stockItems[key]?.stockpile?.r;
 
             stockItems[key] = {
@@ -158,7 +183,7 @@ export class StockManager {
                 }
             };
 
-            await actor.setFlag(this.MODULE_ID, "stock.items", stockItems);
+            await actor.setFlag(this.MODULE_ID, `${stockKey}.items`, stockItems);
             return true;
         } catch (err) {
             console.error(`${this.MODULE_ID} | Error setting stock for "${itemUuid}":`, err);
@@ -282,10 +307,11 @@ export class StockManager {
 
         // Single actor update with all items
         try {
-            const version = actor.getFlag(this.MODULE_ID, "stock.version") || 1;
+            const stockKey = this.getStockKey();
+            const version = actor.getFlag(this.MODULE_ID, `${stockKey}.version`) || 1;
             await actor.update({
-                [`flags.${this.MODULE_ID}.stock.items`]: stockItems,
-                [`flags.${this.MODULE_ID}.stock.version`]: version + 1
+                [`flags.${this.MODULE_ID}.${stockKey}.items`]: stockItems,
+                [`flags.${this.MODULE_ID}.${stockKey}.version`]: version + 1
             });
 
             return itemCount;
@@ -305,7 +331,8 @@ export class StockManager {
         if (!actor) return;
 
         try {
-            const stockData = actor.getFlag(this.MODULE_ID, "stock.items") || {};
+            const stockKey = this.getStockKey();
+            const stockData = actor.getFlag(this.MODULE_ID, `${stockKey}.items`) || {};
             let hasChanges = false;
 
             for (const [key, itemStock] of Object.entries(stockData)) {
@@ -316,10 +343,10 @@ export class StockManager {
             }
 
             if (hasChanges) {
-                const version = actor.getFlag(this.MODULE_ID, "stock.version") || 1;
+                const version = actor.getFlag(this.MODULE_ID, `${stockKey}.version`) || 1;
                 await actor.update({
-                    [`flags.${this.MODULE_ID}.stock.items`]: stockData,
-                    [`flags.${this.MODULE_ID}.stock.version`]: version + 1
+                    [`flags.${this.MODULE_ID}.${stockKey}.items`]: stockData,
+                    [`flags.${this.MODULE_ID}.${stockKey}.version`]: version + 1
                 });
             }
         } catch (err) {
