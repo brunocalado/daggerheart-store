@@ -1,4 +1,4 @@
-import { MODULE_ID, VALID_ITEM_TYPES } from "./store-constants.js";
+import { MODULE_ID, VALID_ITEM_TYPES, STORE_FLAGS } from "./store-constants.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -85,13 +85,13 @@ export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
             const header = headerInput?.value;
 
             const pricePreview = html.querySelector(".preview-price");
-            if (pricePreview) pricePreview.textContent = price ? `{{{${price}}}}` : "{{{Price}}}";
+            if (pricePreview) pricePreview.textContent = price ? `Price: ${price}` : "(not set)";
 
             const tierPreview = html.querySelector(".preview-tier");
-            if (tierPreview) tierPreview.textContent = tier ? `{{{tier${tier}}}}` : "{{{tierX}}}";
+            if (tierPreview) tierPreview.textContent = tier ? `Tier: ${tier}` : "(not set)";
 
             const headerPreview = html.querySelector(".preview-header");
-            if (headerPreview) headerPreview.textContent = header ? `{{{${header}}}}` : "{{{Header}}}";
+            if (headerPreview) headerPreview.textContent = header ? `Header: ${header}` : "(not set)";
         };
 
         if (priceInput) priceInput.addEventListener("input", updatePreviews);
@@ -123,87 +123,50 @@ export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
         this.render();
     }
 
+    /**
+     * Reads store metadata from item flags into local tag state.
+     * Called after drop and after save to refresh the UI.
+     * @param {Object} item - The item document
+     */
     _parseTags(item) {
-        const desc = foundry.utils.getProperty(item, "system.description.value") || 
-                     foundry.utils.getProperty(item, "system.description") || "";
-        
-        // Price: {{{123}}}
-        const priceMatch = desc.match(/\{\{\{(\d+)\}\}\}/);
-        this.tags.price = priceMatch ? parseInt(priceMatch[1]) : null;
-
-        // Tier: {{{tierX}}}
-        const tierMatch = desc.match(/\{\{\{tier([1-4])\}\}\}/i);
-        this.tags.tier = tierMatch ? parseInt(tierMatch[1]) : null;
-
-        // Header: {{{Text}}} (excluding numbers and tier)
-        const allTags = [...desc.matchAll(/\{\{\{([^}]+)\}\}\}/g)];
-        this.tags.header = null;
-        
-        for (const match of allTags) {
-            const content = match[1];
-            if (/^\d+$/.test(content)) continue;
-            if (/^tier[1-4]$/i.test(content)) continue;
-            this.tags.header = content;
-            break; // Take first valid header
-        }
+        this.tags.price  = item.getFlag(MODULE_ID, STORE_FLAGS.price)  ?? null;
+        this.tags.tier   = item.getFlag(MODULE_ID, STORE_FLAGS.tier)   ?? null;
+        this.tags.header = item.getFlag(MODULE_ID, STORE_FLAGS.header) ?? null;
     }
 
+    /**
+     * Writes store metadata to item flags. Never touches system.description.
+     * Triggered by the "Save" action button in the tagger form.
+     * @param {Event} event - The triggering DOM event
+     * @param {HTMLElement} target - The action target element
+     */
     async _onSaveTags(event, target) {
         if (!this.item) return;
 
         const formData = new FormData(event.target.closest("form"));
+
         let newPrice = formData.get("price");
-        if (newPrice) {
-            // Ensure integer and non-negative
-            newPrice = Math.max(0, Math.floor(Number(newPrice))).toString();
-        }
-        const newTier = formData.get("tier");
-        const newHeader = formData.get("header");
+        newPrice = newPrice ? Math.max(0, Math.floor(Number(newPrice))) : null;
 
-        let desc = foundry.utils.getProperty(this.item, "system.description.value") || 
-                   foundry.utils.getProperty(this.item, "system.description") || "";
+        const newTier   = formData.get("tier")?.trim()   || null;
+        const newHeader = formData.get("header")?.trim() || null;
 
-        // Remove existing tags to ensure we don't duplicate and can move them to the end
-        
-        // 1. Remove Price tags: {{{123}}}
-        desc = desc.replace(/\{\{\{(\d+)\}\}\}/g, "");
-
-        // 2. Remove Tier tags: {{{tierX}}}
-        desc = desc.replace(/\{\{\{tier([1-4])\}\}\}/gi, "");
-
-        // 3. Remove Header tag (only the one we detected previously)
-        const oldHeader = this.tags.header;
-        if (oldHeader) {
-            const escaped = oldHeader.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            const re = new RegExp(`\\{\\{\\{${escaped}\\}\\}\\}`);
-            desc = desc.replace(re, "");
-        }
-
-        // Clean up empty paragraphs left behind by removals
-        desc = desc.replace(/<p>\s*<\/p>/g, "");
-        desc = desc.trim();
-
-        // Append new tags at the end
-        let tagsBlock = "";
-        
-        if (newPrice) {
-            tagsBlock += `<p>{{{${newPrice}}}}</p>`;
-        }
-        if (newTier) {
-            tagsBlock += `<p>{{{tier${newTier}}}}</p>`;
-        }
-        if (newHeader && newHeader.trim() !== "") {
-            tagsBlock += `<p>{{{${newHeader.trim()}}}}</p>`;
-        }
-
-        if (tagsBlock) {
-            desc += tagsBlock;
-        }
-
-        if (this.item.system.description.value !== undefined) {
-            await this.item.update({ "system.description.value": desc });
+        if (newPrice !== null) {
+            await this.item.setFlag(MODULE_ID, STORE_FLAGS.price, newPrice);
         } else {
-            await this.item.update({ "system.description": desc });
+            await this.item.unsetFlag(MODULE_ID, STORE_FLAGS.price);
+        }
+
+        if (newTier) {
+            await this.item.setFlag(MODULE_ID, STORE_FLAGS.tier, parseInt(newTier));
+        } else {
+            await this.item.unsetFlag(MODULE_ID, STORE_FLAGS.tier);
+        }
+
+        if (newHeader) {
+            await this.item.setFlag(MODULE_ID, STORE_FLAGS.header, newHeader);
+        } else {
+            await this.item.unsetFlag(MODULE_ID, STORE_FLAGS.header);
         }
 
         ui.notifications.info(`Updated tags for ${this.item.name}`);

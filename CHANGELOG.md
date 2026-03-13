@@ -1,3 +1,11 @@
+# 0.3.0
+YOU MUST READ THIS: https://github.com/brunocalado/daggerheart-store/wiki/Tag-Migration-Guide
+
+- [Changed] Store metadata (price, tier, header) migrated from inline `{{{...}}}` description tags to Foundry item flags (`flags.daggerheart-store.*`)
+- [Added] Migration macro: `await game.daggerheartStore.migrateTags()` converts all existing items (world, actor-owned, compendiums) and strips legacy tags from descriptions
+- [Added] Dry-run mode: `await game.daggerheartStore.migrateTags({ dryRun: true })` previews migration without writing data
+- [Changed] Item Tagger now reads/writes flags exclusively; no longer touches `system.description`
+
 # 0.2.5
 - Item Tag Editor
 - Reset All Prices for All Items Button

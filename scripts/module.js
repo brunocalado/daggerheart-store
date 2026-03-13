@@ -3,6 +3,7 @@ import { StoreImportExport } from "./store-import-export.js";
 import { StoreItemTagger } from "./store-item-tagger.js";
 import { StoreWelcome } from "./store-welcome.js";
 import { StockManager } from "./stock-manager.js";
+import { migrateTags } from "./store-migration.js";
 
 const MODULE_ID = "daggerheart-store";
 const { DialogV2 } = foundry.applications.api;
@@ -301,6 +302,9 @@ Hooks.once("ready", async () => {
             }
         }
     }
+
+    game.daggerheartStore = game.daggerheartStore ?? {};
+    game.daggerheartStore.migrateTags = migrateTags;
 
     globalThis.Store = {
         Open: async () => {

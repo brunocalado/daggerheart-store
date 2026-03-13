@@ -4,7 +4,7 @@
  * (store, config, randomizer, import/export).
  */
 
-import { MODULE_ID, VALID_ITEM_TYPES } from "./store-constants.js";
+import { MODULE_ID, VALID_ITEM_TYPES, STORE_FLAGS } from "./store-constants.js";
 
 const { DialogV2 } = foundry.applications.api;
 
@@ -22,34 +22,33 @@ export function getValidItemTypes() {
 }
 
 /**
- * Determines item tier from system.tier or {{{tierX}}} tag in description.
+ * Returns the store tier for an item, read from flags.
+ * Falls back to system.tier if no flag is set. Defaults to 1.
  * @param {Object} item - The item document
  * @returns {number} Tier value (1-4), defaults to 1
  */
 export function getItemTier(item) {
+    const flagTier = item.getFlag?.(MODULE_ID, STORE_FLAGS.tier);
+    const parsedFlagTier = parseInt(flagTier);
+    if (parsedFlagTier >= 1 && parsedFlagTier <= 4) return parsedFlagTier;
+
     const sysTier = foundry.utils.getProperty(item, "system.tier");
     const parsedSysTier = parseInt(sysTier);
     if (parsedSysTier >= 1 && parsedSysTier <= 4) return parsedSysTier;
-
-    const desc = foundry.utils.getProperty(item, "system.description") || "";
-    const tierMatch = desc.match(/\{\{\{tier([1-4])\}\}\}/i);
-    if (tierMatch) return parseInt(tierMatch[1]);
 
     return 1;
 }
 
 /**
- * Extracts price from {{{number}}} tag in an item's description.
- * Used as a fallback when the item is not in PRICE_DATA.
+ * Returns the store price for an item, read from flags.
+ * Returns 0 if no price flag is set.
  * @param {Object} item - The item document
  * @returns {number} Price value or 0 if not found
  */
 export function extractPriceFromDescription(item) {
-    const desc = foundry.utils.getProperty(item, "system.description.value") ||
-                 foundry.utils.getProperty(item, "system.description") || "";
-    const descString = String(desc);
-    const priceMatch = descString.match(/\{\{\{(\d+)\}\}\}/);
-    return priceMatch ? parseInt(priceMatch[1], 10) : 0;
+    const flagPrice = item.getFlag?.(MODULE_ID, STORE_FLAGS.price);
+    if (flagPrice !== undefined && flagPrice !== null) return parseInt(flagPrice, 10) || 0;
+    return 0;
 }
 
 // --- Currency Helpers ---
@@ -217,6 +216,71 @@ export function getEpicBgColor(hex) {
     const bg = Math.round(base * (1 - mix) + g * mix);
     const bb = Math.round(base * (1 - mix) + b * mix);
     return `#${br.toString(16).padStart(2, "0")}${bg.toString(16).padStart(2, "0")}${bb.toString(16).padStart(2, "0")}`;
+}
+
+// --- Header Helper ---
+
+/**
+ * Returns the store header for an item, read from flags.
+ * @param {Object} item - The item document
+ * @returns {string|null} Header string or null if not set
+ */
+export function getItemHeader(item) {
+    return item.getFlag?.(MODULE_ID, STORE_FLAGS.header) ?? null;
+}
+
+// --- Migration-Only Helpers ---
+
+/**
+ * MIGRATION USE ONLY.
+ * Parses legacy description tags from an item. Do not call at runtime.
+ * @param {Object} item - The item document
+ * @returns {{price: number|null, tier: number|null, header: string|null}}
+ */
+export function parseLegacyStoreTags(item) {
+    const desc = String(
+        foundry.utils.getProperty(item, "system.description") || ""
+    );
+
+    const priceMatch = desc.match(/\{\{\{(\d+)\}\}\}/);
+    const price = priceMatch ? parseInt(priceMatch[1]) : null;
+
+    const tierMatch = desc.match(/\{\{\{tier([1-4])\}\}\}/i);
+    const tier = tierMatch ? parseInt(tierMatch[1]) : null;
+
+    const allTags = [...desc.matchAll(/\{\{\{([^}]+)\}\}\}/g)];
+    let header = null;
+    for (const match of allTags) {
+        const content = match[1];
+        if (/^\d+$/.test(content)) continue;
+        if (/^tier[1-4]$/i.test(content)) continue;
+        header = content;
+        break;
+    }
+
+    return { price, tier, header };
+}
+
+/**
+ * MIGRATION USE ONLY.
+ * Removes store-specific {{{...}}} tags from a description HTML string.
+ * Only strips patterns that match known store tag formats (price, tier, header).
+ * Does NOT strip arbitrary {{{...}}} content unrelated to the store.
+ * @param {string} desc - The raw description HTML
+ * @param {{price: number|null, tier: number|null, header: string|null}} tags - Parsed tag values
+ * @returns {string} Cleaned description
+ */
+export function stripLegacyStoreTags(desc, { price, tier, header }) {
+    let result = desc;
+
+    if (price  !== null) result = result.replace(/\{\{\{\d+\}\}\}/g, "");
+    if (tier   !== null) result = result.replace(/\{\{\{tier[1-4]\}\}\}/gi, "");
+    if (header !== null) {
+        const escaped = header.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        result = result.replace(new RegExp(`\\{\\{\\{${escaped}\\}\\}\\}`), "");
+    }
+
+    return result.replace(/<p>\s*<\/p>/g, "").trim();
 }
 
 // --- Dialog Helper ---

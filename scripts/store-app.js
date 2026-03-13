@@ -6,7 +6,7 @@ import {
     MODULE_ID, STANDARD_CATEGORIES, CATEGORY_ITEM_TYPE
 } from "./store-constants.js";
 import {
-    getValidItemTypes, getItemTier, extractPriceFromDescription,
+    getValidItemTypes, getItemTier, extractPriceFromDescription, getItemHeader,
     getSystemCurrency, getActorWealth, deductGold, addGold,
     getChatWhisperRecipients, buildChatCard,
     getEpicTextColor, getEpicBgColor,
@@ -266,14 +266,14 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
     }
 
     /**
-     * Cleans HTML and price tags from a description.
+     * Cleans unsafe HTML from a description for tooltip display.
+     * Store tags no longer exist in descriptions after migration to flags.
      * @param {string} html - The raw HTML description
      * @returns {string}
      */
     _cleanDescription(html) {
         if (!html) return "";
         return String(html)
-            .replace(/\{\{\{[^}]+\}\}\}/g, '')
             .replace(/<(?!\/?(?:p|br)\b)[^>]*>/gi, '')
             .trim()
             .substring(0, 300);
@@ -391,12 +391,12 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
     _formatItemForComparison(item) {
         if (!item) return null;
         const isWeapon = item.type === "weapon";
-        const desc = foundry.utils.getProperty(item, "system.description.value") ||
-                     foundry.utils.getProperty(item, "system.description") || "";
+        const rawDesc = foundry.utils.getProperty(item, "system.description.value") ||
+                        foundry.utils.getProperty(item, "system.description") || "";
         const base = {
             name: item.name, img: item.img,
             tier: getItemTier(item),
-            description: this._cleanDescription(desc),
+            description: this._cleanDescription(rawDesc),
             isWeapon
         };
         if (isWeapon) return { ...base, ...this._extractWeaponStats(item) };
@@ -655,30 +655,22 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
     }
 
     /**
-     * Extracts a header tag from an item description (non-numeric, non-tier content in {{{...}}}).
-     * @param {string} descString - The raw description string
+     * Returns the store header for an item, read from flags via the shared helper.
+     * @param {Object} item - The item document
      * @returns {string|null}
      */
-    _extractHeaderTag(descString) {
-        const allTags = descString.match(/\{\{\{([^}]+)\}\}\}/g);
-        if (!allTags) return null;
-        for (const tag of allTags) {
-            const content = tag.replace(/\{\{\{|\}\}\}/g, '').trim();
-            if (/^\d+$/.test(content)) continue;
-            if (/^tier[1-4]$/i.test(content)) continue;
-            return content;
-        }
-        return null;
+    _extractHeaderTag(item) {
+        return getItemHeader(item);
     }
 
     /**
-     * Cleans a description string by removing all {{{...}}} tags and unsafe HTML.
+     * Cleans a description string by removing unsafe HTML.
+     * Store tags no longer exist in descriptions after migration to flags.
      * @param {string} descString - The raw description string
      * @returns {string}
      */
     _cleanDescriptionString(descString) {
         return descString
-            .replace(/\{\{\{[^}]+\}\}\}/g, '')
             .replace(/<(?!\/?(?:p|br)\b)[^>]*>/gi, '')
             .trim();
     }
@@ -855,21 +847,10 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             isOverridden = (basePrice !== cleanBasePrice);
                         }
 
-                        const desc = foundry.utils.getProperty(doc, "system.description.value") ||
-                                     foundry.utils.getProperty(doc, "system.description") || "";
-                        const descString = String(desc);
-                        const header = this._extractHeaderTag(descString);
+                        const header = this._extractHeaderTag(doc);
 
-                        // Determine tier for grouping
-                        let itemTier = null;
-                        const sysTier = foundry.utils.getProperty(doc, "system.tier");
-                        const parsedTier = parseInt(sysTier);
-                        if (parsedTier >= 1 && parsedTier <= 4) {
-                            itemTier = parsedTier;
-                        } else {
-                            const tierTagMatch = descString.match(/\{\{\{tier([1-4])\}\}\}/i);
-                            if (tierTagMatch) itemTier = parseInt(tierTagMatch[1]);
-                        }
+                        // Determine tier for grouping via flag-based helper
+                        const itemTier = getItemTier(doc);
 
                         // Per-item comparison (custom tab items can be any type)
                         let canCompare = false;
@@ -893,7 +874,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             ...sharedOpts, basePrice, isOverridden, header, tier: itemTier,
                             canCompare, hasEquippedItem, compareCategory
                         });
-                        itemData.description = this._cleanDescriptionString(descString);
+                        const rawDesc = String(foundry.utils.getProperty(doc, "system.description.value") ||
+                                               foundry.utils.getProperty(doc, "system.description") || "");
+                        itemData.description = this._cleanDescriptionString(rawDesc);
                         Object.assign(itemData, stockFields);
 
                         customItems.push(itemData);
@@ -979,10 +962,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     if (!knownItem) continue;
                     if (!catConfig[tier]) continue;
 
-                    const desc = foundry.utils.getProperty(doc, "system.description.value") ||
-                                 foundry.utils.getProperty(doc, "system.description") || "";
-                    const descString = String(desc);
-                    const header = this._extractHeaderTag(descString);
+                    const header = this._extractHeaderTag(doc);
 
                     const canCompare = !isGM && hasActor && this._isComparableCategory(cat.id);
                     const hasEquippedItem = canCompare && !!this._getEquippedItem(userActor, cat.id);
@@ -992,7 +972,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         ...sharedOpts, basePrice, isOverridden, header,
                         canCompare, hasEquippedItem
                     });
-                    itemData.description = this._cleanDescriptionString(descString);
+                    const rawDesc = String(foundry.utils.getProperty(doc, "system.description.value") ||
+                                           foundry.utils.getProperty(doc, "system.description") || "");
+                    itemData.description = this._cleanDescriptionString(rawDesc);
                     Object.assign(itemData, stockFields);
 
                     if (tierGroups[tier]) tierGroups[tier].items.push(itemData);

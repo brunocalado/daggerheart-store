@@ -77,3 +77,10 @@ export const OBJECT_SETTINGS = [
 
 /** Settings stored as arrays (used for merge logic during import) */
 export const ARRAY_SETTINGS = ["customCompendiums", "customTabCompendiums"];
+
+/** Flag keys for per-item store metadata stored in flags.daggerheart-store.* */
+export const STORE_FLAGS = {
+    price:  "price",
+    tier:   "tier",
+    header: "header"
+};

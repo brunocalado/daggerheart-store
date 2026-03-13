@@ -10,7 +10,7 @@
             <div class="form-group">
                 <label><i class="fas fa-coins"></i> Price</label>
                 <input type="number" name="price" value="{{tags.price}}" placeholder="e.g. 50" min="0" step="1">
-                <p class="hint">Generates <code class="preview-price">{{#if tags.price}}&#123;&#123;&#123;{{tags.price}}&#125;&#125;&#125;{{else}}&#123;&#123;&#123;Price&#125;&#125;&#125;{{/if}}</code></p>
+                <p class="hint"><code class="preview-price">{{#if tags.price}}Price: {{tags.price}}{{else}}(not set){{/if}}</code></p>
             </div>
 
             <div class="form-group">
@@ -22,25 +22,25 @@
                     <option value="3" {{#if (eq tags.tier 3)}}selected{{/if}}>Tier 3 (Rare)</option>
                     <option value="4" {{#if (eq tags.tier 4)}}selected{{/if}}>Tier 4 (Legendary)</option>
                 </select>
-                <p class="hint">Generates <code class="preview-tier">{{#if tags.tier}}{{{tier tags.tier}}}{{else}}{{{tierX}}}{{/if}}</code></p>
+                <p class="hint"><code class="preview-tier">{{#if tags.tier}}Tier: {{tags.tier}}{{else}}(not set){{/if}}</code></p>
             </div>
 
             <div class="form-group">
                 <label><i class="fas fa-heading"></i> Header</label>
                 <input type="text" name="header" value="{{tags.header}}" placeholder="e.g. Potions" maxlength="60">
-                <p class="hint">Generates <code class="preview-header">{{#if tags.header}}&#123;&#123;&#123;{{tags.header}}&#125;&#125;&#125;{{else}}&#123;&#123;&#123;Header&#125;&#125;&#125;{{/if}}</code></p>
+                <p class="hint"><code class="preview-header">{{#if tags.header}}Header: {{tags.header}}{{else}}(not set){{/if}}</code></p>
             </div>
         </div>
 
         <div class="actions">
             <button type="button" class="save-btn" data-action="saveTags">
-                <i class="fas fa-save"></i> Update Item Description
+                <i class="fas fa-save"></i> Save Item Flags
             </button>
         </div>
     {{else}}
         <div class="drop-zone">
             <i class="fas fa-cloud-download-alt"></i>
-            <p>Drag and drop an Item here to edit its Store Tags</p>
+            <p>Drag and drop an Item here to set store metadata.</p>
         </div>
     {{/if}}
 </div>
