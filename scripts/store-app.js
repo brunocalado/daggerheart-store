@@ -787,19 +787,33 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const vendorDescRaw = game.settings.get(MODULE_ID, "vendorDescription") ?? "";
 
         let vendorRelationLabel = "";
+        let vendorRelationColor = "#95a5a6";
         if (!isGM && userActor) {
             const relationships  = game.settings.get(MODULE_ID, "vendorRelationships") || {};
             const relationLevels = game.settings.get(MODULE_ID, "vendorRelationLevels")  || {};
             const level = relationships[userActor.id] ?? 0;
-            const labels = { "-2": "Hostile", "-1": "Distrustful", "0": "Neutral", "1": "Friendly", "2": "Allied" };
-            vendorRelationLabel = labels[String(level)] ?? "Neutral";
+            const RELATION_DISPLAY = {
+                "-2": { label: "Hostile",      emoji: "\u{1F621}", color: "#e74c3c" },
+                "-1": { label: "Distrustful",  emoji: "\u{1F612}", color: "#e67e22" },
+                "0":  { label: "Neutral",      emoji: "\u{1F610}", color: "#95a5a6" },
+                "1":  { label: "Friendly",     emoji: "\u{1F60A}", color: "#27ae60" },
+                "2":  { label: "Allied",       emoji: "\u{1F91D}", color: "#2980b9" }
+            };
+            const rel = RELATION_DISPLAY[String(level)] ?? RELATION_DISPLAY["0"];
+            vendorRelationLabel = `${rel.emoji} ${rel.label}`;
+            vendorRelationColor = rel.color;
         }
+
+        // Encode description for safe use in data-* attributes
+        const vendorDescriptionAttr = (vendorDescRaw || "").replace(/"/g, "&quot;");
 
         Object.assign(context, {
             vendorName,
             vendorImage,
             vendorDescription: vendorDescRaw,
+            vendorDescriptionAttr,
             vendorRelationLabel,
+            vendorRelationColor,
             hasVendorIdentity: !!vendorName
         });
 
@@ -1297,40 +1311,38 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
         trigger.addEventListener("mouseenter", () => {
             if (showTimeout) clearTimeout(showTimeout);
-            showTimeout = setTimeout(() => {
+            showTimeout = setTimeout(async () => {
                 document.querySelectorAll(".vendor-info-tooltip").forEach(t => t.remove());
 
-                const desc     = trigger.dataset.vendorDesc  ?? "";
-                const name     = trigger.dataset.vendorName  ?? "";
-                const img      = trigger.dataset.vendorImage ?? "";
-                const relation = trigger.dataset.vendorRelation ?? "";
+                const templateData = {
+                    vendorName:          trigger.dataset.vendorName     ?? "",
+                    vendorImage:         trigger.dataset.vendorImage    ?? "",
+                    vendorDescription:   trigger.dataset.vendorDesc     ?? "",
+                    vendorRelationLabel: trigger.dataset.vendorRelation ?? "",
+                    vendorRelationColor: trigger.dataset.vendorRelationColor ?? "#95a5a6"
+                };
 
-                // Sanitize HTML: allow safe tags only
-                const sanitized = desc.replace(
-                    /<(?!\/?(?:p|br|b|i|em|strong|ul|ol|li|span|hr)\b)[^>]*>/gi, ""
-                );
+                const templatePath = "modules/daggerheart-store/templates/partials/vendor-tooltip.hbs";
+                const tooltipHtml = await foundry.applications.handlebars.renderTemplate(templatePath, templateData);
 
-                tooltipEl = document.createElement("div");
-                tooltipEl.className = "vendor-info-tooltip";
-                tooltipEl.innerHTML = `
-                    <div class="vit-header">
-                        ${img ? `<img class="vit-image" src="${img}" alt="${name}">` : ""}
-                        <span class="vit-name">${name}</span>
-                    </div>
-                    <div class="vit-description">${sanitized}</div>
-                    <div class="vit-relation">
-                        <i class="fas fa-heart"></i> Relationship: <strong>${relation}</strong>
-                    </div>`;
+                const container = document.createElement("div");
+                container.innerHTML = tooltipHtml;
+                tooltipEl = container.firstElementChild;
                 document.body.appendChild(tooltipEl);
 
+                // Position identical to comparison tooltip
                 const rect    = trigger.getBoundingClientRect();
                 const tipRect = tooltipEl.getBoundingClientRect();
-                let top  = rect.bottom + 8;
-                let left = rect.left;
-                if (left + tipRect.width  > window.innerWidth  - 10) left = window.innerWidth  - tipRect.width  - 10;
-                if (top  + tipRect.height > window.innerHeight - 10) top  = rect.top - tipRect.height - 8;
-                tooltipEl.style.left = `${left}px`;
-                tooltipEl.style.top  = `${top}px`;
+                let top  = rect.top - tipRect.height - 10;
+                if (top < 10) top = rect.bottom + 10;
+                let left = rect.left + (rect.width / 2) - (tipRect.width / 2);
+                if (left < 10) left = 10;
+                if (left + tipRect.width > window.innerWidth - 10) left = window.innerWidth - tipRect.width - 10;
+
+                tooltipEl.style.position = "fixed";
+                tooltipEl.style.left     = `${left}px`;
+                tooltipEl.style.top      = `${top}px`;
+                tooltipEl.style.zIndex   = "10000";
             }, 400);
         });
 

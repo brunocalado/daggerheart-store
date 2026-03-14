@@ -1,0 +1,15 @@
+<div class="vendor-info-tooltip comparison-tooltip">
+    <div class="vendor-tooltip-header">
+        {{#if vendorImage}}
+        <img class="vendor-tooltip-img" src="{{vendorImage}}" alt="{{vendorName}}">
+        {{/if}}
+        <span class="vendor-tooltip-name">{{vendorName}}</span>
+    </div>
+    {{#if vendorDescription}}
+    <div class="vendor-tooltip-desc">{{{vendorDescription}}}</div>
+    {{/if}}
+    <div class="vendor-tooltip-relation">
+        <span>Relationship:</span>
+        <strong style="color: {{vendorRelationColor}}">{{vendorRelationLabel}}</strong>
+    </div>
+</div>

@@ -261,6 +261,7 @@ Hooks.once("init", () => {
         "modules/daggerheart-store/templates/partials/config-compendiums-tab.hbs",
         "modules/daggerheart-store/templates/partials/config-stock-tab.hbs",
         "modules/daggerheart-store/templates/partials/config-vendor-tab.hbs",
+        "modules/daggerheart-store/templates/partials/vendor-tooltip.hbs",
     ]);
 
     // --- HANDLEBARS HELPERS FOR COMPARISON ---

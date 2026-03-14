@@ -1,3 +1,9 @@
+# 0.3.6
+- [Fixed] FilePicker callback no longer causes stale DOM references when selecting vendor images
+- [Changed] Vendor tooltip now uses HBS template rendered via `renderTemplate`, matching the comparison tooltip visual style
+- [Changed] Relationship labels in player view now display colored emojis per level (Hostile/Distrustful/Neutral/Friendly/Allied)
+- [Added] `maxlength` constraints on vendor text fields (Store Name: 50, Vendor Name: 30, Description: 1000)
+
 # 0.3.5
 - [Added] Vendor tab in Store Configuration with vendor identity fields (name, description) and `storeName` moved from General tab
 - [Added] Per-character relationship system (Hostile/Distrustful/Neutral/Friendly/Allied) with configurable price modifiers

@@ -432,20 +432,56 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             });
         });
 
-        // Vendor image filepicker
+        // Vendor image filepicker — capture input ref before picker opens to avoid stale DOM
         const browseBtn = html.querySelector(".vendor-image-browse");
         if (browseBtn) {
-            browseBtn.addEventListener("click", () => {
+            browseBtn.addEventListener("click", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
                 const pathInput = html.querySelector(".vendor-image-path");
-                new foundry.applications.apps.FilePicker({
+
+                const FilePickerClass = foundry.applications.apps.FilePicker.implementation ?? foundry.applications.apps.FilePicker;
+                const picker = new FilePickerClass({
                     type: "image",
                     current: pathInput?.value ?? "",
                     callback: (path) => {
-                        if (pathInput) pathInput.value = path;
-                        pathInput?.dispatchEvent(new Event("change", { bubbles: true }));
-                        this.render();
+                        if (pathInput) {
+                            pathInput.value = path;
+                            pathInput.dispatchEvent(new Event("input", { bubbles: true }));
+                        }
+                        // Update preview image directly without re-render
+                        let preview = html.querySelector(".vendor-image-preview");
+                        if (preview) {
+                            preview.src = path;
+                        } else {
+                            const img = document.createElement("img");
+                            img.className = "vendor-image-preview";
+                            img.src = path;
+                            img.alt = "Vendor Image";
+                            pathInput?.parentElement?.insertBefore(img, pathInput);
+                        }
+                        // Show clear button if not present
+                        const existingClear = html.querySelector(".vendor-image-clear");
+                        if (!existingClear) {
+                            const btn = document.createElement("button");
+                            btn.type = "button";
+                            btn.className = "config-btn icon-only vendor-image-clear";
+                            btn.title = "Clear image";
+                            btn.style.color = "#ff9999";
+                            btn.innerHTML = '<i class="fas fa-times"></i>';
+                            pathInput?.parentElement?.appendChild(btn);
+                            btn.addEventListener("click", async () => {
+                                pathInput.value = "";
+                                const previewEl = html.querySelector(".vendor-image-preview");
+                                if (previewEl) previewEl.remove();
+                                btn.remove();
+                                await game.settings.set(MODULE_ID, "vendorImage", "");
+                            });
+                        }
                     }
-                }).render(true);
+                });
+                picker.render(true);
             });
         }
 
@@ -453,8 +489,12 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         const clearBtn = html.querySelector(".vendor-image-clear");
         if (clearBtn) {
             clearBtn.addEventListener("click", async () => {
+                const pathInput = html.querySelector(".vendor-image-path");
+                if (pathInput) pathInput.value = "";
+                const preview = html.querySelector(".vendor-image-preview");
+                if (preview) preview.remove();
+                clearBtn.remove();
                 await game.settings.set(MODULE_ID, "vendorImage", "");
-                this.render();
             });
         }
 

@@ -3,17 +3,18 @@
     <h3><i class="fas fa-id-card"></i> Vendor Identity</h3>
     <div class="vendor-identity-form">
         <label>Store Name</label>
-        <input type="text" name="storeName" value="{{storeName}}">
+        <input type="text" name="storeName" value="{{storeName}}" maxlength="50">
         <span class="field-hint">Title of the main store window.</span>
 
         <label>Vendor Name <span class="optional">(optional)</span></label>
         <input type="text" name="vendorName" value="{{vendorName}}"
-               placeholder="e.g. Garrick the Blacksmith">
+               placeholder="e.g. Garrick the Blacksmith" maxlength="30">
         <span class="field-hint">NPC name shown in the store header.</span>
 
         <label>Vendor Description <span class="optional">(optional)</span></label>
         <textarea name="vendorDescription" class="vendor-description-field"
-                  placeholder="Brief description of this vendor...">{{vendorDescription}}</textarea>
+                  placeholder="Brief description of this vendor..."
+                  maxlength="1000">{{vendorDescription}}</textarea>
         <span class="field-hint">Flavor text shown below the vendor name.</span>
 
         <label>Vendor Image <span class="optional">(optional)</span></label>

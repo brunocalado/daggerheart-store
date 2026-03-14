@@ -883,32 +883,25 @@
 }
 .vendor-info-trigger:hover { color: var(--dhs-gold, #d4af37); }
 
-/* Vendor Info Tooltip */
+/* Vendor tooltip reuses the comparison-tooltip card visual */
 .vendor-info-tooltip {
-    position: fixed;
-    z-index: 10000;
     min-width: 220px;
     max-width: 320px;
-    background: #1a1a1a;
-    border: 1px solid var(--dhs-gold-border, #6b5a2e);
-    border-radius: 6px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.7);
-    padding: 12px;
-    font-size: 0.9em;
-    color: var(--dhs-text, #ccc);
+    width: auto;
     pointer-events: none;
+    padding: 12px;
 }
 
-.vit-header {
+.vendor-tooltip-header {
     display: flex;
     align-items: center;
     gap: 10px;
     margin-bottom: 10px;
     padding-bottom: 8px;
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid #444;
 }
 
-.vit-image {
+.vendor-tooltip-img {
     width: 48px;
     height: 48px;
     object-fit: cover;
@@ -917,30 +910,30 @@
     flex-shrink: 0;
 }
 
-.vit-name {
-    font-family: var(--dhs-font-heading);
+.vendor-tooltip-name {
     font-size: 1.05em;
-    color: var(--dhs-gold, #d4af37);
     font-weight: bold;
+    color: var(--dhs-gold, #d4af37);
 }
 
-.vit-description {
-    line-height: 1.5;
+.vendor-tooltip-desc {
+    font-size: 0.88em;
     color: #bbb;
-    margin-bottom: 10px;
+    line-height: 1.5;
+    margin-bottom: 8px;
 }
 
-.vit-description p  { margin: 0 0 6px; }
-.vit-description ul,
-.vit-description ol { margin: 4px 0 4px 16px; padding: 0; }
+.vendor-tooltip-desc p  { margin: 0 0 4px; }
+.vendor-tooltip-desc ul,
+.vendor-tooltip-desc ol { margin: 4px 0 4px 14px; padding: 0; }
 
-.vit-relation {
-    padding-top: 8px;
+.vendor-tooltip-relation {
     border-top: 1px solid #333;
+    padding-top: 8px;
+    margin-top: 8px;
     font-size: 0.88em;
     color: #999;
 }
-.vit-relation strong { color: #ccc; }
 
 /* Vendor image picker in Config tab */
 .vendor-image-picker-row {
