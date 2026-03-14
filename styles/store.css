@@ -883,6 +883,10 @@
 }
 .vendor-info-trigger:hover { color: var(--dhs-gold, #d4af37); }
 
+.vendor-header-image.vendor-info-trigger {
+    cursor: help;
+}
+
 /* Vendor tooltip reuses the comparison-tooltip card visual */
 .vendor-info-tooltip {
     min-width: 220px;
@@ -918,7 +922,7 @@
 
 .vendor-tooltip-desc {
     font-size: 0.88em;
-    color: #bbb;
+    color: #e0e0e0;
     line-height: 1.5;
     margin-bottom: 8px;
 }
@@ -932,7 +936,11 @@
     padding-top: 8px;
     margin-top: 8px;
     font-size: 0.88em;
-    color: #999;
+    color: #d0d0d0;
+}
+
+.vendor-tooltip-relation strong {
+    color: #ffffff;
 }
 
 /* Vendor image picker in Config tab */

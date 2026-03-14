@@ -54,19 +54,20 @@
                 {{#if hasVendorIdentity}}
                 <div class="vendor-identity-header">
                     {{#if vendorImage}}
-                    <img class="vendor-header-image" src="{{vendorImage}}" alt="{{vendorName}}">
+                        {{#if vendorDescription}}
+                        <img class="vendor-header-image vendor-info-trigger"
+                             src="{{vendorImage}}"
+                             alt="{{vendorName}}"
+                             data-vendor-desc="{{vendorDescriptionAttr}}"
+                             data-vendor-name="{{vendorName}}"
+                             data-vendor-image="{{vendorImage}}"
+                             data-vendor-relation="{{vendorRelationLabel}}"
+                             data-vendor-relation-color="{{vendorRelationColor}}">
+                        {{else}}
+                        <img class="vendor-header-image" src="{{vendorImage}}" alt="{{vendorName}}">
+                        {{/if}}
                     {{/if}}
                     <span class="vendor-header-name">{{vendorName}}</span>
-                    {{#if vendorDescription}}
-                    <span class="vendor-info-trigger"
-                          data-vendor-desc="{{vendorDescriptionAttr}}"
-                          data-vendor-name="{{vendorName}}"
-                          data-vendor-image="{{vendorImage}}"
-                          data-vendor-relation="{{vendorRelationLabel}}"
-                          data-vendor-relation-color="{{vendorRelationColor}}">
-                        <i class="fas fa-question-circle"></i>
-                    </span>
-                    {{/if}}
                 </div>
                 {{/if}}
             </div>
@@ -96,19 +97,20 @@
                 {{#if hasVendorIdentity}}
                 <div class="vendor-identity-header">
                     {{#if vendorImage}}
-                    <img class="vendor-header-image" src="{{vendorImage}}" alt="{{vendorName}}">
+                        {{#if vendorDescription}}
+                        <img class="vendor-header-image vendor-info-trigger"
+                             src="{{vendorImage}}"
+                             alt="{{vendorName}}"
+                             data-vendor-desc="{{vendorDescriptionAttr}}"
+                             data-vendor-name="{{vendorName}}"
+                             data-vendor-image="{{vendorImage}}"
+                             data-vendor-relation="{{vendorRelationLabel}}"
+                             data-vendor-relation-color="{{vendorRelationColor}}">
+                        {{else}}
+                        <img class="vendor-header-image" src="{{vendorImage}}" alt="{{vendorName}}">
+                        {{/if}}
                     {{/if}}
                     <span class="vendor-header-name">{{vendorName}}</span>
-                    {{#if vendorDescription}}
-                    <span class="vendor-info-trigger"
-                          data-vendor-desc="{{vendorDescriptionAttr}}"
-                          data-vendor-name="{{vendorName}}"
-                          data-vendor-image="{{vendorImage}}"
-                          data-vendor-relation="{{vendorRelationLabel}}"
-                          data-vendor-relation-color="{{vendorRelationColor}}">
-                        <i class="fas fa-question-circle"></i>
-                    </span>
-                    {{/if}}
                 </div>
                 {{/if}}
             </div>
