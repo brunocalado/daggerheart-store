@@ -131,6 +131,11 @@ Hooks.once("init", () => {
     game.settings.register(MODULE_ID, "vendorDescription", {
         name: "Vendor Description", scope: "world", config: false, type: String, default: ""
     });
+    game.settings.register(MODULE_ID, "vendorImage", {
+        name: "Vendor Image",
+        hint: "Square image displayed next to the vendor name in the player header.",
+        scope: "world", config: false, type: String, default: ""
+    });
     game.settings.register(MODULE_ID, "vendorRelationships", {
         name: "Vendor Relationships", scope: "world", config: false, type: Object, default: {}
     });

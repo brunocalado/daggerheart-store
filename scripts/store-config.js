@@ -135,6 +135,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         // Vendor settings — loaded for the Vendor tab
         const vendorName = game.settings.get(MODULE_ID, "vendorName");
         const vendorDescription = game.settings.get(MODULE_ID, "vendorDescription");
+        const vendorImage = game.settings.get(MODULE_ID, "vendorImage") ?? "";
         const vendorRelationLevels = game.settings.get(MODULE_ID, "vendorRelationLevels") ||
             { "-2": 25, "-1": 10, "0": 0, "1": 10, "2": 25 };
         const vendorRelationships = foundry.utils.deepClone(
@@ -209,6 +210,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             epicEffect: epicEffect,
             vendorName,
             vendorDescription,
+            vendorImage,
             vendorRelationLevels,
             vendorRelationships: cleanedRelationships,
             linkedActors,
@@ -429,6 +431,32 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
                 }
             });
         });
+
+        // Vendor image filepicker
+        const browseBtn = html.querySelector(".vendor-image-browse");
+        if (browseBtn) {
+            browseBtn.addEventListener("click", () => {
+                const pathInput = html.querySelector(".vendor-image-path");
+                new foundry.applications.apps.FilePicker({
+                    type: "image",
+                    current: pathInput?.value ?? "",
+                    callback: (path) => {
+                        if (pathInput) pathInput.value = path;
+                        pathInput?.dispatchEvent(new Event("change", { bubbles: true }));
+                        this.render();
+                    }
+                }).render(true);
+            });
+        }
+
+        // Clear vendor image
+        const clearBtn = html.querySelector(".vendor-image-clear");
+        if (clearBtn) {
+            clearBtn.addEventListener("click", async () => {
+                await game.settings.set(MODULE_ID, "vendorImage", "");
+                this.render();
+            });
+        }
 
         // Initialize bulk checkbox states
         this._updateBulkCheckboxes(html);
@@ -797,6 +825,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         // Vendor settings
         await game.settings.set(MODULE_ID, "vendorName", expanded.vendorName || "");
         await game.settings.set(MODULE_ID, "vendorDescription", expanded.vendorDescription || "");
+        await game.settings.set(MODULE_ID, "vendorImage", expanded.vendorImage || "");
 
         // Save relation level modifiers — neutral is always 0
         const relationLevels = {

@@ -781,6 +781,28 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             showFavoritesOnly: this.showFavoritesOnly
         };
 
+        // Vendor identity for player header
+        const vendorName    = game.settings.get(MODULE_ID, "vendorName") ?? "";
+        const vendorImage   = game.settings.get(MODULE_ID, "vendorImage") ?? "";
+        const vendorDescRaw = game.settings.get(MODULE_ID, "vendorDescription") ?? "";
+
+        let vendorRelationLabel = "";
+        if (!isGM && userActor) {
+            const relationships  = game.settings.get(MODULE_ID, "vendorRelationships") || {};
+            const relationLevels = game.settings.get(MODULE_ID, "vendorRelationLevels")  || {};
+            const level = relationships[userActor.id] ?? 0;
+            const labels = { "-2": "Hostile", "-1": "Distrustful", "0": "Neutral", "1": "Friendly", "2": "Allied" };
+            vendorRelationLabel = labels[String(level)] ?? "Neutral";
+        }
+
+        Object.assign(context, {
+            vendorName,
+            vendorImage,
+            vendorDescription: vendorDescRaw,
+            vendorRelationLabel,
+            hasVendorIdentity: !!vendorName
+        });
+
         // Load all needed settings once
         const priceMod = game.settings.get(MODULE_ID, "priceModifier") / 100;
         const sellRatio = game.settings.get(MODULE_ID, "sellRatio") || 0.5;
@@ -1144,6 +1166,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         this._setupItemImages(html);
         this._setupDescriptionTooltips(html);
         this._setupComparisonTooltips(html);
+        this._setupVendorTooltip(html);
         this._setupTabSwitching(html);
     }
 
@@ -1257,6 +1280,63 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 if (tooltipTimeout) { clearTimeout(tooltipTimeout); tooltipTimeout = null; }
                 document.querySelectorAll(".daggerheart-store-tooltip").forEach(t => t.remove());
             });
+        });
+    }
+
+    /**
+     * Sets up the vendor identity tooltip on hover over the info trigger icon.
+     * Displays vendor image, name, HTML description, and player relationship status.
+     * @param {HTMLElement} html - The root element of the rendered application
+     */
+    _setupVendorTooltip(html) {
+        const trigger = html.querySelector(".vendor-info-trigger");
+        if (!trigger) return;
+
+        let tooltipEl = null;
+        let showTimeout = null;
+
+        trigger.addEventListener("mouseenter", () => {
+            if (showTimeout) clearTimeout(showTimeout);
+            showTimeout = setTimeout(() => {
+                document.querySelectorAll(".vendor-info-tooltip").forEach(t => t.remove());
+
+                const desc     = trigger.dataset.vendorDesc  ?? "";
+                const name     = trigger.dataset.vendorName  ?? "";
+                const img      = trigger.dataset.vendorImage ?? "";
+                const relation = trigger.dataset.vendorRelation ?? "";
+
+                // Sanitize HTML: allow safe tags only
+                const sanitized = desc.replace(
+                    /<(?!\/?(?:p|br|b|i|em|strong|ul|ol|li|span|hr)\b)[^>]*>/gi, ""
+                );
+
+                tooltipEl = document.createElement("div");
+                tooltipEl.className = "vendor-info-tooltip";
+                tooltipEl.innerHTML = `
+                    <div class="vit-header">
+                        ${img ? `<img class="vit-image" src="${img}" alt="${name}">` : ""}
+                        <span class="vit-name">${name}</span>
+                    </div>
+                    <div class="vit-description">${sanitized}</div>
+                    <div class="vit-relation">
+                        <i class="fas fa-heart"></i> Relationship: <strong>${relation}</strong>
+                    </div>`;
+                document.body.appendChild(tooltipEl);
+
+                const rect    = trigger.getBoundingClientRect();
+                const tipRect = tooltipEl.getBoundingClientRect();
+                let top  = rect.bottom + 8;
+                let left = rect.left;
+                if (left + tipRect.width  > window.innerWidth  - 10) left = window.innerWidth  - tipRect.width  - 10;
+                if (top  + tipRect.height > window.innerHeight - 10) top  = rect.top - tipRect.height - 8;
+                tooltipEl.style.left = `${left}px`;
+                tooltipEl.style.top  = `${top}px`;
+            }, 400);
+        });
+
+        trigger.addEventListener("mouseleave", () => {
+            if (showTimeout) { clearTimeout(showTimeout); showTimeout = null; }
+            if (tooltipEl)   { tooltipEl.remove(); tooltipEl = null; }
         });
     }
 
@@ -1902,7 +1982,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             "epicItems", "epicIcon", "epicColor", "epicLabel", "epicEffect",
             "partyActorId", "customTabName", "customTabCompendiums", "customTabTierGroup",
             "useDefaultCompendiums", "sellRatio", "stockEnabled", "showStockQuantity", "randomizerSettings",
-            "vendorName", "vendorDescription", "vendorRelationships", "vendorRelationLevels"
+            "vendorName", "vendorDescription", "vendorImage", "vendorRelationships", "vendorRelationLevels"
         ];
         const currentSettings = {};
         for (const key of settingsKeys) currentSettings[key] = game.settings.get(MODULE_ID, key);
@@ -1940,7 +2020,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 customTabTierGroup: true, useDefaultCompendiums: true,
                 sellRatio: 0.5, stockEnabled: false, showStockQuantity: true,
                 randomizerSettings: {},
-                vendorName: "", vendorDescription: "",
+                vendorName: "", vendorDescription: "", vendorImage: "",
                 vendorRelationships: {},
                 vendorRelationLevels: { "-2": 25, "-1": 10, "0": 0, "1": 10, "2": 25 }
             };
@@ -1957,7 +2037,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             "epicItems", "epicIcon", "epicColor", "epicLabel", "epicEffect",
             "partyActorId", "customTabName", "customTabCompendiums", "customTabTierGroup",
             "useDefaultCompendiums", "sellRatio", "stockEnabled", "showStockQuantity", "randomizerSettings",
-            "vendorName", "vendorDescription", "vendorRelationships", "vendorRelationLevels"
+            "vendorName", "vendorDescription", "vendorImage", "vendorRelationships", "vendorRelationLevels"
         ];
 
         // Migrate old profile format

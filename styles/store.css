@@ -847,6 +847,121 @@
     }
 }
 
+/* ==================================================== */
+/* VENDOR IDENTITY HEADER (player view)                 */
+/* ==================================================== */
+
+.vendor-identity-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.vendor-header-image {
+    width: 34px;
+    height: 34px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid var(--dhs-gold-border, #6b5a2e);
+    flex-shrink: 0;
+}
+
+.vendor-header-name {
+    font-family: var(--dhs-font-heading);
+    font-size: 1.05em;
+    color: var(--dhs-gold, #d4af37);
+    font-weight: bold;
+    letter-spacing: 0.3px;
+}
+
+.vendor-info-trigger {
+    cursor: help;
+    color: #888;
+    font-size: 0.9em;
+    transition: color 0.2s;
+    line-height: 1;
+}
+.vendor-info-trigger:hover { color: var(--dhs-gold, #d4af37); }
+
+/* Vendor Info Tooltip */
+.vendor-info-tooltip {
+    position: fixed;
+    z-index: 10000;
+    min-width: 220px;
+    max-width: 320px;
+    background: #1a1a1a;
+    border: 1px solid var(--dhs-gold-border, #6b5a2e);
+    border-radius: 6px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+    padding: 12px;
+    font-size: 0.9em;
+    color: var(--dhs-text, #ccc);
+    pointer-events: none;
+}
+
+.vit-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #333;
+}
+
+.vit-image {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid var(--dhs-gold-border, #6b5a2e);
+    flex-shrink: 0;
+}
+
+.vit-name {
+    font-family: var(--dhs-font-heading);
+    font-size: 1.05em;
+    color: var(--dhs-gold, #d4af37);
+    font-weight: bold;
+}
+
+.vit-description {
+    line-height: 1.5;
+    color: #bbb;
+    margin-bottom: 10px;
+}
+
+.vit-description p  { margin: 0 0 6px; }
+.vit-description ul,
+.vit-description ol { margin: 4px 0 4px 16px; padding: 0; }
+
+.vit-relation {
+    padding-top: 8px;
+    border-top: 1px solid #333;
+    font-size: 0.88em;
+    color: #999;
+}
+.vit-relation strong { color: #ccc; }
+
+/* Vendor image picker in Config tab */
+.vendor-image-picker-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.vendor-image-preview {
+    width: 32px;
+    height: 32px;
+    object-fit: cover;
+    border-radius: 3px;
+    border: 1px solid var(--dhs-border-light);
+    flex-shrink: 0;
+}
+
+.vendor-image-path {
+    flex: 1;
+}
+
 /* ---- FAVORITES ---- */
 
 .daggerheart-store {

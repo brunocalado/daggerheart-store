@@ -2,9 +2,13 @@
 - [Added] Vendor tab in Store Configuration with vendor identity fields (name, description) and `storeName` moved from General tab
 - [Added] Per-character relationship system (Hostile/Distrustful/Neutral/Friendly/Allied) with configurable price modifiers
 - [Added] Relationship price modifier applied after all existing price transformations for player characters
+- [Added] Vendor Image setting with FilePicker in the Vendor tab (browse, preview, clear)
+- [Added] Vendor identity block in the player store header showing image, name, and info tooltip
+- [Added] Vendor info tooltip on hover displaying image, description (HTML-safe), and relationship status
 - [Changed] Vendor Identity form uses CSS grid layout for consistent label/input alignment
 - [Changed] Character Relationships rows now show a colored price-effect badge (+25%, -10%, etc.) next to the dropdown
 - [Changed] Relationship Modifiers table polished with colored level badges, arrow icons, and `%` suffix on inputs
+- [Changed] Player header now shows vendor identity instead of "Character: name" when a vendor name is set
 - [Removed] Redundant live-preview span from Relationship Modifiers percentage inputs
 
 # 0.3.4

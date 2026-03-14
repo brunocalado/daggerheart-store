@@ -15,6 +15,32 @@
         <textarea name="vendorDescription" class="vendor-description-field"
                   placeholder="Brief description of this vendor...">{{vendorDescription}}</textarea>
         <span class="field-hint">Flavor text shown below the vendor name.</span>
+
+        <label>Vendor Image <span class="optional">(optional)</span></label>
+        <div class="vendor-image-picker-row">
+            {{#if vendorImage}}
+            <img class="vendor-image-preview" src="{{vendorImage}}" alt="Vendor Image">
+            {{/if}}
+            <input type="text"
+                   name="vendorImage"
+                   class="vendor-image-path"
+                   value="{{vendorImage}}"
+                   placeholder="path/to/image.webp">
+            <button type="button"
+                    class="config-btn icon-only vendor-image-browse"
+                    title="Browse for image">
+                <i class="fas fa-file-image"></i>
+            </button>
+            {{#if vendorImage}}
+            <button type="button"
+                    class="config-btn icon-only vendor-image-clear"
+                    title="Clear image"
+                    style="color:#ff9999;">
+                <i class="fas fa-times"></i>
+            </button>
+            {{/if}}
+        </div>
+        <span class="field-hint">Square 1:1 image shown next to the vendor name.</span>
     </div>
 </div>
 

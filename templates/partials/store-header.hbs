@@ -51,7 +51,23 @@
         {{#if hasPartyActor}}
             <!-- Party Actor Selected: Layout Split -->
             <div class="header-left">
-                <label>Character:</label> <strong>{{actorName}}</strong>
+                {{#if hasVendorIdentity}}
+                <div class="vendor-identity-header">
+                    {{#if vendorImage}}
+                    <img class="vendor-header-image" src="{{vendorImage}}" alt="{{vendorName}}">
+                    {{/if}}
+                    <span class="vendor-header-name">{{vendorName}}</span>
+                    {{#if vendorDescription}}
+                    <span class="vendor-info-trigger"
+                          data-vendor-desc="{{vendorDescription}}"
+                          data-vendor-name="{{vendorName}}"
+                          data-vendor-image="{{vendorImage}}"
+                          data-vendor-relation="{{vendorRelationLabel}}">
+                        <i class="fas fa-question-circle"></i>
+                    </span>
+                    {{/if}}
+                </div>
+                {{/if}}
             </div>
             <div class="header-right">
                 <!-- Transfer Funds Button -->
@@ -76,7 +92,23 @@
         {{else}}
             <!-- No Party Actor: Standard Display -->
             <div class="header-left">
-                <label>Character:</label> <strong>{{actorName}}</strong>
+                {{#if hasVendorIdentity}}
+                <div class="vendor-identity-header">
+                    {{#if vendorImage}}
+                    <img class="vendor-header-image" src="{{vendorImage}}" alt="{{vendorName}}">
+                    {{/if}}
+                    <span class="vendor-header-name">{{vendorName}}</span>
+                    {{#if vendorDescription}}
+                    <span class="vendor-info-trigger"
+                          data-vendor-desc="{{vendorDescription}}"
+                          data-vendor-name="{{vendorName}}"
+                          data-vendor-image="{{vendorImage}}"
+                          data-vendor-relation="{{vendorRelationLabel}}">
+                        <i class="fas fa-question-circle"></i>
+                    </span>
+                    {{/if}}
+                </div>
+                {{/if}}
             </div>
             <div class="header-right">
                 <label>PC Wealth:</label>
