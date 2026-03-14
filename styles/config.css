@@ -814,20 +814,6 @@
     background: rgba(255,255,255,0.03);
 }
 
-.modifier-level-badge {
-    display: inline-block;
-    width: 28px;
-    text-align: center;
-    padding: 2px 4px;
-    border-radius: 3px;
-    font-weight: bold;
-    font-family: var(--dhs-font-heading);
-}
-
-.level-up   { background: rgba(244,67,54,0.2);  color: #f44336; border: 1px solid rgba(244,67,54,0.4); }
-.level-down { background: rgba(76,175,80,0.2);  color: #4caf50; border: 1px solid rgba(76,175,80,0.4); }
-.level-none { background: rgba(150,150,150,0.1); color: #888;   border: 1px solid #444; }
-
 .modifier-input-wrapper {
     display: flex;
     align-items: center;

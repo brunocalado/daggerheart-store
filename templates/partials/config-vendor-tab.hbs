@@ -63,7 +63,6 @@
     <table class="vendor-relation-table">
         <thead>
             <tr>
-                <th>Level</th>
                 <th>Label</th>
                 <th>Price Effect</th>
                 <th>Modifier %</th>
@@ -72,9 +71,6 @@
         <tbody>
             {{#each vendorRelationLevelsArray}}
             <tr class="{{#if (eq direction "up")}}modifier-row-up{{else if (eq direction "down")}}modifier-row-down{{else}}modifier-row-neutral{{/if}}">
-                <td class="modifier-level-cell">
-                    <span class="modifier-level-badge level-{{direction}}">{{level}}</span>
-                </td>
                 <td class="modifier-label-cell">{{label}}</td>
                 <td class="modifier-effect-cell">
                     {{#if (eq direction "up")}}
