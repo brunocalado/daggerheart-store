@@ -645,32 +645,95 @@
 /* VENDOR TAB                                           */
 /* ==================================================== */
 
+/* Identity Form - 3-column grid: label | input | hint */
+.vendor-identity-form {
+    display: grid;
+    grid-template-columns: 160px 1fr auto;
+    align-items: center;
+    gap: 8px 12px;
+    margin-bottom: 10px;
+}
+
+.vendor-identity-form label {
+    color: var(--dhs-text-muted);
+    font-size: 0.95em;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.vendor-identity-form input[type="text"],
+.vendor-identity-form textarea {
+    width: 100%;
+    background: var(--dhs-bg-darker);
+    border: 1px solid var(--dhs-border-light);
+    border-radius: 4px;
+    color: var(--dhs-text-white);
+    padding: 5px 8px;
+    font-size: 0.95em;
+    transition: border-color 0.2s;
+}
+
+.vendor-identity-form input[type="text"]:focus,
+.vendor-identity-form textarea:focus {
+    outline: none;
+    border-color: var(--dhs-gold);
+    box-shadow: 0 0 4px rgba(212, 175, 55, 0.3);
+}
+
+.vendor-description-field {
+    resize: vertical;
+    min-height: 52px;
+    grid-row: span 1;
+}
+
+.field-hint {
+    font-size: 0.82em;
+    color: #666;
+    white-space: nowrap;
+}
+
+.optional {
+    font-size: 0.8em;
+    color: #666;
+    font-style: italic;
+}
+
+/* Character Relationships list */
 .vendor-relations-list {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 5px;
+    margin-top: 8px;
 }
 
 .vendor-relation-row {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 4px 6px;
-    background: rgba(0, 0, 0, 0.15);
-    border-radius: 4px;
+    padding: 6px 10px;
+    background: var(--dhs-bg-darker);
+    border: 1px solid var(--dhs-border);
+    border-radius: 5px;
+    transition: border-color 0.2s;
+}
+
+.vendor-relation-row:hover {
+    border-color: #555;
 }
 
 .vendor-actor-icon {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     object-fit: cover;
-    border-radius: 3px;
+    border-radius: 4px;
+    border: 1px solid var(--dhs-border-mid);
     flex-shrink: 0;
 }
 
 .vendor-actor-name {
     flex: 1;
     font-size: 0.95em;
+    color: var(--dhs-text);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -679,4 +742,124 @@
 .vendor-relation-row select {
     width: 130px;
     flex-shrink: 0;
+    background: var(--dhs-bg);
+    border: 1px solid var(--dhs-border-light);
+    border-radius: 4px;
+    color: var(--dhs-text);
+    padding: 3px 6px;
+    font-size: 0.9em;
+}
+
+/* Price effect badge next to dropdown */
+.vendor-relation-effect {
+    min-width: 48px;
+    text-align: center;
+    font-size: 0.85em;
+    font-weight: bold;
+    font-family: var(--dhs-font-heading);
+    padding: 2px 6px;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+.effect-up {
+    color: #f44336;
+    background: rgba(244, 67, 54, 0.15);
+    border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+.effect-down {
+    color: #4caf50;
+    background: rgba(76, 175, 80, 0.15);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.effect-neutral {
+    color: #888;
+    background: transparent;
+    border: 1px solid transparent;
+}
+
+/* Relationship Modifiers table */
+.vendor-relation-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+    font-size: 0.93em;
+}
+
+.vendor-relation-table th {
+    background: #1a1a1a;
+    color: var(--dhs-gold);
+    font-family: var(--dhs-font-heading);
+    text-transform: uppercase;
+    font-size: 0.85em;
+    letter-spacing: 0.5px;
+    padding: 8px 10px;
+    border-bottom: 2px solid var(--dhs-gold-border);
+    text-align: left;
+}
+
+.vendor-relation-table td {
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--dhs-bg-lighter);
+    vertical-align: middle;
+}
+
+.vendor-relation-table tr:last-child td {
+    border-bottom: none;
+}
+
+.vendor-relation-table tr:hover td {
+    background: rgba(255,255,255,0.03);
+}
+
+.modifier-level-badge {
+    display: inline-block;
+    width: 28px;
+    text-align: center;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-weight: bold;
+    font-family: var(--dhs-font-heading);
+}
+
+.level-up   { background: rgba(244,67,54,0.2);  color: #f44336; border: 1px solid rgba(244,67,54,0.4); }
+.level-down { background: rgba(76,175,80,0.2);  color: #4caf50; border: 1px solid rgba(76,175,80,0.4); }
+.level-none { background: rgba(150,150,150,0.1); color: #888;   border: 1px solid #444; }
+
+.modifier-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    width: 90px;
+}
+
+.vendor-relation-pct-input {
+    width: 60px;
+    background: var(--dhs-bg-darker);
+    border: 1px solid var(--dhs-border-light);
+    border-radius: 4px;
+    color: var(--dhs-text-white);
+    padding: 4px 6px;
+    text-align: center;
+    font-size: 0.95em;
+    transition: border-color 0.2s;
+}
+
+.vendor-relation-pct-input:focus {
+    outline: none;
+    border-color: var(--dhs-gold);
+    box-shadow: 0 0 4px rgba(212, 175, 55, 0.3);
+}
+
+.modifier-pct-suffix {
+    color: var(--dhs-text-muted);
+    font-size: 0.9em;
+}
+
+.modifier-fixed {
+    color: #666;
+    font-style: italic;
+    font-size: 0.9em;
 }

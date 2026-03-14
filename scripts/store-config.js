@@ -152,11 +152,24 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         for (const user of game.users) {
             const actor = user.character;
             if (!actor) continue;
+            const level = cleanedRelationships[actor.id] ?? 0;
+            const pct = vendorRelationLevels[String(level)] ?? 0;
+            let relationEffect = "—";
+            let effectClass = "effect-neutral";
+            if (level < 0) {
+                relationEffect = `+${pct}%`;
+                effectClass = "effect-up";
+            } else if (level > 0) {
+                relationEffect = `-${pct}%`;
+                effectClass = "effect-down";
+            }
             linkedActors.push({
                 id: actor.id,
                 name: actor.name,
                 img: actor.img,
-                relationLevel: cleanedRelationships[actor.id] ?? 0
+                relationLevel: level,
+                relationEffect,
+                effectClass
             });
         }
         linkedActors.sort((a, b) => a.name.localeCompare(b.name));
@@ -392,14 +405,28 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             });
         });
 
-        // Vendor tab: live preview of relation level percentages
-        const relationInputs = html.querySelectorAll(".vendor-relation-pct-input");
-        relationInputs.forEach(input => {
-            input.addEventListener("input", (e) => {
-                const level = e.target.dataset.level;
-                const value = parseInt(e.target.value) || 0;
-                const previewEl = html.querySelector(`.vendor-relation-preview[data-level="${level}"]`);
-                if (previewEl) previewEl.textContent = `${value}%`;
+        // Vendor tab: update price effect badge when relation dropdown changes
+        const relationSelects = html.querySelectorAll(".vendor-relation-select");
+        relationSelects.forEach(select => {
+            select.addEventListener("change", (e) => {
+                const actorId = e.target.dataset.actorId;
+                const level = parseInt(e.target.value) ?? 0;
+                const effectEl = html.querySelector(`.vendor-relation-effect[data-actor-id="${actorId}"]`);
+                if (!effectEl) return;
+
+                const pctInput = html.querySelector(`.vendor-relation-pct-input[data-level="${level}"]`);
+                const pct = pctInput ? (parseInt(pctInput.value) || 0) : 0;
+
+                if (level === 0) {
+                    effectEl.textContent = "—";
+                    effectEl.className = "vendor-relation-effect effect-neutral";
+                } else if (level < 0) {
+                    effectEl.textContent = `+${pct}%`;
+                    effectEl.className = "vendor-relation-effect effect-up";
+                } else {
+                    effectEl.textContent = `-${pct}%`;
+                    effectEl.className = "vendor-relation-effect effect-down";
+                }
             });
         });
 

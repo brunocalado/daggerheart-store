@@ -1,25 +1,20 @@
 {{! Vendor Identity }}
 <div class="config-section">
     <h3><i class="fas fa-id-card"></i> Vendor Identity</h3>
-
-    <div class="form-group inline-group">
+    <div class="vendor-identity-form">
         <label>Store Name</label>
         <input type="text" name="storeName" value="{{storeName}}">
-        <p class="notes">Sets the title of the main store window.</p>
-    </div>
+        <span class="field-hint">Title of the main store window.</span>
 
-    <div class="form-group inline-group">
         <label>Vendor Name <span class="optional">(optional)</span></label>
         <input type="text" name="vendorName" value="{{vendorName}}"
                placeholder="e.g. Garrick the Blacksmith">
-        <p class="notes">NPC name displayed in the store header.</p>
-    </div>
+        <span class="field-hint">NPC name shown in the store header.</span>
 
-    <div class="form-group inline-group">
         <label>Vendor Description <span class="optional">(optional)</span></label>
-        <textarea name="vendorDescription"
+        <textarea name="vendorDescription" class="vendor-description-field"
                   placeholder="Brief description of this vendor...">{{vendorDescription}}</textarea>
-        <p class="notes">Flavor text shown below the vendor name.</p>
+        <span class="field-hint">Flavor text shown below the vendor name.</span>
     </div>
 </div>
 
@@ -36,7 +31,9 @@
         <div class="vendor-relation-row">
             <img class="vendor-actor-icon" src="{{img}}" title="{{name}}">
             <span class="vendor-actor-name">{{name}}</span>
-            <select name="vendorRelationships.{{id}}">
+            <select name="vendorRelationships.{{id}}"
+                    data-actor-id="{{id}}"
+                    class="vendor-relation-select">
                 {{#each ../vendorRelationOptions}}
                 <option value="{{level}}"
                     {{#if (eq level ../relationLevel)}}selected{{/if}}>
@@ -44,6 +41,8 @@
                 </option>
                 {{/each}}
             </select>
+            <span class="vendor-relation-effect {{effectClass}}"
+                  data-actor-id="{{id}}">{{relationEffect}}</span>
         </div>
         {{/each}}
     </div>
@@ -72,23 +71,34 @@
         </thead>
         <tbody>
             {{#each vendorRelationLevelsArray}}
-            <tr>
-                <td>{{level}}</td>
-                <td>{{label}}</td>
-                <td>{{#if (eq direction "up")}}↑ Higher{{else if (eq direction "down")}}↓ Lower{{else}}—{{/if}}</td>
-                <td>
+            <tr class="{{#if (eq direction "up")}}modifier-row-up{{else if (eq direction "down")}}modifier-row-down{{else}}modifier-row-neutral{{/if}}">
+                <td class="modifier-level-cell">
+                    <span class="modifier-level-badge level-{{direction}}">{{level}}</span>
+                </td>
+                <td class="modifier-label-cell">{{label}}</td>
+                <td class="modifier-effect-cell">
+                    {{#if (eq direction "up")}}
+                        <span class="effect-up"><i class="fas fa-arrow-up"></i> Higher</span>
+                    {{else if (eq direction "down")}}
+                        <span class="effect-down"><i class="fas fa-arrow-down"></i> Lower</span>
+                    {{else}}
+                        <span class="effect-neutral">—</span>
+                    {{/if}}
+                </td>
+                <td class="modifier-input-cell">
                     {{#if (eq level 0)}}
-                        <span>0% (fixed)</span>
+                        <span class="modifier-fixed">0% (fixed)</span>
                         <input type="hidden" name="vendorRelationLevels.0" value="0">
                     {{else}}
-                        <input type="number"
-                               class="vendor-relation-pct-input"
-                               name="vendorRelationLevels.{{level}}"
-                               data-level="{{level}}"
-                               value="{{pct}}"
-                               min="0" max="100" step="1">
-                        <span class="vendor-relation-preview"
-                              data-level="{{level}}">{{pct}}%</span>
+                        <div class="modifier-input-wrapper">
+                            <input type="number"
+                                   class="vendor-relation-pct-input"
+                                   name="vendorRelationLevels.{{level}}"
+                                   data-level="{{level}}"
+                                   value="{{pct}}"
+                                   min="0" max="100" step="5">
+                            <span class="modifier-pct-suffix">%</span>
+                        </div>
                     {{/if}}
                 </td>
             </tr>
