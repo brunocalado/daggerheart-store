@@ -640,3 +640,43 @@
         }
     }
 }
+
+/* ==================================================== */
+/* VENDOR TAB                                           */
+/* ==================================================== */
+
+.vendor-relations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.vendor-relation-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 6px;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+}
+
+.vendor-actor-icon {
+    width: 28px;
+    height: 28px;
+    object-fit: cover;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+.vendor-actor-name {
+    flex: 1;
+    font-size: 0.95em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.vendor-relation-row select {
+    width: 130px;
+    flex-shrink: 0;
+}

@@ -2,7 +2,7 @@ import { PRICE_DATA, PACK_MAPPING } from "./price-data.js";
 import { StockManager } from "./stock-manager.js";
 import {
     MODULE_ID, STANDARD_CATEGORIES, CATEGORY_ITEM_TYPE,
-    EXCLUDED_SYSTEM_PACKS, CATEGORY_ICONS
+    EXCLUDED_SYSTEM_PACKS, CATEGORY_ICONS, VENDOR_RELATION_LEVELS
 } from "./store-constants.js";
 import { getValidItemTypes, getItemTier, showStoreDialog } from "./store-utils.js";
 
@@ -21,7 +21,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         id: "daggerheart-store-config",
         tag: "form",
         window: { title: "Store Configuration (GM)", icon: "fas fa-cogs", resizable: true },
-        position: { width: 700, height: 740 },
+        position: { width: 780, height: 740 },
         form: { handler: StoreConfig.prototype._updateSettings, closeOnSubmit: true },
         actions: {
             addCompendium: StoreConfig.prototype._onAddCompendium,
@@ -132,6 +132,41 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             tier4: categoryDefaults[cat.key]?.tier4 || 1
         }));
 
+        // Vendor settings — loaded for the Vendor tab
+        const vendorName = game.settings.get(MODULE_ID, "vendorName");
+        const vendorDescription = game.settings.get(MODULE_ID, "vendorDescription");
+        const vendorRelationLevels = game.settings.get(MODULE_ID, "vendorRelationLevels") ||
+            { "-2": 25, "-1": 10, "0": 0, "1": 10, "2": 25 };
+        const vendorRelationships = foundry.utils.deepClone(
+            game.settings.get(MODULE_ID, "vendorRelationships") || {}
+        );
+
+        // Build linked actor list from users with assigned characters; drop orphaned actorIds
+        const linkedActors = [];
+        const cleanedRelationships = {};
+
+        for (const [actorId, level] of Object.entries(vendorRelationships)) {
+            if (game.actors.get(actorId)) cleanedRelationships[actorId] = level;
+        }
+
+        for (const user of game.users) {
+            const actor = user.character;
+            if (!actor) continue;
+            linkedActors.push({
+                id: actor.id,
+                name: actor.name,
+                img: actor.img,
+                relationLevel: cleanedRelationships[actor.id] ?? 0
+            });
+        }
+        linkedActors.sort((a, b) => a.name.localeCompare(b.name));
+
+        // Pre-process relation levels into array to avoid dynamic key lookup in Handlebars
+        const vendorRelationLevelsArray = VENDOR_RELATION_LEVELS.map(r => ({
+            ...r,
+            pct: vendorRelationLevels[String(r.level)] ?? 0
+        }));
+
         return {
             storeName: storeName,
             customTabName: customTabName,
@@ -158,7 +193,14 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             epicIcon: epicIcon,
             epicColor: epicColor,
             epicLabel: epicLabel,
-            epicEffect: epicEffect
+            epicEffect: epicEffect,
+            vendorName,
+            vendorDescription,
+            vendorRelationLevels,
+            vendorRelationships: cleanedRelationships,
+            linkedActors,
+            vendorRelationOptions: VENDOR_RELATION_LEVELS,
+            vendorRelationLevelsArray
         };
     }
 
@@ -347,6 +389,17 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             this._filterCategoryOptions(packSelect);
             packSelect.addEventListener("change", () => {
                 this._filterCategoryOptions(packSelect);
+            });
+        });
+
+        // Vendor tab: live preview of relation level percentages
+        const relationInputs = html.querySelectorAll(".vendor-relation-pct-input");
+        relationInputs.forEach(input => {
+            input.addEventListener("input", (e) => {
+                const level = e.target.dataset.level;
+                const value = parseInt(e.target.value) || 0;
+                const previewEl = html.querySelector(`.vendor-relation-preview[data-level="${level}"]`);
+                if (previewEl) previewEl.textContent = `${value}%`;
             });
         });
 
@@ -713,6 +766,31 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             const compendiumArray = Object.values(expanded.customCompendiums);
             await game.settings.set(MODULE_ID, "customCompendiums", compendiumArray);
         }
+
+        // Vendor settings
+        await game.settings.set(MODULE_ID, "vendorName", expanded.vendorName || "");
+        await game.settings.set(MODULE_ID, "vendorDescription", expanded.vendorDescription || "");
+
+        // Save relation level modifiers — neutral is always 0
+        const relationLevels = {
+            "-2": parseInt(expanded.vendorRelationLevels?.["-2"]) || 25,
+            "-1": parseInt(expanded.vendorRelationLevels?.["-1"]) || 10,
+            "0": 0,
+            "1":  parseInt(expanded.vendorRelationLevels?.["1"])  || 10,
+            "2":  parseInt(expanded.vendorRelationLevels?.["2"])  || 25
+        };
+        await game.settings.set(MODULE_ID, "vendorRelationLevels", relationLevels);
+
+        // Save relationships — only persist non-neutral values; drop orphaned actorIds
+        const savedRelationships = {};
+        if (expanded.vendorRelationships) {
+            for (const [actorId, level] of Object.entries(expanded.vendorRelationships)) {
+                const numLevel = parseInt(level) ?? 0;
+                if (!game.actors.get(actorId)) continue;
+                if (numLevel !== 0) savedRelationships[actorId] = numLevel;
+            }
+        }
+        await game.settings.set(MODULE_ID, "vendorRelationships", savedRelationships);
 
         // Stock System Settings - Validate Party Actor before enabling
         const partyActorId = expanded.partyActorId || game.settings.get(MODULE_ID, "partyActorId");

@@ -1,0 +1,98 @@
+{{! Vendor Identity }}
+<div class="config-section">
+    <h3><i class="fas fa-id-card"></i> Vendor Identity</h3>
+
+    <div class="form-group inline-group">
+        <label>Store Name</label>
+        <input type="text" name="storeName" value="{{storeName}}">
+        <p class="notes">Sets the title of the main store window.</p>
+    </div>
+
+    <div class="form-group inline-group">
+        <label>Vendor Name <span class="optional">(optional)</span></label>
+        <input type="text" name="vendorName" value="{{vendorName}}"
+               placeholder="e.g. Garrick the Blacksmith">
+        <p class="notes">NPC name displayed in the store header.</p>
+    </div>
+
+    <div class="form-group inline-group">
+        <label>Vendor Description <span class="optional">(optional)</span></label>
+        <textarea name="vendorDescription"
+                  placeholder="Brief description of this vendor...">{{vendorDescription}}</textarea>
+        <p class="notes">Flavor text shown below the vendor name.</p>
+    </div>
+</div>
+
+<hr>
+
+{{! Character Relationships }}
+<div class="config-section">
+    <h3><i class="fas fa-users"></i> Character Relationships</h3>
+    {{#if linkedActors}}
+    <p class="notes">Only characters linked to a user account are listed.
+       Relationship is stored per actor and persists across user reassignments.</p>
+    <div class="vendor-relations-list">
+        {{#each linkedActors}}
+        <div class="vendor-relation-row">
+            <img class="vendor-actor-icon" src="{{img}}" title="{{name}}">
+            <span class="vendor-actor-name">{{name}}</span>
+            <select name="vendorRelationships.{{id}}">
+                {{#each ../vendorRelationOptions}}
+                <option value="{{level}}"
+                    {{#if (eq level ../relationLevel)}}selected{{/if}}>
+                    {{label}}
+                </option>
+                {{/each}}
+            </select>
+        </div>
+        {{/each}}
+    </div>
+    {{else}}
+    <p class="notes warning">No users have a linked character assigned.
+       Assign characters to users in the User Management panel.</p>
+    {{/if}}
+</div>
+
+<hr>
+
+{{! Relationship Modifiers }}
+<div class="config-section">
+    <h3><i class="fas fa-heart"></i> Relationship Modifiers</h3>
+    <p class="notes">Define the price modifier (%) for each relationship level.
+       Hostile/Distrustful increase prices; Friendly/Allied decrease them.</p>
+
+    <table class="vendor-relation-table">
+        <thead>
+            <tr>
+                <th>Level</th>
+                <th>Label</th>
+                <th>Price Effect</th>
+                <th>Modifier %</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each vendorRelationLevelsArray}}
+            <tr>
+                <td>{{level}}</td>
+                <td>{{label}}</td>
+                <td>{{#if (eq direction "up")}}↑ Higher{{else if (eq direction "down")}}↓ Lower{{else}}—{{/if}}</td>
+                <td>
+                    {{#if (eq level 0)}}
+                        <span>0% (fixed)</span>
+                        <input type="hidden" name="vendorRelationLevels.0" value="0">
+                    {{else}}
+                        <input type="number"
+                               class="vendor-relation-pct-input"
+                               name="vendorRelationLevels.{{level}}"
+                               data-level="{{level}}"
+                               value="{{pct}}"
+                               min="0" max="100" step="1">
+                        <span class="vendor-relation-preview"
+                              data-level="{{level}}">{{pct}}%</span>
+                    {{/if}}
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>

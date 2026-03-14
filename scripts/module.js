@@ -124,6 +124,22 @@ Hooks.once("init", () => {
         default: ""
     });
 
+    // --- VENDOR SETTINGS ---
+    game.settings.register(MODULE_ID, "vendorName", {
+        name: "Vendor Name", scope: "world", config: false, type: String, default: ""
+    });
+    game.settings.register(MODULE_ID, "vendorDescription", {
+        name: "Vendor Description", scope: "world", config: false, type: String, default: ""
+    });
+    game.settings.register(MODULE_ID, "vendorRelationships", {
+        name: "Vendor Relationships", scope: "world", config: false, type: Object, default: {}
+    });
+    game.settings.register(MODULE_ID, "vendorRelationLevels", {
+        name: "Vendor Relation Level Modifiers",
+        scope: "world", config: false, type: Object,
+        default: { "-2": 25, "-1": 10, "0": 0, "1": 10, "2": 25 }
+    });
+
     // --- RANDOMIZER SETTINGS ---
     game.settings.register(MODULE_ID, "randomizerSettings", {
         name: "Randomizer Settings",
@@ -239,6 +255,7 @@ Hooks.once("init", () => {
         "modules/daggerheart-store/templates/partials/config-tiers-tab.hbs",
         "modules/daggerheart-store/templates/partials/config-compendiums-tab.hbs",
         "modules/daggerheart-store/templates/partials/config-stock-tab.hbs",
+        "modules/daggerheart-store/templates/partials/config-vendor-tab.hbs",
     ]);
 
     // --- HANDLEBARS HELPERS FOR COMPARISON ---
@@ -256,6 +273,10 @@ Hooks.once("init", () => {
 
     Handlebars.registerHelper("eq", (a, b) => {
         return a == b;
+    });
+
+    Handlebars.registerHelper("toString", (val) => {
+        return String(val);
     });
 
     Handlebars.registerHelper("tier", (val) => {

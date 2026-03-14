@@ -65,7 +65,8 @@ export const EXPORTABLE_SETTINGS = [
     "epicItems", "epicIcon", "epicColor", "epicLabel", "epicEffect",
     "partyActorId", "customTabName", "customTabCompendiums", "customTabTierGroup",
     "useDefaultCompendiums", "sellRatio", "stockEnabled", "showStockQuantity", "randomizerSettings",
-    "currencyMode", "chatPrivacy", "chatMessageStyle"
+    "currencyMode", "chatPrivacy", "chatMessageStyle",
+    "vendorName", "vendorDescription", "vendorRelationships", "vendorRelationLevels"
 ];
 
 /** Settings stored as objects (used for merge logic during import) */
@@ -77,6 +78,15 @@ export const OBJECT_SETTINGS = [
 
 /** Settings stored as arrays (used for merge logic during import) */
 export const ARRAY_SETTINGS = ["customCompendiums", "customTabCompendiums"];
+
+/** Vendor relationship levels with labels and price direction metadata */
+export const VENDOR_RELATION_LEVELS = [
+    { level: -2, label: "Hostile",     direction: "up"   },
+    { level: -1, label: "Distrustful", direction: "up"   },
+    { level:  0, label: "Neutral",     direction: "none" },
+    { level:  1, label: "Friendly",    direction: "down" },
+    { level:  2, label: "Allied",      direction: "down" },
+];
 
 /** Flag keys for per-item store metadata stored in flags.daggerheart-store.* */
 export const STORE_FLAGS = {

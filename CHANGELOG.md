@@ -1,3 +1,8 @@
+# 0.3.5
+- [Added] Vendor tab in Store Configuration with vendor identity fields (name, description) and `storeName` moved from General tab
+- [Added] Per-character relationship system (Hostile/Distrustful/Neutral/Friendly/Allied) with configurable price modifiers
+- [Added] Relationship price modifier applied after all existing price transformations for player characters
+
 # 0.3.4
 - [Fixed] Stock data collision when multiple store profiles share the same Party Actor — stock is now namespaced per profile (`stock_<ProfileName>`)
 - [Added] One-time migration moves legacy `stock` flag to `stock_Default` so existing worlds retain their data

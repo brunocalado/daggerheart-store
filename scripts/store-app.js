@@ -584,6 +584,19 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
         const sellPrice = Math.floor(basePrice * sellRatio);
 
+        // Vendor relationship modifier — applied last, only for players with a linked actor
+        const isGMUser = game.user.isGM;
+        if (!isGMUser && hasActor && userActor) {
+            const relationships = game.settings.get(MODULE_ID, "vendorRelationships") || {};
+            const relationLevels = game.settings.get(MODULE_ID, "vendorRelationLevels") || {};
+            const level = relationships[userActor.id] ?? 0;
+            if (level !== 0) {
+                const pct = parseInt(relationLevels[String(level)]) || 0;
+                const multiplier = level < 0 ? (1 + pct / 100) : (1 - pct / 100);
+                finalPrice = Math.ceil(finalPrice * multiplier);
+            }
+        }
+
         const canAffordPersonal = userGold >= finalPrice;
         const canBuyPersonal = hasActor && canAffordPersonal && !isPurchaseBlocked;
         const combinedWealth = partyGold + userGold;
@@ -1888,7 +1901,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             "hiddenItems", "blockedSaleItems", "blockedPurchaseItems", "lockedItems",
             "epicItems", "epicIcon", "epicColor", "epicLabel", "epicEffect",
             "partyActorId", "customTabName", "customTabCompendiums", "customTabTierGroup",
-            "useDefaultCompendiums", "sellRatio", "stockEnabled", "showStockQuantity", "randomizerSettings"
+            "useDefaultCompendiums", "sellRatio", "stockEnabled", "showStockQuantity", "randomizerSettings",
+            "vendorName", "vendorDescription", "vendorRelationships", "vendorRelationLevels"
         ];
         const currentSettings = {};
         for (const key of settingsKeys) currentSettings[key] = game.settings.get(MODULE_ID, key);
@@ -1925,7 +1939,10 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 customTabCompendiums: ["daggerheart-store.general-items"],
                 customTabTierGroup: true, useDefaultCompendiums: true,
                 sellRatio: 0.5, stockEnabled: false, showStockQuantity: true,
-                randomizerSettings: {}
+                randomizerSettings: {},
+                vendorName: "", vendorDescription: "",
+                vendorRelationships: {},
+                vendorRelationLevels: { "-2": 25, "-1": 10, "0": 0, "1": 10, "2": 25 }
             };
         } else {
             const profiles = game.settings.get(MODULE_ID, "storeProfiles");
@@ -1939,7 +1956,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             "hiddenItems", "blockedSaleItems", "blockedPurchaseItems", "lockedItems",
             "epicItems", "epicIcon", "epicColor", "epicLabel", "epicEffect",
             "partyActorId", "customTabName", "customTabCompendiums", "customTabTierGroup",
-            "useDefaultCompendiums", "sellRatio", "stockEnabled", "showStockQuantity", "randomizerSettings"
+            "useDefaultCompendiums", "sellRatio", "stockEnabled", "showStockQuantity", "randomizerSettings",
+            "vendorName", "vendorDescription", "vendorRelationships", "vendorRelationLevels"
         ];
 
         // Migrate old profile format
