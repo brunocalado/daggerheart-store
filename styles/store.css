@@ -586,7 +586,7 @@
 
         /* Hardcoded sale color */
         background: #1a4d1a;
-        color: #7fff7f;
+        color: #ffffff;
 
         /* Keep pulse animation */
         animation: saleTextPulse 2s infinite ease-in-out;

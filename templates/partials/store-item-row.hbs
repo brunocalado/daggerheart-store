@@ -2,6 +2,11 @@
 
     <!-- Left Side: Icon, Name AND Sale Text -->
     <div class="row-left">
+        {{#unless @root.isGM}}
+            {{#if this.isSale}}
+                <span class="sale-badge" aria-label="SALE">S<br>A<br>L<br>E</span>
+            {{/if}}
+        {{/unless}}
         <div class="item-icon-wrapper">
             <img src="{{this.img}}" title="Click to view details" class="item-image" data-uuid="{{this.uuid}}" width="36" height="36"/>
             {{#unless @root.isGM}}
@@ -30,12 +35,6 @@
         {{#if this.itemSummary}}
             <span class="weapon-stats">{{this.itemSummary}}</span>
         {{/if}}
-
-        {{#unless @root.isGM}}
-            {{#if this.isSale}}
-                <span class="sale-badge" aria-label="SALE">S<br>A<br>L<br>E</span>
-            {{/if}}
-        {{/unless}}
 
         {{#unless @root.isGM}}
             {{#if this.isEpic}}
