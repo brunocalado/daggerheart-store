@@ -1,7 +1,7 @@
 import { PRICE_DATA, PACK_MAPPING } from "./price-data.js";
 import { StockManager } from "./stock-manager.js";
 import { MODULE_ID, STANDARD_CATEGORIES, CATEGORY_ITEM_TYPE } from "./store-constants.js";
-import { getValidItemTypes, getItemTier, extractPriceFromDescription, showStoreDialog } from "./store-utils.js";
+import { getValidItemTypes, getItemTier, extractPriceFromDescription, getOriginalName, showStoreDialog } from "./store-utils.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -114,7 +114,7 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
                         if (pack) {
                             const docs = await pack.getDocuments();
                             for (const doc of docs) {
-                                const originalName = (game.modules.get("babele")?.active ? doc.flags?.babele?.originalName : null) ?? doc.name;
+                                const originalName = getOriginalName(doc);
                                 if (priceList.hasOwnProperty(originalName)) {
                                     const tier = priceList[originalName].tier;
                                     if (catConfig[tier]) {
@@ -228,7 +228,7 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
                     if (pack) {
                         const docs = await pack.getDocuments();
                         for (const doc of docs) {
-                            const originalName = (game.modules.get("babele")?.active ? doc.flags?.babele?.originalName : null) ?? doc.name;
+                            const originalName = getOriginalName(doc);
                             if (priceList.hasOwnProperty(originalName)) {
                                 const tier = priceList[originalName].tier;
                                 if (catConfig[tier]) {
@@ -273,7 +273,7 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
                                 if (!isSecondary && categoryKey === "Secondary Weapons") continue;
                             }
 
-                            const originalName = (game.modules.get("babele")?.active ? doc.flags?.babele?.originalName : null) ?? doc.name;
+                            const originalName = getOriginalName(doc);
                             const tier = getItemTier(doc);
                             if (catConfig[tier]) {
                                 let basePrice = 0;

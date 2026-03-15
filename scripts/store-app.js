@@ -7,7 +7,7 @@ import {
 } from "./store-constants.js";
 import {
     getValidItemTypes, getItemTier, extractPriceFromDescription, getItemHeader,
-    getSystemCurrency, getActorWealth, deductGold, addGold,
+    getOriginalName, getSystemCurrency, getActorWealth, deductGold, addGold,
     getChatWhisperRecipients, buildChatCard,
     getEpicTextColor, getEpicBgColor,
     showStoreDialog
@@ -1005,7 +1005,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     let tier = 1;
                     let knownItem = false;
 
-                    const originalName = (game.modules.get("babele")?.active ? doc.flags?.babele?.originalName : null) ?? doc.name;
+                    const originalName = getOriginalName(doc);
                     if (priceList.hasOwnProperty(originalName)) {
                         cleanBasePrice = Math.ceil(priceList[originalName].price * priceMod);
                         basePrice = cleanBasePrice;

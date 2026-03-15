@@ -51,6 +51,18 @@ export function extractPriceFromDescription(item) {
     return 0;
 }
 
+/**
+ * Returns the original (pre-translation) name of a compendium document.
+ * When Babele is active, translated documents store the English name in
+ * flags.babele.originalName. Falls back to doc.name for untranslated items
+ * or when Babele is not active.
+ * @param {Object} doc - A Foundry Item document from a compendium
+ * @returns {string}
+ */
+export function getOriginalName(doc) {
+    return (game.modules.get("babele")?.active ? doc.flags?.babele?.originalName : null) ?? doc.name;
+}
+
 // --- Currency Helpers ---
 
 /**

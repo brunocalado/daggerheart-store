@@ -4,7 +4,7 @@ import {
     MODULE_ID, STANDARD_CATEGORIES, CATEGORY_ITEM_TYPE,
     EXCLUDED_SYSTEM_PACKS, CATEGORY_ICONS, VENDOR_RELATION_LEVELS
 } from "./store-constants.js";
-import { getValidItemTypes, getItemTier, showStoreDialog } from "./store-utils.js";
+import { getValidItemTypes, getItemTier, getOriginalName, showStoreDialog } from "./store-utils.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -762,7 +762,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
                         if (!isSecondary && categoryKey === "Secondary Weapons") continue;
                     }
 
-                    const originalName = (game.modules.get("babele")?.active ? doc.flags?.babele?.originalName : null) ?? doc.name;
+                    const originalName = getOriginalName(doc);
                     if (PRICE_DATA[categoryKey]?.[originalName]) continue;
 
                     const tier = getItemTier(doc);
