@@ -14,7 +14,7 @@ const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
     constructor(options) {
         super(options);
-        this.currentTab = "general";
+        this.currentTab = game.user.getFlag(MODULE_ID, "configTab") ?? "general";
     }
 
     static DEFAULT_OPTIONS = {
@@ -229,6 +229,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
                 e.preventDefault();
                 const tabId = e.currentTarget.dataset.tab;
                 this.currentTab = tabId;
+                game.user.setFlag(MODULE_ID, "configTab", tabId);
 
                 tabs.forEach(t => t.classList.remove("active"));
                 e.currentTarget.classList.add("active");
