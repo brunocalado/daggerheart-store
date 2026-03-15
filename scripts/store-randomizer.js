@@ -114,7 +114,7 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
                         if (pack) {
                             const docs = await pack.getDocuments();
                             for (const doc of docs) {
-                                const originalName = doc._source?.name ?? doc.name;
+                                const originalName = (game.modules.get("babele")?.active ? doc.flags?.babele?.originalName : null) ?? doc.name;
                                 if (priceList.hasOwnProperty(originalName)) {
                                     const tier = priceList[originalName].tier;
                                     if (catConfig[tier]) {
@@ -228,7 +228,7 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
                     if (pack) {
                         const docs = await pack.getDocuments();
                         for (const doc of docs) {
-                            const originalName = doc._source?.name ?? doc.name;
+                            const originalName = (game.modules.get("babele")?.active ? doc.flags?.babele?.originalName : null) ?? doc.name;
                             if (priceList.hasOwnProperty(originalName)) {
                                 const tier = priceList[originalName].tier;
                                 if (catConfig[tier]) {
@@ -273,7 +273,7 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
                                 if (!isSecondary && categoryKey === "Secondary Weapons") continue;
                             }
 
-                            const originalName = doc._source?.name ?? doc.name;
+                            const originalName = (game.modules.get("babele")?.active ? doc.flags?.babele?.originalName : null) ?? doc.name;
                             const tier = getItemTier(doc);
                             if (catConfig[tier]) {
                                 let basePrice = 0;

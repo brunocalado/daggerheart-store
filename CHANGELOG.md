@@ -1,3 +1,6 @@
+# 0.4.2
+- [Fixed] Babele compatibility: item name lookup against `PRICE_DATA` now uses `doc.flags.babele.originalName` when Babele is active, preventing all items from failing to match when translations are enabled
+
 # 0.3.6
 - [Fixed] FilePicker callback no longer causes stale DOM references when selecting vendor images
 - [Changed] Vendor tooltip now uses HBS template rendered via `renderTemplate`, matching the comparison tooltip visual style

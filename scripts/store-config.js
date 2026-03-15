@@ -762,7 +762,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
                         if (!isSecondary && categoryKey === "Secondary Weapons") continue;
                     }
 
-                    const originalName = doc._source?.name ?? doc.name;
+                    const originalName = (game.modules.get("babele")?.active ? doc.flags?.babele?.originalName : null) ?? doc.name;
                     if (PRICE_DATA[categoryKey]?.[originalName]) continue;
 
                     const tier = getItemTier(doc);
