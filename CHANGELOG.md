@@ -1,3 +1,6 @@
+# 0.4.4
+- [Performance] Store Randomizer open time reduced by ~63% — _prepareContext compendium loading parallelized via Promise.all (before: 1412ms → after: 525ms)
+
 # 0.4.3
 - Updated Docs
 - [Fixed] Players without Owner on the party actor can now see party gold, use "Buy with Party", transfer funds, and view stock — all party writes are routed through GM queries (socket.js), so write ownership on the party actor is no longer required on the client side

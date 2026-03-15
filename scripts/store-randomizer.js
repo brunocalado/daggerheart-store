@@ -90,79 +90,85 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
 
         categories = categories.filter(c => !hiddenCategories[c.key]);
 
-        // Count items for each category
-        for (const cat of categories) {
+        // Hoist store actor lookups outside the loop — they are the same for every category
+        const storeActor = StockManager.getStoreActor();
+        const stockKey = StockManager.getStockKey();
+        const categoryDefaults = storeActor?.getFlag(MODULE_ID, `${stockKey}.categoryDefaults`) || StockManager._getDefaultCategorySettings();
+
+        // Count items for each category — all packs are fetched concurrently to avoid serial round-trips to IndexedDB
+        await Promise.all(categories.map(async (cat) => {
             let itemCount = 0;
 
             if (cat.id === "custom-tab") {
-                for (const packId of customTabCompendiums) {
-                    if (!packId || packId.trim() === "") continue;
+                await Promise.all(customTabCompendiums.map(async (packId) => {
+                    if (!packId || packId.trim() === "") return;
                     const pack = game.packs.get(packId);
-                    if (pack) {
-                        const docs = await pack.getDocuments();
-                        itemCount += docs.filter(d => getValidItemTypes().includes(d.type)).length;
-                    }
-                }
+                    if (!pack) return;
+                    const docs = await pack.getDocuments().catch(() => []);
+                    itemCount += docs.filter(d => getValidItemTypes().includes(d.type)).length;
+                }));
             } else {
                 const catConfig = allowedTiers[cat.key] || {1:true, 2:true, 3:true, 4:true};
                 const priceList = PRICE_DATA[cat.key] || {};
+
+                const packPromises = [];
 
                 if (useDefaultCompendiums) {
                     const defaultPackId = PACK_MAPPING[cat.key];
                     if (defaultPackId) {
                         const pack = game.packs.get(defaultPackId);
                         if (pack) {
-                            const docs = await pack.getDocuments();
-                            for (const doc of docs) {
-                                const originalName = getOriginalName(doc);
-                                if (priceList.hasOwnProperty(originalName)) {
-                                    const tier = priceList[originalName].tier;
-                                    if (catConfig[tier]) {
-                                        itemCount++;
+                            packPromises.push(
+                                pack.getDocuments().catch(() => []).then(docs => {
+                                    for (const doc of docs) {
+                                        const originalName = getOriginalName(doc);
+                                        if (priceList.hasOwnProperty(originalName)) {
+                                            const tier = priceList[originalName].tier;
+                                            if (catConfig[tier]) itemCount++;
+                                        }
                                     }
-                                }
-                            }
+                                })
+                            );
                         }
                     }
                 }
 
-                for (const custom of customCompendiums) {
-                    if (custom.category === cat.key) {
-                        const pack = game.packs.get(custom.pack);
-                        if (pack) {
-                            const docs = await pack.getDocuments();
-                            for (const doc of docs) {
-                                const expectedType = CATEGORY_ITEM_TYPE[cat.key];
-                                if (expectedType && doc.type !== expectedType) continue;
+                const customForCat = customCompendiums.filter(c => c.category === cat.key);
+                for (const custom of customForCat) {
+                    const pack = game.packs.get(custom.pack);
+                    if (pack) {
+                        packPromises.push(
+                            pack.getDocuments().catch(() => []).then(docs => {
+                                for (const doc of docs) {
+                                    const expectedType = CATEGORY_ITEM_TYPE[cat.key];
+                                    if (expectedType && doc.type !== expectedType) return;
 
-                                if (doc.type === "weapon") {
-                                    const isSecondary = foundry.utils.getProperty(doc, "system.secondary") === true;
-                                    if (isSecondary && cat.key !== "Secondary Weapons") continue;
-                                    if (!isSecondary && cat.key === "Secondary Weapons") continue;
-                                }
+                                    if (doc.type === "weapon") {
+                                        const isSecondary = foundry.utils.getProperty(doc, "system.secondary") === true;
+                                        if (isSecondary && cat.key !== "Secondary Weapons") return;
+                                        if (!isSecondary && cat.key === "Secondary Weapons") return;
+                                    }
 
-                                const tier = getItemTier(doc);
-                                if (catConfig[tier]) {
-                                    itemCount++;
+                                    const tier = getItemTier(doc);
+                                    if (catConfig[tier]) itemCount++;
                                 }
-                            }
-                        }
+                            })
+                        );
                     }
                 }
+
+                await Promise.all(packPromises);
             }
 
             cat.itemCount = itemCount;
 
-            const storeActor = StockManager.getStoreActor();
-            const stockKey = StockManager.getStockKey();
-            const categoryDefaults = storeActor?.getFlag(MODULE_ID, `${stockKey}.categoryDefaults`) || StockManager._getDefaultCategorySettings();
             const catDefaults = categoryDefaults[cat.key];
             if (catDefaults) {
                 cat.defaultQty = Math.max(catDefaults.tier1 || 0, catDefaults.tier2 || 0, catDefaults.tier3 || 0, catDefaults.tier4 || 0);
             } else {
                 cat.defaultQty = 10;
             }
-        }
+        }));
 
         // Attach saved randomizer values to each category
         const savedRandomizer = game.settings.get(MODULE_ID, "randomizerSettings") || {};
