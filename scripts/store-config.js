@@ -99,7 +99,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
                 const defaultOwnership = partyActor.ownership.default ?? 0;
                 const ownershipLevels = { 0: "None", 1: "Limited", 2: "Observer", 3: "Owner" };
                 partyActorOwnership = ownershipLevels[defaultOwnership] || "None";
-                partyActorOwnershipOk = defaultOwnership >= 3;
+                partyActorOwnershipOk = true; // Ownership is no longer required; actor presence is enough
             }
         }
 
@@ -198,7 +198,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             selectedPartyActor: selectedPartyActor,
             partyActorOwnership: partyActorOwnership,
             partyActorOwnershipOk: partyActorOwnershipOk,
-            stockReady: hasPartyActor && partyActorOwnershipOk,
+            stockReady: hasPartyActor,
             activeTab: this.currentTab,
             hasPartyActor: hasPartyActor,
             stockEnabled: stockEnabled,
@@ -269,7 +269,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
                         const defaultOwnership = actor.ownership.default ?? 0;
                         const ownershipLevels = { 0: "None", 1: "Limited", 2: "Observer", 3: "Owner" };
                         ownershipText = ownershipLevels[defaultOwnership] || "None";
-                        isOk = defaultOwnership >= 3;
+                        isOk = true; // Ownership level no longer gates stock activation
                     }
                 }
 
@@ -289,7 +289,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
                     }
                 }
 
-                const stockReady = hasActor && isOk;
+                const stockReady = hasActor;
                 const stockCard = html.querySelector(".stock-toggle-card");
                 const stockCheckbox = html.querySelector("#stockEnabledCheckbox");
 
@@ -308,7 +308,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
                     if (descSpan) {
                         descSpan.innerHTML = stockReady
                             ? "Tracks item quantities and prevents purchases when out of stock."
-                            : '<em class="warning">Requires Party Actor with Owner permission.</em>';
+                            : '<em class="warning">A Party Actor is required to enable stock.</em>';
                     }
                 }
             });

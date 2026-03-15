@@ -6,17 +6,26 @@
         <option value="{{this.id}}" {{#if (eq this.id ../selectedPartyActor)}}selected{{/if}}>{{this.name}}</option>
         {{/each}}
     </select>
-    <span class="ownership-info" {{#unless selectedPartyActor}}style="display: none;"{{/unless}}>
+    {{#if selectedPartyActor}}
+    <span class="ownership-info">
         <span class="config-separator">|</span>
         <span class="ownership-label">Ownership:</span>
         <span class="ownership-value">{{partyActorOwnership}}</span>
         <span class="config-separator">|</span>
-        <span class="ownership-status {{#if partyActorOwnershipOk}}status-ok{{else}}status-warning{{/if}}">
-            Status: {{#if partyActorOwnershipOk}}OK{{else}}WARNING (Read Docs){{/if}}
+        <span class="ownership-status status-ok">
+            Status: OK
         </span>
     </span>
+    {{else}}
+    <span class="ownership-info">
+        <span class="config-separator">|</span>
+        <span class="ownership-status status-warning">
+            Status: WARNING — Read Docs
+        </span>
+    </span>
+    {{/if}}
 </div>
-<p class="notes">Select a party actor to enable shared wealth, stock management, and randomizer features.</p>
+<p class="notes">The Party Actor is required to save stock data and randomizer results, and to allow players to use the Transfer feature.</p>
 
 <hr>
 
