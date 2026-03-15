@@ -1,3 +1,6 @@
+# 0.4.2
+- [Fixed] Babele compatibility: item name lookup against `PRICE_DATA` now uses `doc.flags.babele.originalName` when Babele is active, preventing all items from failing to match when translations are enabled
+
 # 0.4.0
 - Vendor identity
 

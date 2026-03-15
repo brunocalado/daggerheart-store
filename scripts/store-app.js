@@ -7,7 +7,7 @@ import {
 } from "./store-constants.js";
 import {
     getValidItemTypes, getItemTier, extractPriceFromDescription, getItemHeader,
-    getSystemCurrency, getActorWealth, deductGold, addGold,
+    getOriginalName, getSystemCurrency, getActorWealth, deductGold, addGold,
     getChatWhisperRecipients, buildChatCard,
     getEpicTextColor, getEpicBgColor,
     showStoreDialog
@@ -1005,10 +1005,11 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     let tier = 1;
                     let knownItem = false;
 
-                    if (priceList.hasOwnProperty(doc.name)) {
-                        cleanBasePrice = Math.ceil(priceList[doc.name].price * priceMod);
+                    const originalName = getOriginalName(doc);
+                    if (priceList.hasOwnProperty(originalName)) {
+                        cleanBasePrice = Math.ceil(priceList[originalName].price * priceMod);
                         basePrice = cleanBasePrice;
-                        tier = priceList[doc.name].tier;
+                        tier = priceList[originalName].tier;
                         knownItem = true;
                     }
 
@@ -1016,7 +1017,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
                     if (!packInfo.isDefault) {
                         knownItem = true;
-                        if (!priceList.hasOwnProperty(doc.name)) {
+                        if (!priceList.hasOwnProperty(originalName)) {
                              tier = getItemTier(doc);
                              const extracted = extractPriceFromDescription(doc);
                              if (extracted > 0) {

@@ -4,7 +4,7 @@ import {
     MODULE_ID, STANDARD_CATEGORIES, CATEGORY_ITEM_TYPE,
     EXCLUDED_SYSTEM_PACKS, CATEGORY_ICONS, VENDOR_RELATION_LEVELS
 } from "./store-constants.js";
-import { getValidItemTypes, getItemTier, showStoreDialog } from "./store-utils.js";
+import { getValidItemTypes, getItemTier, getOriginalName, showStoreDialog } from "./store-utils.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -14,7 +14,7 @@ const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
     constructor(options) {
         super(options);
-        this.currentTab = "general";
+        this.currentTab = game.user.getFlag(MODULE_ID, "configTab") ?? "general";
     }
 
     static DEFAULT_OPTIONS = {
@@ -229,6 +229,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
                 e.preventDefault();
                 const tabId = e.currentTarget.dataset.tab;
                 this.currentTab = tabId;
+                game.user.setFlag(MODULE_ID, "configTab", tabId);
 
                 tabs.forEach(t => t.classList.remove("active"));
                 e.currentTarget.classList.add("active");
@@ -762,7 +763,8 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
                         if (!isSecondary && categoryKey === "Secondary Weapons") continue;
                     }
 
-                    if (PRICE_DATA[categoryKey]?.[doc.name]) continue;
+                    const originalName = getOriginalName(doc);
+                    if (PRICE_DATA[categoryKey]?.[originalName]) continue;
 
                     const tier = getItemTier(doc);
                     const qty = defaults[`tier${tier}`] || 0;
