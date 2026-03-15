@@ -1,3 +1,6 @@
+# 0.4.0
+- Vendor identity
+
 # 0.3.6
 - [Fixed] FilePicker callback no longer causes stale DOM references when selecting vendor images
 - [Changed] Vendor tooltip now uses HBS template rendered via `renderTemplate`, matching the comparison tooltip visual style
