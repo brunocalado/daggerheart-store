@@ -16,67 +16,58 @@ A dynamic, interactive, and fully configurable store for the **Daggerheart** sys
 ### 🛍️ For Players
 
 * **Intuitive Interface:** Browse categories (Weapons, Armor, Potions, etc.) with organized tabs.
-
-* **Real-Time Search:** Find the desired item instantly by typing its name.
-
+* **Real-Time Search:** Find the desired item instantly by typing its name. Clear the search with a single button.
 * **Visual Details:** Clear icons, names, and prices. Click on the item image to open the full compendium sheet.
-
 * **Automated Purchase:** Clicking "Buy" automatically deducts currency from the character sheet and adds the item to the inventory.
-
 * **💰 Sell System:** Sell items from your inventory directly to the store. The sell value is configurable by the GM.
-
-* **✨ Auto-Treasure Conversion:** Automatically converts *Handfuls*, *Bags*, and *Chests* into coins when the store is opened, ensuring you always have your liquid cash ready.
-
-* **Party Funds & Split Payment:** If enabled, view Party Wealth and split the cost of purchases between your character's funds and the Party's treasury.
-
+* **✨ Auto-Treasure Conversion:** Automatically converts *Handfuls*, *Bags*, and *Chests* into coins when the store is opened.
+* **Party Funds & Split Payment:** View Party Wealth and split the cost of purchases between your character and the Party's treasury.
 * **Visual & Audio Feedback:** Coin sounds upon purchase/sale and stylized chat messages confirm the transaction.
-
 * **Items on Sale:** Spot discounted items marked with special tags and reduced prices.
-
-* **Quick Stats:** View essential stats for Weapons (Damage, Range, Trait) and Armor (Score, Thresholds) directly in the store list without opening the sheet.
-
-* **Smart Recommendations:** Weapons that match your character's highest Trait are highlighted with a gold crown, helping you find the best gear for your build.
-
+* **Quick Stats:** View essential stats for Weapons (Damage, Range, Trait) and Armor (Score, Thresholds) directly in the list.
+* **Smart Recommendations:** Weapons matching your character's highest Trait are highlighted with a gold crown.
+* **⭐ Favorites:** Bookmark items to quickly filter and access your wishlist across sessions.
+* **Equipment Comparison:** Compare a store item against what you currently have equipped before buying.
+* **🧑‍🤝‍🧑 Vendor Identity:** See the merchant's name, portrait, and a tooltip showing your relationship status — colored per level (Hostile/Distrustful/Neutral/Friendly/Allied).
 
 ### 🛠️ For the Gamemaster (GM)
 
-* **Store Profiles:** Save and load different store configurations (Presets) to quickly switch settings between different towns, merchants, or campaign acts.
+* **Store Profiles:** Save and load different store configurations (Presets) to quickly switch between towns, merchants, or campaign acts. Update and rename profiles at any time — Epic item states and Randomizer options are saved per profile.
 
-* **Total Control:** Open the store for all players or a specific one with a single click using the header buttons.
+* **Total Control:** Open the store for all players or a specific one with a single click.
 
-* **Bulk Actions:** Quickly manage inventory with one-click buttons to: **Mark all items as On Sale or remove them from sale**, **Show all items or hide them across the entire store**, **Enable or disable purchases for all items** and **Enable or disable sales for all items**
+* **Bulk Actions:** One-click buttons to: Mark all items as On Sale or remove them, Show/Hide all items, Enable/Disable purchases for all items, Enable/Disable sales for all items, and **Reset all prices to default**.
 
 * **Dynamic Pricing:**
-
   * **Global Multiplier:** Adjust world inflation (e.g., 50% to 300%) using a slider.
-
-  * **Manual Override:** Change the price of any individual item on the fly, directly within the store interface.
+  * **Manual Override:** Change the price of any individual item on the fly.
 
 * **Inventory Management:**
-
-  * **Visibility Toggle, Block Sales and Block Purchases:** You can set up the store the way you want.
-
+  * **Visibility Toggle, Block Sales and Block Purchases:** Full per-item control.
+  * **Inventory Stock:** Set limited quantities per item. Stock is namespaced per profile — no data collisions when multiple profiles share the same Party Actor.
   * **Promotions (Sale):** Mark items as "On Sale" to apply a configurable automatic discount.
-
   * **Filter by Tier:** Configure which Tiers (1, 2, 3, 4) appear in each category via settings.
+  * **Block from Randomizer:** Lock specific items so they are never replaced by random generation.
+  * **Epic Items:** Flag items as Epic with distinct visual effects; state is saved per profile.
+
+* **Vendor Identity:**
+  * **Vendor Tab:** Configure the merchant's name, portrait (FilePicker), and a description shown as an in-store tooltip.
+  * **Per-Character Relationships:** Set each player character's relationship level (Hostile → Allied) with configurable price modifiers applied after all other pricing transformations.
+
+* **Item Tag Editor:** Edit item metadata (price, tier, header) directly from within the store using Foundry item flags — no manual description editing required.
 
 * **Customization:**
-
-  * **Party Actor:** Link a Party Actor to the store to enable group purchases.
-
-  * **Custom Compendiums:** Add your own item compendiums (Homebrew) to be scanned by the store.
-
-  * **Custom Tab:** Configure a dedicated tab linked to a specific compendium for special merchant inventories.
-
+  * **Party Actor:** Link a Party Actor to enable group purchases.
+  * **Custom Compendiums:** Add homebrew compendiums to the store. Disable SRD compendiums to streamline pure-homebrew setups.
+  * **Custom Tab:** Dedicate a tab to one or more specific compendiums for special merchant inventories.
   * **System Integration:** Automatically detects the Currency Name defined in your Daggerheart system settings.
+  * **Import / Export:** Share your store profile configuration across worlds or with other GMs.
 
-* **Store Randomizer:**
-
-  * **Random Merchant:** Generate dynamic inventory.
+* **Store Randomizer:** Generate dynamic inventory per category with configurable parameters. Includes a shortcut to restore maximum item counts. Options saved per profile.
 
 ## ⚙️ Instructions & Usage
 
-You need to read instructions to use this module! 
+You need to read the instructions to use this module!
 
 [Click Here!](https://github.com/brunocalado/daggerheart-store/wiki)
 
@@ -115,9 +106,7 @@ Install via the Foundry VTT Module browser or use this manifest link:
 ## ⚖️ Credits and License
 
 * **Code License:** GNU GPLv3.
-
 * **Assets:** AI Audio and images provided are [CC0 1.0 Universal Public Domain](https://creativecommons.org/publicdomain/zero/1.0/).
-
 * **epic.mp3** [Zapsplat](https://www.zapsplat.com). The audio assets are used in accordance with the Zapsplat Standard License.
 
 **Disclaimer:** This module is an independent creation and is not affiliated with Darrington Press.
