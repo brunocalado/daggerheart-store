@@ -733,11 +733,10 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const partyActorId = game.settings.get(MODULE_ID, "partyActorId");
         let partyActor = partyActorId ? game.actors.get(partyActorId) : null;
 
+        // All party actor writes are delegated to the GM via CONFIG.queries (socket.js),
+        // so players only need Observer access (the default) to read gold data.
+        // No ownership check needed here.
         let hasPartyActor = !!partyActor;
-        if (hasPartyActor && !isGM) {
-            const defaultOwnership = partyActor.ownership?.default ?? 0;
-            hasPartyActor = defaultOwnership >= 3;
-        }
 
         const userGold = userActor ? getActorWealth(userActor) : 0;
         const partyGold = partyActor ? getActorWealth(partyActor) : 0;
@@ -836,7 +835,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const epicLabel = game.settings.get(MODULE_ID, "epicLabel");
         const epicEffect = game.settings.get(MODULE_ID, "epicEffect");
 
-        const stockEnabled = game.settings.get(MODULE_ID, "stockEnabled") && hasPartyActor;
+        // Stock writes go via GM query, so only require that a party actor is configured —
+        // not that the player holds write ownership on it. `partyActor` is already resolved above.
+        const stockEnabled = game.settings.get(MODULE_ID, "stockEnabled") && !!partyActor;
         const showStockQuantity = game.settings.get(MODULE_ID, "showStockQuantity");
 
         // Shared options object for _buildItemData

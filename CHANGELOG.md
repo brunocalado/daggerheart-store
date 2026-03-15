@@ -1,3 +1,6 @@
+# 0.4.3
+- [Fixed] Players without Owner on the party actor can now see party gold, use "Buy with Party", transfer funds, and view stock — all party writes are routed through GM queries (socket.js), so write ownership on the party actor is no longer required on the client side
+
 # 0.4.2
 - [Fixed] Babele compatibility: item name lookup against `PRICE_DATA` now uses `doc.flags.babele.originalName` when Babele is active, preventing all items from failing to match when translations are enabled
 
