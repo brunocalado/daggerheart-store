@@ -762,7 +762,8 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
                         if (!isSecondary && categoryKey === "Secondary Weapons") continue;
                     }
 
-                    if (PRICE_DATA[categoryKey]?.[doc.name]) continue;
+                    const originalName = doc._source?.name ?? doc.name;
+                    if (PRICE_DATA[categoryKey]?.[originalName]) continue;
 
                     const tier = getItemTier(doc);
                     const qty = defaults[`tier${tier}`] || 0;

@@ -114,8 +114,9 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
                         if (pack) {
                             const docs = await pack.getDocuments();
                             for (const doc of docs) {
-                                if (priceList.hasOwnProperty(doc.name)) {
-                                    const tier = priceList[doc.name].tier;
+                                const originalName = doc._source?.name ?? doc.name;
+                                if (priceList.hasOwnProperty(originalName)) {
+                                    const tier = priceList[originalName].tier;
                                     if (catConfig[tier]) {
                                         itemCount++;
                                     }
@@ -227,10 +228,11 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
                     if (pack) {
                         const docs = await pack.getDocuments();
                         for (const doc of docs) {
-                            if (priceList.hasOwnProperty(doc.name)) {
-                                const tier = priceList[doc.name].tier;
+                            const originalName = doc._source?.name ?? doc.name;
+                            if (priceList.hasOwnProperty(originalName)) {
+                                const tier = priceList[originalName].tier;
                                 if (catConfig[tier]) {
-                                    const basePrice = Math.ceil(priceList[doc.name].price * priceMod);
+                                    const basePrice = Math.ceil(priceList[originalName].price * priceMod);
                                     items.push({
                                         name: doc.name,
                                         uuid: doc.uuid,
@@ -271,11 +273,12 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
                                 if (!isSecondary && categoryKey === "Secondary Weapons") continue;
                             }
 
+                            const originalName = doc._source?.name ?? doc.name;
                             const tier = getItemTier(doc);
                             if (catConfig[tier]) {
                                 let basePrice = 0;
-                                if (priceList.hasOwnProperty(doc.name)) {
-                                    basePrice = Math.ceil(priceList[doc.name].price * priceMod);
+                                if (priceList.hasOwnProperty(originalName)) {
+                                    basePrice = Math.ceil(priceList[originalName].price * priceMod);
                                 } else {
                                     // Fallback: extract price from {{{number}}} tag
                                     const extracted = extractPriceFromDescription(doc);
