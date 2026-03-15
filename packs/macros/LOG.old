@@ -1,5 +1,11 @@
-2026/03/15-14:19:22.956 610c Log #1456: 0 ops saved to Table #1457 OK
-2026/03/15-14:19:22.956 610c Archiving C:\Users\Bruno\Documents\VTT\fvttdev\Data\modules\daggerheart-store\packs\macros/001456.log: OK
-2026/03/15-14:19:22.957 610c Table #1327: 2 entries OK
-2026/03/15-14:19:22.960 610c Archiving C:\Users\Bruno\Documents\VTT\fvttdev\Data\modules\daggerheart-store\packs\macros/MANIFEST-001454: OK
-2026/03/15-14:19:22.962 610c **** Repaired leveldb C:\Users\Bruno\Documents\VTT\fvttdev\Data\modules\daggerheart-store\packs\macros; recovered 1 files; 892 bytes. Some data may have been lost. ****
+2026/03/15-14:19:22.968 610c Delete type=3 #1
+2026/03/15-14:49:30.997 3410 Level-0 table #1461: started
+2026/03/15-14:49:30.997 3410 Level-0 table #1461: 0 bytes OK
+2026/03/15-14:49:30.999 3410 Delete type=0 #1459
+2026/03/15-14:49:31.007 3410 Manual compaction at level-0 from '!macros!d3GkUwZzrxbSv2VF' @ 72057594037927935 : 1 .. '!macros!lWDmGeMZEFxKcsPa' @ 0 : 0; will stop at '!macros!lWDmGeMZEFxKcsPa' @ 5 : 1
+2026/03/15-14:49:31.007 3410 Compacting 1@0 + 0@1 files
+2026/03/15-14:49:31.008 3410 Generated table #1462@0: 2 keys, 892 bytes
+2026/03/15-14:49:31.008 3410 Compacted 1@0 + 0@1 files => 892 bytes
+2026/03/15-14:49:31.009 3410 compacted to: files[ 0 1 0 0 0 0 0 ]
+2026/03/15-14:49:31.009 3410 Delete type=2 #1327
+2026/03/15-14:49:31.009 3410 Manual compaction at level-0 from '!macros!lWDmGeMZEFxKcsPa' @ 5 : 1 .. '!macros!lWDmGeMZEFxKcsPa' @ 0 : 0; will stop at (end)

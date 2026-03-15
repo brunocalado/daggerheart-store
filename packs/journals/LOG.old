@@ -1,5 +1,12 @@
-2026/03/15-14:19:22.975 6028 Log #1464: 0 ops saved to Table #1465 OK
-2026/03/15-14:19:22.976 6028 Archiving C:\Users\Bruno\Documents\VTT\fvttdev\Data\modules\daggerheart-store\packs\journals/001464.log: OK
-2026/03/15-14:19:22.977 6028 Table #1335: 37 entries OK
-2026/03/15-14:19:22.979 6028 Archiving C:\Users\Bruno\Documents\VTT\fvttdev\Data\modules\daggerheart-store\packs\journals/MANIFEST-001462: OK
-2026/03/15-14:19:22.982 6028 **** Repaired leveldb C:\Users\Bruno\Documents\VTT\fvttdev\Data\modules\daggerheart-store\packs\journals; recovered 1 files; 58584 bytes. Some data may have been lost. ****
+2026/03/15-14:19:22.991 6028 Delete type=3 #1
+2026/03/15-14:49:30.994 3410 Level-0 table #1469: started
+2026/03/15-14:49:30.996 3410 Level-0 table #1469: 16002 bytes OK
+2026/03/15-14:49:30.997 3410 Delete type=0 #1467
+2026/03/15-14:49:31.003 3410 Manual compaction at level-0 from '!journal!5Zo1xf1V8L77XM2W' @ 72057594037927935 : 1 .. '!journal.pages!fIXCeXWeDbAu3uFg.bbQY9zgHxE3hTplw' @ 0 : 0; will stop at '!journal.pages!fIXCeXWeDbAu3uFg.bbQY9zgHxE3hTplw' @ 375 : 1
+2026/03/15-14:49:31.003 3410 Compacting 2@0 + 0@1 files
+2026/03/15-14:49:31.005 3410 Generated table #1470@0: 37 keys, 57703 bytes
+2026/03/15-14:49:31.005 3410 Compacted 2@0 + 0@1 files => 57703 bytes
+2026/03/15-14:49:31.006 3410 compacted to: files[ 0 1 0 0 0 0 0 ]
+2026/03/15-14:49:31.007 3410 Delete type=2 #1335
+2026/03/15-14:49:31.007 3410 Delete type=2 #1469
+2026/03/15-14:49:31.009 3410 Manual compaction at level-0 from '!journal.pages!fIXCeXWeDbAu3uFg.bbQY9zgHxE3hTplw' @ 375 : 1 .. '!journal.pages!fIXCeXWeDbAu3uFg.bbQY9zgHxE3hTplw' @ 0 : 0; will stop at (end)
