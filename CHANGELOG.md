@@ -7,6 +7,8 @@
 - [Changed] CSS class `.comparison-tooltip` renamed to `.dhs-comparison-tooltip` — prevents namespace collision with other modules
 - [Changed] CSS class `.store-dialog` renamed to `.dhs-dialog` — prevents namespace collision with other modules
 - [Changed] Extracted hardcoded colors to CSS variables: `--dhs-compare-better`, `--dhs-compare-worse`, `--dhs-purple` — improves maintainability and theme consistency
+- [Added] Presence Modifier — new toggle in the Vendor tab that applies a configurable % discount/surcharge per point of the character's Presence trait (positive Presence = discount, negative = surcharge). Applied after relationship modifier in the price calculation pipeline.
+- [Added] Character Relationships redesign — section moved to last in the Vendor tab, now has column headers (Character | Status | Rel. Bonus | Presence | Total) and shows combined multiplicative price effect when Presence Modifier is enabled.
 
 # 0.4.4
 

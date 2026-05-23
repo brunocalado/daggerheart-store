@@ -66,7 +66,8 @@ export const EXPORTABLE_SETTINGS = [
     "partyActorId", "customTabName", "customTabCompendiums", "customTabTierGroup",
     "useDefaultCompendiums", "sellRatio", "stockEnabled", "showStockQuantity", "randomizerSettings",
     "currencyMode", "chatPrivacy", "chatMessageStyle",
-    "vendorName", "vendorDescription", "vendorRelationships", "vendorRelationLevels"
+    "vendorName", "vendorDescription", "vendorRelationships", "vendorRelationLevels",
+    "vendorPresenceEnabled", "vendorPresenceModifier"
 ];
 
 /** Settings stored as objects (used for merge logic during import) */

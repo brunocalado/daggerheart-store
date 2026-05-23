@@ -143,6 +143,8 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         const vendorRelationships = foundry.utils.deepClone(
             game.settings.get(MODULE_ID, "vendorRelationships") || {}
         );
+        const vendorPresenceEnabled = game.settings.get(MODULE_ID, "vendorPresenceEnabled") ?? false;
+        const vendorPresenceModifier = game.settings.get(MODULE_ID, "vendorPresenceModifier") ?? 1.5;
 
         // Build linked actor list from users with assigned characters; drop orphaned actorIds
         const linkedActors = [];
@@ -166,13 +168,57 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
                 relationEffect = `-${pct}%`;
                 effectClass = "effect-down";
             }
+
+            // Presence effect — calculated per actor when presence modifier is enabled
+            let presenceEffect = "—";
+            let presenceEffectClass = "effect-neutral";
+            let totalEffect = "—";
+            let totalEffectClass = "effect-neutral";
+            // Raw presence percentage stored as data-attribute so the relation-change
+            // listener in _onRender can recalculate totals without re-rendering.
+            let presencePctRaw = 0;
+
+            if (vendorPresenceEnabled) {
+                const presenceValue = foundry.utils.getProperty(actor, "system.traits.presence.value") ?? 0;
+                presencePctRaw = presenceValue * vendorPresenceModifier;
+
+                if (presenceValue > 0) {
+                    presenceEffect = `-${Math.abs(presencePctRaw).toFixed(1)}%`;
+                    presenceEffectClass = "effect-down";
+                } else if (presenceValue < 0) {
+                    presenceEffect = `+${Math.abs(presencePctRaw).toFixed(1)}%`;
+                    presenceEffectClass = "effect-up";
+                }
+
+                // Combined multiplicative total (relationship × presence)
+                const relMultiplier = level < 0 ? (1 + pct / 100) : (level > 0 ? (1 - pct / 100) : 1);
+                const presenceMultiplier = 1 - (presencePctRaw / 100);
+                const combinedMultiplier = relMultiplier * presenceMultiplier;
+                const totalPct = (combinedMultiplier - 1) * 100;
+
+                if (Math.abs(totalPct) >= 0.05) {
+                    if (totalPct < 0) {
+                        totalEffect = `${totalPct.toFixed(1)}%`;
+                        totalEffectClass = "effect-down";
+                    } else {
+                        totalEffect = `+${totalPct.toFixed(1)}%`;
+                        totalEffectClass = "effect-up";
+                    }
+                }
+            }
+
             linkedActors.push({
                 id: actor.id,
                 name: actor.name,
                 img: actor.img,
                 relationLevel: level,
                 relationEffect,
-                effectClass
+                effectClass,
+                presenceEffect,
+                presenceEffectClass,
+                presencePctRaw,
+                totalEffect,
+                totalEffectClass
             });
         }
         linkedActors.sort((a, b) => a.name.localeCompare(b.name));
@@ -217,7 +263,9 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             vendorRelationships: cleanedRelationships,
             linkedActors,
             vendorRelationOptions: VENDOR_RELATION_LEVELS,
-            vendorRelationLevelsArray
+            vendorRelationLevelsArray,
+            vendorPresenceEnabled,
+            vendorPresenceModifier
         };
     }
 
@@ -353,6 +401,19 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             });
         });
 
+        // Presence toggle: sync modifier input active state.
+        // Registered after the generic toggleCards handler so checkbox.checked is already updated
+        // when this listener fires (same-element listeners execute in registration order;
+        // stopPropagation only blocks bubble, not sibling listeners on the same node).
+        const presenceToggleCard = html.querySelector("#presenceEnabledCard");
+        const presenceModifierInput = html.querySelector("#presenceModifierInput");
+        if (presenceToggleCard && presenceModifierInput) {
+            presenceToggleCard.addEventListener("click", () => {
+                const cb = presenceToggleCard.querySelector("input[type='checkbox']");
+                if (cb) presenceModifierInput.classList.toggle("presence-input-inactive", !cb.checked);
+            });
+        }
+
         // Tier Matrix: Tier Button Toggle Visual
         const tierBtns = html.querySelectorAll(".tier-btn");
         tierBtns.forEach(btn => {
@@ -410,7 +471,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             });
         });
 
-        // Vendor tab: update price effect badge when relation dropdown changes
+        // Vendor tab: update price effect badge (and total if presence enabled) when relation dropdown changes
         const relationSelects = html.querySelectorAll(".vendor-relation-select");
         relationSelects.forEach(select => {
             select.addEventListener("change", (e) => {
@@ -431,6 +492,28 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
                 } else {
                     effectEl.textContent = `-${pct}%`;
                     effectEl.className = "vendor-relation-effect effect-down";
+                }
+
+                // Also recalculate the total column if presence is active
+                const row = e.target.closest(".vendor-relation-row");
+                if (!row || !row.classList.contains("has-presence")) return;
+                const totalEl = row.querySelector(".vr-col-total .vendor-relation-effect");
+                if (!totalEl) return;
+
+                const presencePctRaw = parseFloat(row.dataset.presencePct) || 0;
+                const relMultiplier = level < 0 ? (1 + pct / 100) : (level > 0 ? (1 - pct / 100) : 1);
+                const presenceMultiplier = 1 - (presencePctRaw / 100);
+                const totalPct = (relMultiplier * presenceMultiplier - 1) * 100;
+
+                if (Math.abs(totalPct) < 0.05) {
+                    totalEl.textContent = "—";
+                    totalEl.className = "vendor-relation-effect effect-neutral";
+                } else if (totalPct < 0) {
+                    totalEl.textContent = `${totalPct.toFixed(1)}%`;
+                    totalEl.className = "vendor-relation-effect effect-down";
+                } else {
+                    totalEl.textContent = `+${totalPct.toFixed(1)}%`;
+                    totalEl.className = "vendor-relation-effect effect-up";
                 }
             });
         });
@@ -891,6 +974,13 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             }
         }
         await game.settings.set(MODULE_ID, "vendorRelationships", savedRelationships);
+
+        // Presence Modifier Settings
+        await game.settings.set(MODULE_ID, "vendorPresenceEnabled", expanded.vendorPresenceEnabled || false);
+        const currentPresenceMod = game.settings.get(MODULE_ID, "vendorPresenceModifier") ?? 1.5;
+        const presenceModVal = parseFloat(expanded.vendorPresenceModifier ?? currentPresenceMod);
+        await game.settings.set(MODULE_ID, "vendorPresenceModifier",
+            isNaN(presenceModVal) ? 1.5 : Math.max(0, presenceModVal));
 
         // Stock System Settings - Validate Party Actor before enabling
         const partyActorId = expanded.partyActorId || game.settings.get(MODULE_ID, "partyActorId");

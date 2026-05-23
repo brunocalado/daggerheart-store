@@ -873,4 +873,101 @@
     & .vendor-image-path {
         flex: 1;
     }
+
+    /* ------------------------------------------------------------------ */
+    /* PRESENCE MODIFIER SECTION                                           */
+    /* ------------------------------------------------------------------ */
+
+    /* Row for "% per Presence point" — label + input + hint inline */
+    & .presence-modifier-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 16px;
+        background: var(--dhs-bg-darker);
+        border: 1px solid var(--dhs-border);
+        border-radius: 5px;
+        margin-top: 8px;
+    }
+
+    & .presence-modifier-label {
+        flex: 1;
+        color: var(--dhs-text-muted);
+        font-size: 0.95em;
+    }
+
+    /* Dims the input visually when Presence Modifier is OFF.
+       pointer-events: none keeps the value in form submission (unlike disabled). */
+    & .vendor-relation-pct-input.presence-input-inactive {
+        opacity: 0.4;
+        pointer-events: none;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* CHARACTER RELATIONSHIPS — COLUMN LAYOUT                             */
+    /*                                                                     */
+    /* Widths (presence OFF):  char(flex:1) | status(130px) | rel(72px)   */
+    /* Widths (presence ON):   + presence(72px) | total(72px)             */
+    /* ------------------------------------------------------------------ */
+
+    & .vendor-relations-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 10px;
+        font-size: 0.8em;
+        font-family: var(--dhs-font-heading);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--dhs-gold);
+        border-bottom: 1px solid var(--dhs-gold-border);
+        margin-bottom: 4px;
+    }
+
+    & .vendor-relation-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    & .vr-col-char {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    & .vr-col-status {
+        width: 130px;
+        flex-shrink: 0;
+
+        & select {
+            width: 100%;
+            background: var(--dhs-bg);
+            border: 1px solid var(--dhs-border-light);
+            border-radius: 4px;
+            color: var(--dhs-text);
+            padding: 3px 6px;
+            font-size: 0.9em;
+        }
+    }
+
+    & .vr-col-rel {
+        width: 72px;
+        flex-shrink: 0;
+        text-align: center;
+    }
+
+    & .vr-col-presence {
+        width: 72px;
+        flex-shrink: 0;
+        text-align: center;
+    }
+
+    & .vr-col-total {
+        width: 72px;
+        flex-shrink: 0;
+        text-align: center;
+    }
 }

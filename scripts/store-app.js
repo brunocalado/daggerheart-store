@@ -586,7 +586,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
         const sellPrice = Math.floor(basePrice * sellRatio);
 
-        // Vendor relationship modifier — applied last, only for players with a linked actor
+        // Vendor relationship modifier — applied after sale modifier, only for non-GM players
         const isGMUser = game.user.isGM;
         if (!isGMUser && hasActor && userActor) {
             const relationships = game.settings.get(MODULE_ID, "vendorRelationships") || {};
@@ -596,6 +596,21 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 const pct = parseInt(relationLevels[String(level)]) || 0;
                 const multiplier = level < 0 ? (1 + pct / 100) : (1 - pct / 100);
                 finalPrice = Math.ceil(finalPrice * multiplier);
+            }
+        }
+
+        // Presence modifier — applied after relationship modifier, non-GM players only
+        if (!isGMUser && hasActor && userActor) {
+            const presenceEnabled = game.settings.get(MODULE_ID, "vendorPresenceEnabled");
+            if (presenceEnabled) {
+                const presenceModifier = game.settings.get(MODULE_ID, "vendorPresenceModifier") ?? 1.5;
+                const presenceValue = foundry.utils.getProperty(userActor, "system.traits.presence.value") ?? 0;
+                if (presenceValue !== 0 && presenceModifier > 0) {
+                    const presencePct = presenceValue * presenceModifier;
+                    const presenceMultiplier = 1 - (presencePct / 100);
+                    finalPrice = Math.ceil(finalPrice * presenceMultiplier);
+                    finalPrice = Math.max(1, finalPrice);
+                }
             }
         }
 

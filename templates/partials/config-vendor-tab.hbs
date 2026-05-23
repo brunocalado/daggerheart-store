@@ -47,40 +47,6 @@
 
 <hr>
 
-{{! Character Relationships }}
-<div class="config-section">
-    <h3><i class="fas fa-users"></i> Character Relationships</h3>
-    {{#if linkedActors}}
-    <p class="notes">Only characters linked to a user account are listed.
-       Relationship is stored per actor and persists across user reassignments.</p>
-    <div class="vendor-relations-list">
-        {{#each linkedActors}}
-        <div class="vendor-relation-row">
-            <img class="vendor-actor-icon" src="{{img}}" title="{{name}}">
-            <span class="vendor-actor-name">{{name}}</span>
-            <select name="vendorRelationships.{{id}}"
-                    data-actor-id="{{id}}"
-                    class="vendor-relation-select">
-                {{#each ../vendorRelationOptions}}
-                <option value="{{level}}"
-                    {{#if (eq level ../relationLevel)}}selected{{/if}}>
-                    {{label}}
-                </option>
-                {{/each}}
-            </select>
-            <span class="vendor-relation-effect {{effectClass}}"
-                  data-actor-id="{{id}}">{{relationEffect}}</span>
-        </div>
-        {{/each}}
-    </div>
-    {{else}}
-    <p class="notes warning">No users have a linked character assigned.
-       Assign characters to users in the User Management panel.</p>
-    {{/if}}
-</div>
-
-<hr>
-
 {{! Relationship Modifiers }}
 <div class="config-section">
     <h3><i class="fas fa-heart"></i> Relationship Modifiers</h3>
@@ -128,4 +94,104 @@
             {{/each}}
         </tbody>
     </table>
+</div>
+
+<hr>
+
+{{! Presence Modifier }}
+<div class="config-section">
+    <h3><i class="fas fa-star"></i> Presence Modifier</h3>
+    <p class="notes">When enabled, each character's Presence trait value adjusts prices.
+       Positive Presence grants a discount; negative Presence adds a surcharge.<br>
+       Example with 1.5%/pt — Presence +3 = 4.5% discount; Presence −2 = 3.0% surcharge.</p>
+
+    <label id="presenceEnabledCard"
+           class="stock-toggle-card {{#if vendorPresenceEnabled}}active{{/if}}">
+        <input type="checkbox" name="vendorPresenceEnabled" {{checked vendorPresenceEnabled}}>
+        <div class="card-content">
+            <i class="fas fa-star stock-icon"></i>
+            <div class="stock-text">
+                <strong>Enable Presence Modifier</strong>
+                <span class="stock-description">Adjusts prices based on each character's Presence trait value.</span>
+            </div>
+        </div>
+        <div class="toggle-switch">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+        </div>
+    </label>
+
+    <div class="presence-modifier-row">
+        <label class="presence-modifier-label">% per Presence point</label>
+        <div class="modifier-input-wrapper">
+            <input type="number"
+                   id="presenceModifierInput"
+                   name="vendorPresenceModifier"
+                   class="vendor-relation-pct-input{{#unless vendorPresenceEnabled}} presence-input-inactive{{/unless}}"
+                   value="{{vendorPresenceModifier}}"
+                   min="0" max="20" step="0.5">
+            <span class="modifier-pct-suffix">%</span>
+        </div>
+        <span class="field-hint">e.g. 1.5% → Presence +3 = 4.5% discount</span>
+    </div>
+</div>
+
+<hr>
+
+{{! Character Relationships }}
+<div class="config-section">
+    <h3><i class="fas fa-users"></i> Character Relationships</h3>
+    {{#if linkedActors}}
+    <p class="notes">Only characters linked to a user account are listed.
+       Relationship is stored per actor and persists across user reassignments.</p>
+
+    <div class="vendor-relations-header {{#if vendorPresenceEnabled}}has-presence{{/if}}">
+        <span class="vr-col-char">Character</span>
+        <span class="vr-col-status">Status</span>
+        <span class="vr-col-rel">Rel. Bonus</span>
+        {{#if vendorPresenceEnabled}}
+        <span class="vr-col-presence">Presence</span>
+        <span class="vr-col-total">Total</span>
+        {{/if}}
+    </div>
+
+    <div class="vendor-relations-list">
+        {{#each linkedActors}}
+        <div class="vendor-relation-row {{#if ../vendorPresenceEnabled}}has-presence{{/if}}"
+             data-presence-pct="{{presencePctRaw}}">
+            <div class="vr-col-char">
+                <img class="vendor-actor-icon" src="{{img}}" title="{{name}}">
+                <span class="vendor-actor-name">{{name}}</span>
+            </div>
+            <div class="vr-col-status">
+                <select name="vendorRelationships.{{id}}"
+                        data-actor-id="{{id}}"
+                        class="vendor-relation-select">
+                    {{#each ../vendorRelationOptions}}
+                    <option value="{{level}}"
+                        {{#if (eq level ../relationLevel)}}selected{{/if}}>
+                        {{label}}
+                    </option>
+                    {{/each}}
+                </select>
+            </div>
+            <div class="vr-col-rel">
+                <span class="vendor-relation-effect {{effectClass}}"
+                      data-actor-id="{{id}}">{{relationEffect}}</span>
+            </div>
+            {{#if ../vendorPresenceEnabled}}
+            <div class="vr-col-presence">
+                <span class="vendor-relation-effect {{presenceEffectClass}}">{{presenceEffect}}</span>
+            </div>
+            <div class="vr-col-total">
+                <span class="vendor-relation-effect {{totalEffectClass}}">{{totalEffect}}</span>
+            </div>
+            {{/if}}
+        </div>
+        {{/each}}
+    </div>
+    {{else}}
+    <p class="notes warning">No users have a linked character assigned.
+       Assign characters to users in the User Management panel.</p>
+    {{/if}}
 </div>

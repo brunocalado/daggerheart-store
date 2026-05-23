@@ -143,6 +143,14 @@ Hooks.once("init", () => {
         scope: "world", config: false, type: Object,
         default: { "-2": 25, "-1": 10, "0": 0, "1": 10, "2": 25 }
     });
+    game.settings.register(MODULE_ID, "vendorPresenceEnabled", {
+        name: "Vendor Presence Modifier Enabled",
+        scope: "world", config: false, type: Boolean, default: false
+    });
+    game.settings.register(MODULE_ID, "vendorPresenceModifier", {
+        name: "Vendor Presence Modifier (% per point)",
+        scope: "world", config: false, type: Number, default: 1.5
+    });
 
     // --- RANDOMIZER SETTINGS ---
     game.settings.register(MODULE_ID, "randomizerSettings", {
