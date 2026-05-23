@@ -6,6 +6,17 @@
 
 export const MODULE_ID = "daggerheart-store";
 
+/**
+ * Sell tab definition — prepended to the category list for non-GM players.
+ * Uses an icon-only display to preserve the existing tab layout width.
+ */
+export const SELL_TAB = {
+    id: "sell",
+    label: "My Inventory",
+    icon: "fa-sack-dollar",
+    iconOnly: true
+};
+
 /** Standard store categories with their display labels and data keys */
 export const STANDARD_CATEGORIES = [
     { id: "primary", label: "Primary Weapons", key: "Primary Weapons" },

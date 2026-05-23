@@ -12,7 +12,15 @@
     <!-- Tab Navigation -->
     <nav class="sheet-tabs tabs">
         {{#each categories}}
-        <a class="item {{#if (eq this.id ../activeTab)}}active{{/if}}" data-tab="{{this.id}}">{{this.label}}</a>
+        <a class="item {{#if this.iconOnly}}icon-only{{/if}} {{#if (eq this.id ../activeTab)}}active{{/if}}"
+           data-tab="{{this.id}}"
+           title="{{this.label}}">
+            {{#if this.iconOnly}}
+                <i class="fas {{this.icon}}"></i>
+            {{else}}
+                {{this.label}}
+            {{/if}}
+        </a>
         {{/each}}
     </nav>
 
@@ -21,21 +29,25 @@
         {{#each categories as |cat|}}
         <div class="tab" data-tab="{{cat.id}}" style="display: {{#if (eq cat.id ../activeTab)}}block{{else}}none{{/if}};">
 
-            {{> "modules/daggerheart-store/templates/partials/store-search-bar.hbs"}}
-
-            {{#each (lookup ../tabs cat.id) as |group|}}
-                {{#if group.label}}
-                <div class="tier-separator {{#if group.isHiddenGroup}}hidden-group-separator{{/if}}">{{{group.label}}}</div>
-                {{/if}}
-
-                <div class="item-list">
-                    {{#each group.items}}
-                    {{> "modules/daggerheart-store/templates/partials/store-item-row.hbs"}}
-                    {{/each}}
-                </div>
+            {{#if (eq cat.id "sell")}}
+                {{> "modules/daggerheart-store/templates/partials/store-sell-tab.hbs"}}
             {{else}}
-                <p class="empty-tab">No items available in this category based on current GM settings.</p>
-            {{/each}}
+                {{> "modules/daggerheart-store/templates/partials/store-search-bar.hbs"}}
+
+                {{#each (lookup ../tabs cat.id) as |group|}}
+                    {{#if group.label}}
+                    <div class="tier-separator {{#if group.isHiddenGroup}}hidden-group-separator{{/if}}">{{{group.label}}}</div>
+                    {{/if}}
+
+                    <div class="item-list">
+                        {{#each group.items}}
+                        {{> "modules/daggerheart-store/templates/partials/store-item-row.hbs"}}
+                        {{/each}}
+                    </div>
+                {{else}}
+                    <p class="empty-tab">No items available in this category based on current GM settings.</p>
+                {{/each}}
+            {{/if}}
         </div>
         {{/each}}
     </section>

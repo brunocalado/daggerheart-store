@@ -33,18 +33,6 @@
         </button>
     {{/if}}
 
-    <!-- Sell Button -->
-    <button type="button"
-            class="sell-btn"
-            data-action="sellItem"
-            data-name="{{this.name}}"
-            data-uuid="{{this.uuid}}"
-            data-price="{{this.sellPrice}}"
-            title="Sell Item for {{this.sellPrice}}"
-            {{#unless this.canSell}}disabled{{/unless}}>
-        <i class="fas fa-sack-dollar"></i> Sell
-    </button>
-
     <!-- Buy Buttons -->
     {{#if @root.hasPartyActor}}
         <button type="button"

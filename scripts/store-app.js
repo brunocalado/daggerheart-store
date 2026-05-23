@@ -3,7 +3,7 @@ import { StockManager } from "./stock-manager.js";
 import { StoreConfig } from "./store-config.js";
 import { StoreRandomizer } from "./store-randomizer.js";
 import {
-    MODULE_ID, STANDARD_CATEGORIES, CATEGORY_ITEM_TYPE
+    MODULE_ID, STANDARD_CATEGORIES, CATEGORY_ITEM_TYPE, SELL_TAB
 } from "./store-constants.js";
 import {
     getValidItemTypes, getItemTier, extractPriceFromDescription, getItemHeader,
@@ -23,7 +23,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
     constructor(options) {
         super(options);
         this.searchQuery = "";
-        this.activeTab = "primary";
+        // Non-GM players open directly on the sell tab (first tab in the list).
+        // GMs do not have the sell tab, so they fall back to "primary".
+        this.activeTab = game.user.isGM ? "primary" : "sell";
         /** @type {Object<string, boolean>} Per-user favorited items keyed by item name */
         this.favoritedItems = {};
         /** @type {boolean} Whether the favorites-only filter is active */
@@ -663,6 +665,126 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
     }
 
     /**
+     * Builds the flat list of items displayed in the player's sell tab.
+     * Iterates the player's inventory and cross-references against the full store catalog.
+     * Hidden items are intentionally included — hidden ≠ unsellable.
+     * Called from `_prepareContext` when the sell tab is the active one.
+     * @param {Object} opts
+     * @param {Actor} opts.userActor - The player's assigned character
+     * @param {number} opts.sellRatio - Sell price multiplier applied to the catalog base price
+     * @param {Object} opts.blockedSaleItems - Items blocked from selling, keyed by item name
+     * @param {Object} opts.priceOverrides - Manual price overrides, keyed by item name
+     * @param {number} opts.priceMod - Global price modifier (percentage / 100)
+     * @param {boolean} opts.useDefaultCompendiums - Whether default system compendiums are active
+     * @param {Array} opts.customCompendiums - Custom per-category compendium config objects
+     * @param {Array} opts.customTabCompendiums - Custom tab compendium pack IDs
+     * @returns {Promise<Array>} Alphabetically sorted array of sell-tab item data objects
+     */
+    async _buildSellTabItems({ userActor, sellRatio, blockedSaleItems, priceOverrides, priceMod, useDefaultCompendiums, customCompendiums, customTabCompendiums }) {
+        const catalogIndex = await this._buildStoreCatalogIndex({
+            priceMod, priceOverrides, useDefaultCompendiums, customCompendiums, customTabCompendiums
+        });
+
+        const sellItems = [];
+        for (const playerItem of userActor.items) {
+            const entry = catalogIndex.get(playerItem.name);
+            if (!entry) continue; // not registered in the store catalog
+
+            const isSaleBlocked = !!blockedSaleItems[playerItem.name];
+            const sellPrice = Math.floor(entry.basePrice * sellRatio);
+
+            sellItems.push({
+                name: playerItem.name,
+                // Prefer the player's own item image so renamed/reskinned copies look right
+                img: playerItem.img || entry.img,
+                sellPrice,
+                canSell: !isSaleBlocked,
+                isSaleBlocked,
+                // Catalog UUID used by _setupItemImages (click to view) and stock management in _onSellItem
+                catalogUuid: entry.uuid,
+                description: entry.description || ""
+            });
+        }
+
+        sellItems.sort((a, b) => a.name.localeCompare(b.name));
+        return sellItems;
+    }
+
+    /**
+     * Builds a Map of every store item name to its catalog metadata, spanning all
+     * configured compendiums (default + custom categories + custom tab).
+     * Used exclusively by the sell tab to validate and price the player's inventory.
+     * Hidden items are included by design: store visibility does not affect sellability.
+     * @param {Object} opts
+     * @param {number} opts.priceMod - Global price modifier (percentage / 100)
+     * @param {Object} opts.priceOverrides - Manual price overrides, keyed by item name
+     * @param {boolean} opts.useDefaultCompendiums - Whether default system compendiums are active
+     * @param {Array} opts.customCompendiums - Custom per-category compendium config objects
+     * @param {Array} opts.customTabCompendiums - Custom tab compendium pack IDs
+     * @returns {Promise<Map<string, {basePrice: number, img: string, uuid: string}>>}
+     */
+    async _buildStoreCatalogIndex({ priceMod, priceOverrides, useDefaultCompendiums, customCompendiums, customTabCompendiums }) {
+        const catalog = new Map();
+        const seenNames = new Set();
+
+        // --- Default system compendiums (standard category packs) ---
+        if (useDefaultCompendiums) {
+            const defaultPackIds = [...new Set(Object.values(PACK_MAPPING))];
+            const results = await Promise.all(
+                defaultPackIds.map(id => game.packs.get(id)?.getDocuments() ?? Promise.resolve([]))
+            );
+            for (const docs of results) {
+                for (const doc of docs) {
+                    if (seenNames.has(doc.name)) continue;
+                    seenNames.add(doc.name);
+
+                    const originalName = getOriginalName(doc);
+                    let basePrice = 0;
+                    // Search all category price tables; items can appear under multiple keys
+                    for (const catKey of Object.keys(PRICE_DATA)) {
+                        if (PRICE_DATA[catKey][originalName]) {
+                            basePrice = Math.ceil(PRICE_DATA[catKey][originalName].price * priceMod);
+                            break;
+                        }
+                    }
+                    if (priceOverrides.hasOwnProperty(doc.name)) basePrice = priceOverrides[doc.name];
+
+                    const rawDesc = String(foundry.utils.getProperty(doc, "system.description.value") ||
+                                          foundry.utils.getProperty(doc, "system.description") || "");
+                    catalog.set(doc.name, { basePrice, img: doc.img, uuid: doc.uuid, description: this._cleanDescriptionString(rawDesc) });
+                }
+            }
+        }
+
+        // --- Custom category compendiums + custom tab compendiums ---
+        const customCategoryPackIds = (customCompendiums || [])
+            .filter(c => c?.pack)
+            .map(c => c.pack);
+        const customTabPackIds = (customTabCompendiums || [])
+            .filter(p => p?.trim());
+        const allCustomPackIds = [...new Set([...customCategoryPackIds, ...customTabPackIds])];
+
+        const customResults = await Promise.all(
+            allCustomPackIds.map(id => game.packs.get(id)?.getDocuments() ?? Promise.resolve([]))
+        );
+        for (const docs of customResults) {
+            for (const doc of docs) {
+                if (seenNames.has(doc.name)) continue;
+                seenNames.add(doc.name);
+
+                let basePrice = extractPriceFromDescription(doc);
+                if (priceOverrides.hasOwnProperty(doc.name)) basePrice = priceOverrides[doc.name];
+
+                const rawDescCustom = String(foundry.utils.getProperty(doc, "system.description.value") ||
+                                            foundry.utils.getProperty(doc, "system.description") || "");
+                catalog.set(doc.name, { basePrice, img: doc.img, uuid: doc.uuid, description: this._cleanDescriptionString(rawDescCustom) });
+            }
+        }
+
+        return catalog;
+    }
+
+    /**
      * Fetches stock data for an item and returns stock-related fields.
      * @param {string} uuid - The item UUID
      * @param {boolean} stockEnabled - Whether stock system is active
@@ -879,7 +1001,16 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         }
 
         categories = categories.filter(c => !hiddenCategories[c.key]);
+
+        // Prepend the sell tab for non-GM players who have an assigned actor.
+        // The sell tab is not compendium-based so it is never subject to hiddenCategories.
+        if (!isGM && hasActor) {
+            categories.unshift({ ...SELL_TAB });
+        }
+
         context.categories = categories;
+        // Default sell items — populated below when the sell tab is the active one.
+        context.sellItems = [];
 
         if (categories.length > 0) {
             const currentTabExists = categories.find(c => c.id === this.activeTab);
@@ -893,6 +1024,17 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             // OPTIMIZATION: Only process the active tab
             if (cat.id !== this.activeTab) {
                 context.tabs[cat.id] = [];
+                continue;
+            }
+
+            // Sell tab: inventory-centric — iterates the player's items and cross-references
+            // against all configured store compendiums, including hidden ones.
+            if (cat.id === "sell") {
+                context.sellItems = await this._buildSellTabItems({
+                    userActor, sellRatio, blockedSaleItems, priceOverrides,
+                    priceMod, useDefaultCompendiums, customCompendiums, customTabCompendiums
+                });
+                context.tabs["sell"] = [];
                 continue;
             }
 

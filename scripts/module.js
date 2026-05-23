@@ -262,6 +262,7 @@ Hooks.once("init", () => {
         "modules/daggerheart-store/templates/partials/store-item-row.hbs",
         "modules/daggerheart-store/templates/partials/store-gm-controls.hbs",
         "modules/daggerheart-store/templates/partials/store-player-controls.hbs",
+        "modules/daggerheart-store/templates/partials/store-sell-tab.hbs",
         "modules/daggerheart-store/templates/partials/config-general-tab.hbs",
         "modules/daggerheart-store/templates/partials/config-categories-tab.hbs",
         "modules/daggerheart-store/templates/partials/config-tiers-tab.hbs",

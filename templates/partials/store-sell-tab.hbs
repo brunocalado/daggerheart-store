@@ -1,0 +1,41 @@
+<div class="sell-tab">
+    {{#if @root.sellItems.length}}
+        {{#each @root.sellItems}}
+        <div class="store-row {{#unless this.canSell}}gm-hidden-item{{/unless}}">
+
+            <div class="row-left">
+                <div class="item-icon-wrapper">
+                    <img src="{{this.img}}"
+                         title="Click to view details"
+                         class="item-image"
+                         data-uuid="{{this.catalogUuid}}"
+                         width="36" height="36" />
+                </div>
+
+                <span class="store-item-name" {{#if this.description}}data-item-desc="{{this.description}}"{{/if}}>{{this.name}}</span>
+            </div>
+
+            <div class="row-right">
+                <div class="price-display">
+                    <span class="item-price">
+                        <i class="fas fa-coins price-coin-icon"></i> {{this.sellPrice}}
+                    </span>
+                </div>
+
+                <button type="button"
+                        class="sell-btn"
+                        data-action="sellItem"
+                        data-name="{{this.name}}"
+                        data-uuid="{{this.catalogUuid}}"
+                        data-price="{{this.sellPrice}}"
+                        title="{{#if this.canSell}}Sell for {{this.sellPrice}}{{else}}Sale blocked for this item{{/if}}"
+                        {{#unless this.canSell}}disabled{{/unless}}>
+                    <i class="fas fa-hand-holding-dollar"></i> Sell
+                </button>
+            </div>
+        </div>
+        {{/each}}
+    {{else}}
+        <p class="empty-tab">Your inventory has no items registered in the store.</p>
+    {{/if}}
+</div>

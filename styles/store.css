@@ -111,6 +111,23 @@
                 filter: none;
             }
         }
+
+        /* Icon-only sell tab — fixed width so it does not stretch like text tabs */
+        & .item.icon-only {
+            flex: 0 0 auto;
+            width: 42px;
+            padding: 6px 8px;
+            font-size: 1.2em;
+        }
+    }
+
+    /* ---- SELL TAB ---- */
+
+    & .sell-tab {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        padding: 4px 0;
     }
 
     /* ---- CONTENT AREA ---- */

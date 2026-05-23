@@ -9,6 +9,11 @@
 - [Changed] Extracted hardcoded colors to CSS variables: `--dhs-compare-better`, `--dhs-compare-worse`, `--dhs-purple` — improves maintainability and theme consistency
 - [Added] Presence Modifier — new toggle in the Vendor tab that applies a configurable % discount/surcharge per point of the character's Presence trait (positive Presence = discount, negative = surcharge). Applied after relationship modifier in the price calculation pipeline.
 - [Added] Character Relationships redesign — section moved to last in the Vendor tab, now has column headers (Character | Status | Rel. Bonus | Presence | Total) and shows combined multiplicative price effect when Presence Modifier is enabled.
+- [Added] Dedicated **Sell tab** (icon-only `fa-sack-dollar`, first tab for players) — lists all player inventory items that exist in the store catalog, including GM-hidden items; respects `blockedSaleItems`
+- [Changed] Sell button removed from all standard/custom category item rows — selling is now centralised in the Sell tab
+- [Added] `_buildSellTabItems` — builds the sell tab item list by iterating the player's inventory and cross-referencing the full store catalog index
+- [Added] `_buildStoreCatalogIndex` — aggregates all configured compendiums (default + custom categories + custom tab) into a single `Map<name, {basePrice, img, uuid}>` used by the sell tab
+- https://github.com/brunocalado/daggerheart-store/issues/4
 
 # 0.4.4
 
