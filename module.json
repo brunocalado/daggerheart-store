@@ -1,20 +1,23 @@
 {
   "id": "daggerheart-store",
   "title": "Daggerheart: Store",
-  "version": "0.4.4",
+
+  "version": "0.5.0",
+
   "compatibility": {
-    "minimum": "13",
-    "verified": "13"
+    "minimum": "14",
+    "verified": "14"
   },
+
   "authors": [
     {
       "name": "Mestre Digital",
+      "url": "http://youtube.com/@mestredigital",
       "flags": {}
     }
   ],
-  
   "description": "A dynamic, interactive, and fully configurable store for the Daggerheart system in Foundry VTT. Allow your players to purchase weapons, armor, potions, and miscellaneous items directly from an elegant visual interface, while the GM maintains full control over prices and what is displayed.",
-
+  
   "relationships": {
     "systems": [
       {
@@ -24,17 +27,22 @@
       }
     ]
   },
-
-  "media": [{
-    "type": "setup",
-    "url": "modules/daggerheart-store/assets/images/thumbnail.webp",
-    "thumbnail": "modules/daggerheart-store/assets/images/thumbnail.webp"
-  }], 
   
+  "media": [
+    {
+      "type": "setup",
+      "url": "modules/daggerheart-store/assets/images/thumbnail.webp",
+      "thumbnail": "modules/daggerheart-store/assets/images/thumbnail.webp",
+      "loop": false,
+      "flags": {}
+    }
+  ],
+
   "socket": true,
   "esmodules": [
     "scripts/module.js"
   ],
+
   "styles": [
     "styles/variables.css",
     "styles/store.css",
@@ -45,6 +53,7 @@
     "styles/dialogs.css",
     "styles/item-tagger.css"
   ],
+  
   "packs": [
     {
       "label": "General Items",
@@ -57,7 +66,7 @@
         "ASSISTANT": "OWNER"
       },
       "flags": {},
-      "banner": "modules/daggerheart-store/assets/images/banner.webp" 
+      "banner": "modules/daggerheart-store/assets/images/banner.webp"
     },
     {
       "label": "Macros",
@@ -70,7 +79,7 @@
         "ASSISTANT": "OWNER"
       },
       "flags": {},
-      "banner": "modules/daggerheart-store/assets/images/banner.webp" 
+      "banner": "modules/daggerheart-store/assets/images/banner.webp"
     },
     {
       "label": "Journals",
@@ -83,24 +92,24 @@
         "ASSISTANT": "OWNER"
       },
       "flags": {},
-      "banner": "modules/daggerheart-store/assets/images/banner.webp" 
-    } 
-  ],  
+      "banner": "modules/daggerheart-store/assets/images/banner.webp"
+    }
+  ],
   "packFolders": [
     {
       "name": "💰 Store",
       "sorting": "a",
       "color": "#624d09",
-      "packs": [        
-        "general-items",        
+      "packs": [
+        "general-items",
         "journals",
         "macros"
       ],
       "folders": []
     }
   ],
-  
   "url": "https://github.com/brunocalado/daggerheart-store",
   "manifest": "https://raw.githubusercontent.com/brunocalado/daggerheart-store/main/module.json",
-  "download": "https://codeload.github.com/brunocalado/daggerheart-store/zip/main"
+  "download": "https://codeload.github.com/brunocalado/daggerheart-store/zip/main",
+  "flags": {}
 }

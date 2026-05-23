@@ -5,8 +5,7 @@ import { StoreWelcome } from "./store-welcome.js";
 import { StockManager } from "./stock-manager.js";
 import { migrateTags } from "./store-migration.js";
 import { registerQueryHandlers } from "./socket.js";
-
-const MODULE_ID = "daggerheart-store";
+import { MODULE_ID } from "./store-constants.js";
 const { DialogV2 } = foundry.applications.api;
 
 Hooks.once("init", () => {
@@ -491,7 +490,8 @@ Hooks.on("deleteActor", (actor, options, userId) => {
 });
 
 Hooks.on("renderDaggerheartMenu", (app, html, data) => {
-    const element = (html instanceof jQuery) ? html[0] : html;
+    // v14 ApplicationV2 always delivers HTMLElement; the jQuery fallback is a v13 remnant.
+    const element = html instanceof HTMLElement ? html : html[0];
     const myButton = document.createElement("button");
     myButton.type = "button";
     myButton.innerHTML = `<i class="fas fa-balance-scale"></i> Open Store`;

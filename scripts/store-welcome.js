@@ -1,5 +1,6 @@
+import { MODULE_ID } from "./store-constants.js";
+
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
-const MODULE_ID = "daggerheart-store";
 
 /**
  * Welcome Screen Application
@@ -22,6 +23,8 @@ export class StoreWelcome extends HandlebarsApplicationMixin(ApplicationV2) {
             closeWelcome: StoreWelcome.prototype._onCloseWelcome
         }
     };
+
+    static BASE_APPLICATION = foundry.applications.api.ApplicationV2;
 
     static PARTS = {
         main: {

@@ -364,7 +364,7 @@
         }
 
         &.sale-pulse {
-            animation: saleGreenPulse 3s infinite ease-in-out;
+            animation: dhs-saleGreenPulse 3s infinite ease-in-out;
             border: 1px solid #006400;
         }
 
@@ -382,7 +382,7 @@
             width: 60%;
             height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
-            animation: epicShine 6s ease-in-out infinite;
+            animation: dhs-epicShine 6s ease-in-out infinite;
             pointer-events: none;
         }
 
@@ -393,12 +393,12 @@
             width: 35%;
             height: 200%;
             background: radial-gradient(ellipse at center, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.25) 40%, transparent 70%);
-            animation: epicGlow 4s ease-in-out infinite;
+            animation: dhs-epicGlow 4s ease-in-out infinite;
             pointer-events: none;
         }
 
         &.epic-fx-pulse {
-            animation: epicPulse 2.5s ease-in-out infinite;
+            animation: dhs-epicPulse 2.5s ease-in-out infinite;
         }
 
         &.epic-fx-wave::after {
@@ -408,12 +408,12 @@
             width: 100%;
             height: 50%;
             background: linear-gradient(180deg, transparent, rgba(255,255,255,0.5), transparent);
-            animation: epicWave 3.5s ease-in-out infinite;
+            animation: dhs-epicWave 3.5s ease-in-out infinite;
             pointer-events: none;
         }
 
         &.epic-fx-border-glow {
-            animation: epicBorderGlow 1.8s ease-in-out infinite;
+            animation: dhs-epicBorderGlow 1.8s ease-in-out infinite;
         }
     }
 
@@ -589,7 +589,7 @@
         color: #ffffff;
 
         /* Keep pulse animation */
-        animation: saleTextPulse 2s infinite ease-in-out;
+        animation: dhs-saleTextPulse 2s infinite ease-in-out;
     }
 
     /* ---- ICON BUTTONS ---- */
@@ -756,7 +756,7 @@
             -1px  1px 0 #000,
              1px  1px 0 #000,
              0 0 5px #8a7020;
-        animation: pulseCrown 2s infinite ease-in-out;
+        animation: dhs-pulseCrown 2s infinite ease-in-out;
     }
 
     /* ---- STOCK SYSTEM ---- */
@@ -772,9 +772,9 @@
         font-weight: bold;
         display: inline-block;
 
-        &.stock-available { color: #4caf50; }
+        &.stock-available { color: var(--dhs-compare-better); }
         &.stock-low { color: #ff9800; }
-        &.stock-out { color: #f44336; text-decoration: line-through; }
+        &.stock-out { color: var(--dhs-compare-worse); text-decoration: line-through; }
         &.stock-unlimited { color: #2196f3; font-size: 1.1em; }
     }
 
@@ -788,8 +788,8 @@
 
         &.in-stock {
             background: rgba(76, 175, 80, 0.2);
-            color: #4caf50;
-            border: 1px solid #4caf50;
+            color: var(--dhs-compare-better);
+            border: 1px solid var(--dhs-compare-better);
         }
 
         &.low-stock {
@@ -800,8 +800,8 @@
 
         &.out-of-stock {
             background: rgba(244, 67, 54, 0.2);
-            color: #f44336;
-            border: 1px solid #f44336;
+            color: var(--dhs-compare-worse);
+            border: 1px solid var(--dhs-compare-worse);
         }
     }
 
@@ -848,119 +848,103 @@
 }
 
 /* ==================================================== */
-/* VENDOR IDENTITY HEADER (player view)                 */
+/* VENDOR IDENTITY HEADER (scoped under store window)   */
 /* ==================================================== */
 
-.vendor-identity-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+.daggerheart-store {
+
+    & .vendor-identity-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    & .vendor-header-image {
+        width: 34px;
+        height: 34px;
+        object-fit: cover;
+        border-radius: 4px;
+        border: 1px solid var(--dhs-gold-border, #6b5a2e);
+        flex-shrink: 0;
+    }
+
+    & .vendor-header-name {
+        font-family: var(--dhs-font-heading);
+        font-size: 1.05em;
+        color: var(--dhs-gold, #d4af37);
+        font-weight: bold;
+        letter-spacing: 0.3px;
+    }
+
+    & .vendor-info-trigger {
+        cursor: help;
+        color: #888;
+        font-size: 0.9em;
+        transition: color 0.2s;
+        line-height: 1;
+
+        &:hover { color: var(--dhs-gold, #d4af37); }
+    }
+
+    & .vendor-header-image.vendor-info-trigger {
+        cursor: help;
+    }
 }
 
-.vendor-header-image {
-    width: 34px;
-    height: 34px;
-    object-fit: cover;
-    border-radius: 4px;
-    border: 1px solid var(--dhs-gold-border, #6b5a2e);
-    flex-shrink: 0;
-}
-
-.vendor-header-name {
-    font-family: var(--dhs-font-heading);
-    font-size: 1.05em;
-    color: var(--dhs-gold, #d4af37);
-    font-weight: bold;
-    letter-spacing: 0.3px;
-}
-
-.vendor-info-trigger {
-    cursor: help;
-    color: #888;
-    font-size: 0.9em;
-    transition: color 0.2s;
-    line-height: 1;
-}
-.vendor-info-trigger:hover { color: var(--dhs-gold, #d4af37); }
-
-.vendor-header-image.vendor-info-trigger {
-    cursor: help;
-}
-
-/* Vendor tooltip reuses the comparison-tooltip card visual */
+/* Vendor tooltip — appended to document.body, scoped via own root class */
 .vendor-info-tooltip {
     min-width: 220px;
     max-width: 320px;
     width: auto;
     pointer-events: none;
     padding: 12px;
-}
 
-.vendor-tooltip-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #444;
-}
+    & .vendor-tooltip-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #444;
+    }
 
-.vendor-tooltip-img {
-    width: 48px;
-    height: 48px;
-    object-fit: cover;
-    border-radius: 4px;
-    border: 1px solid var(--dhs-gold-border, #6b5a2e);
-    flex-shrink: 0;
-}
+    & .vendor-tooltip-img {
+        width: 48px;
+        height: 48px;
+        object-fit: cover;
+        border-radius: 4px;
+        border: 1px solid var(--dhs-gold-border, #6b5a2e);
+        flex-shrink: 0;
+    }
 
-.vendor-tooltip-name {
-    font-size: 1.05em;
-    font-weight: bold;
-    color: var(--dhs-gold, #d4af37);
-}
+    & .vendor-tooltip-name {
+        font-size: 1.05em;
+        font-weight: bold;
+        color: var(--dhs-gold, #d4af37);
+    }
 
-.vendor-tooltip-desc {
-    font-size: 0.88em;
-    color: #e0e0e0;
-    line-height: 1.5;
-    margin-bottom: 8px;
-}
+    & .vendor-tooltip-desc {
+        font-size: 0.88em;
+        color: #e0e0e0;
+        line-height: 1.5;
+        margin-bottom: 8px;
 
-.vendor-tooltip-desc p  { margin: 0 0 4px; }
-.vendor-tooltip-desc ul,
-.vendor-tooltip-desc ol { margin: 4px 0 4px 14px; padding: 0; }
+        & p  { margin: 0 0 4px; }
+        & ul,
+        & ol { margin: 4px 0 4px 14px; padding: 0; }
+    }
 
-.vendor-tooltip-relation {
-    border-top: 1px solid #333;
-    padding-top: 8px;
-    margin-top: 8px;
-    font-size: 0.88em;
-    color: #d0d0d0;
-}
+    & .vendor-tooltip-relation {
+        border-top: 1px solid #333;
+        padding-top: 8px;
+        margin-top: 8px;
+        font-size: 0.88em;
+        color: #d0d0d0;
 
-.vendor-tooltip-relation strong {
-    color: #ffffff;
-}
-
-/* Vendor image picker in Config tab */
-.vendor-image-picker-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.vendor-image-preview {
-    width: 32px;
-    height: 32px;
-    object-fit: cover;
-    border-radius: 3px;
-    border: 1px solid var(--dhs-border-light);
-    flex-shrink: 0;
-}
-
-.vendor-image-path {
-    flex: 1;
+        & strong {
+            color: #ffffff;
+        }
+    }
 }
 
 /* ---- FAVORITES ---- */
@@ -1014,41 +998,41 @@
 
 /* ---- STORE KEYFRAMES ---- */
 
-@keyframes saleGreenPulse {
+@keyframes dhs-saleGreenPulse {
     0% { box-shadow: 0 0 2px #1a3a1a; border-color: #2a5a2a; }
     50% { box-shadow: 0 0 8px #3a7a3a; border-color: #006400; }
     100% { box-shadow: 0 0 2px #1a3a1a; border-color: #2a5a2a; }
 }
 
-@keyframes saleTextPulse {
+@keyframes dhs-saleTextPulse {
     0%   { opacity: 0.75; box-shadow: 0 0 2px #1a5a3a; }
     50%  { opacity: 1;    box-shadow: 0 0 7px #3a8a5a; }
     100% { opacity: 0.75; box-shadow: 0 0 2px #1a5a3a; }
 }
 
-@keyframes epicShine {
+@keyframes dhs-epicShine {
     0%, 70% { left: -100%; }
     100% { left: 150%; }
 }
 
-@keyframes epicGlow {
+@keyframes dhs-epicGlow {
     0% { left: -35%; opacity: 0; }
     10% { opacity: 1; }
     80% { opacity: 1; }
     100% { left: 110%; opacity: 0; }
 }
 
-@keyframes epicPulse {
+@keyframes dhs-epicPulse {
     0%, 100% { filter: brightness(1); }
     50% { filter: brightness(1.15); }
 }
 
-@keyframes epicWave {
+@keyframes dhs-epicWave {
     0%, 60% { top: -50%; }
     100% { top: 100%; }
 }
 
-@keyframes epicBorderGlow {
+@keyframes dhs-epicBorderGlow {
     0%, 100% {
         box-shadow: inset 4px 0 0 0 currentColor, -2px 0 8px rgba(255,255,255,0.3);
     }
@@ -1057,7 +1041,7 @@
     }
 }
 
-@keyframes pulseCrown {
+@keyframes dhs-pulseCrown {
     0% { transform: scale(1); opacity: 0.9; }
     50% { transform: scale(1.15); opacity: 1; }
     100% { transform: scale(1); opacity: 0.9; }

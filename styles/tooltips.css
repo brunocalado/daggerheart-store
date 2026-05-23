@@ -33,7 +33,7 @@
 /* ITEM COMPARISON FEATURE                              */
 /* ==================================================== */
 
-.comparison-tooltip {
+.dhs-comparison-tooltip {
     position: fixed;
     z-index: 10000;
     width: 600px;
@@ -171,8 +171,8 @@
         font-weight: bold;
         color: var(--dhs-gold);
 
-        &.compare-better { color: #4caf50; }
-        &.compare-worse { color: #f44336; }
+        &.compare-better { color: var(--dhs-compare-better); }
+        &.compare-worse { color: var(--dhs-compare-worse); }
 
         & i.fa-caret-up,
         & i.fa-caret-down {
@@ -180,8 +180,8 @@
         }
     }
 
-    & .compare-better { color: #4caf50; }
-    & .compare-worse { color: #f44336; }
+    & .compare-better { color: var(--dhs-compare-better); }
+    & .compare-worse { color: var(--dhs-compare-worse); }
 
     & .direct-tag {
         font-size: 0.75em;
@@ -231,20 +231,20 @@
         }
 
         &.feature-gained {
-            color: #4caf50;
+            color: var(--dhs-compare-better);
 
             & .feature-name,
             & .feature-desc {
-                color: #4caf50;
+                color: var(--dhs-compare-better);
             }
         }
 
         &.feature-lost {
-            color: #f44336;
+            color: var(--dhs-compare-worse);
 
             & .feature-name,
             & .feature-desc {
-                color: #f44336;
+                color: var(--dhs-compare-worse);
             }
         }
     }

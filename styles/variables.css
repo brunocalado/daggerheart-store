@@ -38,6 +38,13 @@
     --dhs-red-light: #ff5555;
     --dhs-sell: #8b3333;
 
+    /* Comparison indicators */
+    --dhs-compare-better: #4caf50;
+    --dhs-compare-worse: #f44336;
+
+    /* Accent */
+    --dhs-purple: #8e44ad;
+
     /* Fonts */
     --dhs-font-heading: "Aleo", serif;
     --dhs-font-body: "Lato", sans-serif;

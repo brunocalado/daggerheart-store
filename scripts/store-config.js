@@ -34,6 +34,8 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         }
     };
 
+    static BASE_APPLICATION = foundry.applications.api.ApplicationV2;
+
     static PARTS = { form: { template: "modules/daggerheart-store/templates/store-config.hbs" } };
 
     async _prepareContext(options) {

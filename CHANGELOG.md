@@ -1,4 +1,15 @@
+# 0.5.0
+
+- v14 only
+- [Fixed] `MODULE_ID` now always imported from `store-constants.js` — single source of truth for module ID (was re-declared in 2 files)
+- [Fixed] Removed jQuery instanceof compatibility check from hook handler — v14 ApplicationV2 always delivers HTMLElement directly
+- [Fixed] Added `BASE_APPLICATION` to all 6 ApplicationV2 subclasses for proper v14 hook dispatch and DEFAULT_OPTIONS merging
+- [Changed] CSS class `.comparison-tooltip` renamed to `.dhs-comparison-tooltip` — prevents namespace collision with other modules
+- [Changed] CSS class `.store-dialog` renamed to `.dhs-dialog` — prevents namespace collision with other modules
+- [Changed] Extracted hardcoded colors to CSS variables: `--dhs-compare-better`, `--dhs-compare-worse`, `--dhs-purple` — improves maintainability and theme consistency
+
 # 0.4.4
+
 - [Performance] Store Randomizer open time reduced by ~63% — _prepareContext compendium loading parallelized via Promise.all (before: 1412ms → after: 525ms)
 
 # 0.4.3

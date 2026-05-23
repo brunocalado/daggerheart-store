@@ -130,11 +130,11 @@
         display: block;
         margin: 0 auto;
         border: none;
-        animation: welcome-float 3s ease-in-out infinite;
+        animation: dhs-welcome-float 3s ease-in-out infinite;
     }
 }
 
-@keyframes welcome-float {
+@keyframes dhs-welcome-float {
     0%, 100% {
         transform: translateY(0);
     }

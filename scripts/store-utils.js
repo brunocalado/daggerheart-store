@@ -349,7 +349,7 @@ export async function showStoreDialog(options) {
             new DialogV2({
                 window: { title, icon },
                 content: contentHtml,
-                classes: ["store-dialog"],
+                classes: ["dhs-dialog"],
                 modal: true,
                 buttons: [
                     {
@@ -383,7 +383,7 @@ export async function showStoreDialog(options) {
     return DialogV2.confirm({
         window: { title, icon },
         content: contentHtml,
-        classes: ["store-dialog"],
+        classes: ["dhs-dialog"],
         rejectClose: false,
         modal: true
     });

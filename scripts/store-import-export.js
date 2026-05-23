@@ -25,6 +25,8 @@ export class StoreImportExport extends HandlebarsApplicationMixin(ApplicationV2)
         }
     };
 
+    static BASE_APPLICATION = foundry.applications.api.ApplicationV2;
+
     static PARTS = {
         main: {
             template: "modules/daggerheart-store/templates/store-import-export.hbs"
@@ -106,7 +108,7 @@ export class StoreImportExport extends HandlebarsApplicationMixin(ApplicationV2)
                         </p>
                         ${hasProfiles ? profileSelectHtml : ""}
                     </div>`,
-                classes: ["store-dialog"],
+                classes: ["dhs-dialog"],
                 modal: true,
                 buttons: [
                     {

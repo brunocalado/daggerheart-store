@@ -94,6 +94,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         }
     };
 
+    static BASE_APPLICATION = foundry.applications.api.ApplicationV2;
+
     static PARTS = {
         main: {
             template: "modules/daggerheart-store/templates/store.hbs",
@@ -1371,7 +1373,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 if (compareTooltipRemoveTimeout) clearTimeout(compareTooltipRemoveTimeout);
 
                 compareTooltipTimeout = setTimeout(async () => {
-                    document.querySelectorAll(".comparison-tooltip").forEach(t => t.remove());
+                    document.querySelectorAll(".dhs-comparison-tooltip").forEach(t => t.remove());
 
                     const comparisonData = await this._buildComparisonData(itemUuid, category, actor);
                     if (!comparisonData) return;
@@ -1410,7 +1412,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             btn.addEventListener("mouseleave", () => {
                 if (compareTooltipTimeout) { clearTimeout(compareTooltipTimeout); compareTooltipTimeout = null; }
                 compareTooltipRemoveTimeout = setTimeout(() => {
-                    document.querySelectorAll(".comparison-tooltip").forEach(t => t.remove());
+                    document.querySelectorAll(".dhs-comparison-tooltip").forEach(t => t.remove());
                 }, 200);
             });
         });
@@ -1613,7 +1615,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
         const content = `
             <div class="store-dialog-content">
-                <h3 class="store-dialog-header" style="color: #8e44ad;">Transfer Funds</h3>
+                <h3 class="store-dialog-header" style="color: var(--dhs-purple);">Transfer Funds</h3>
             </div>
             <div class="transfer-wealth-display">
                 <div class="transfer-wealth-item">
@@ -1645,7 +1647,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const dialog = new DialogV2({
             window: { title: "Transfer Funds", icon: "fas fa-exchange-alt", resizable: false },
             content,
-            classes: ["store-dialog"],
+            classes: ["dhs-dialog"],
             modal: true,
             buttons: [
                 {
@@ -1778,7 +1780,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         new DialogV2({
             window: { title: "Split Payment", icon: "fas fa-coins", resizable: false },
             content,
-            classes: ["store-dialog", "split-payment-dialog"],
+            classes: ["dhs-dialog", "split-payment-dialog"],
             modal: true,
             buttons: [
                 {
@@ -1937,7 +1939,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const result = await new Promise((resolve) => {
             const dialog = new DialogV2({
                 window: { title: "Save Store Profile", icon: "fas fa-save" },
-                content: contentHtml, classes: ["store-dialog"], modal: true,
+                content: contentHtml, classes: ["dhs-dialog"], modal: true,
                 buttons: [
                     { action: "confirm", label: isNewDefault ? "Create New" : "Overwrite Profile", icon: "fas fa-save",
                         callback: (event, button, dialog) => {

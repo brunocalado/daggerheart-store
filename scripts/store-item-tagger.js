@@ -39,6 +39,8 @@ export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
         }
     };
 
+    static BASE_APPLICATION = foundry.applications.api.ApplicationV2;
+
     static PARTS = {
         main: {
             template: "modules/daggerheart-store/templates/item-tagger.hbs"
