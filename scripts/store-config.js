@@ -178,8 +178,11 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             // listener in _onRender can recalculate totals without re-rendering.
             let presencePctRaw = 0;
 
+            // Always fetch presence value so _refreshPresenceColumns can recalculate
+            // without a full re-render when the toggle or modifier changes at runtime.
+            const presenceValue = foundry.utils.getProperty(actor, "system.traits.presence.value") ?? 0;
+
             if (vendorPresenceEnabled) {
-                const presenceValue = foundry.utils.getProperty(actor, "system.traits.presence.value") ?? 0;
                 presencePctRaw = presenceValue * vendorPresenceModifier;
 
                 if (presenceValue > 0) {
@@ -217,6 +220,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
                 presenceEffect,
                 presenceEffectClass,
                 presencePctRaw,
+                presenceValue,
                 totalEffect,
                 totalEffectClass
             });
@@ -401,16 +405,25 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             });
         });
 
-        // Presence toggle: sync modifier input active state.
-        // Registered after the generic toggleCards handler so checkbox.checked is already updated
-        // when this listener fires (same-element listeners execute in registration order;
-        // stopPropagation only blocks bubble, not sibling listeners on the same node).
+        // Presence toggle: sync modifier input active state and refresh the Character
+        // Relationships columns in real-time. Registered after the generic toggleCards handler
+        // so checkbox.checked is already updated when this listener fires (same-element
+        // listeners execute in registration order; stopPropagation only blocks bubble).
         const presenceToggleCard = html.querySelector("#presenceEnabledCard");
         const presenceModifierInput = html.querySelector("#presenceModifierInput");
         if (presenceToggleCard && presenceModifierInput) {
             presenceToggleCard.addEventListener("click", () => {
                 const cb = presenceToggleCard.querySelector("input[type='checkbox']");
-                if (cb) presenceModifierInput.classList.toggle("presence-input-inactive", !cb.checked);
+                if (cb) {
+                    presenceModifierInput.classList.toggle("presence-input-inactive", !cb.checked);
+                    this._refreshPresenceColumns(html);
+                }
+            });
+
+            // Recalculate presence/total columns live as the modifier value changes.
+            presenceModifierInput.addEventListener("input", () => {
+                const cb = presenceToggleCard.querySelector("input[type='checkbox']");
+                if (cb?.checked) this._refreshPresenceColumns(html);
             });
         }
 
@@ -500,7 +513,11 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
                 const totalEl = row.querySelector(".vr-col-total .vendor-relation-effect");
                 if (!totalEl) return;
 
-                const presencePctRaw = parseFloat(row.dataset.presencePct) || 0;
+                // Use raw presence value × current modifier so the total stays accurate
+                // when the modifier input was changed before saving.
+                const rowPresenceValue = parseFloat(row.dataset.presenceValue) || 0;
+                const currentMod = parseFloat(presenceModifierInput?.value) || 0;
+                const presencePctRaw = rowPresenceValue * currentMod;
                 const relMultiplier = level < 0 ? (1 + pct / 100) : (level > 0 ? (1 - pct / 100) : 1);
                 const presenceMultiplier = 1 - (presencePctRaw / 100);
                 const totalPct = (relMultiplier * presenceMultiplier - 1) * 100;
@@ -676,6 +693,85 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
                 const tierCheckboxes = row.querySelectorAll(".tier-btn input[type='checkbox']");
                 const allChecked = Array.from(tierCheckboxes).every(cb => cb.checked);
                 toggle.checked = allChecked;
+            }
+        });
+    }
+
+    /**
+     * Recalculates and re-renders the Presence and Total columns in the Character
+     * Relationships section based on the current state of the "Enable Presence Modifier"
+     * toggle and the "% per Presence point" input — without requiring a full re-render.
+     * Called from _onRender when attaching listeners and on subsequent toggle/input events.
+     * @param {HTMLElement} html - The application root element.
+     */
+    _refreshPresenceColumns(html) {
+        const presenceToggleCb = html.querySelector("#presenceEnabledCard input[type='checkbox']");
+        const presenceModInput = html.querySelector("#presenceModifierInput");
+        const header = html.querySelector(".vendor-relations-header");
+        const rows = html.querySelectorAll(".vendor-relation-row");
+
+        const enabled = presenceToggleCb?.checked ?? false;
+        const modifierPct = parseFloat(presenceModInput?.value) || 0;
+
+        // Sync header column visibility and has-presence class.
+        if (header) {
+            header.classList.toggle("has-presence", enabled);
+            const presenceHeader = header.querySelector(".vr-col-presence");
+            const totalHeader = header.querySelector(".vr-col-total");
+            if (presenceHeader) presenceHeader.style.display = enabled ? "" : "none";
+            if (totalHeader) totalHeader.style.display = enabled ? "" : "none";
+        }
+
+        rows.forEach(row => {
+            row.classList.toggle("has-presence", enabled);
+
+            const presenceCol = row.querySelector(".vr-col-presence");
+            const totalCol = row.querySelector(".vr-col-total");
+            if (presenceCol) presenceCol.style.display = enabled ? "" : "none";
+            if (totalCol) totalCol.style.display = enabled ? "" : "none";
+
+            if (!enabled) return;
+
+            const presenceValue = parseFloat(row.dataset.presenceValue) || 0;
+            const presencePctRaw = presenceValue * modifierPct;
+
+            // Presence column effect badge.
+            const presenceEffectEl = presenceCol?.querySelector(".vendor-relation-effect");
+            if (presenceEffectEl) {
+                if (presenceValue > 0) {
+                    presenceEffectEl.textContent = `-${Math.abs(presencePctRaw).toFixed(1)}%`;
+                    presenceEffectEl.className = "vendor-relation-effect effect-down";
+                } else if (presenceValue < 0) {
+                    presenceEffectEl.textContent = `+${Math.abs(presencePctRaw).toFixed(1)}%`;
+                    presenceEffectEl.className = "vendor-relation-effect effect-up";
+                } else {
+                    presenceEffectEl.textContent = "—";
+                    presenceEffectEl.className = "vendor-relation-effect effect-neutral";
+                }
+            }
+
+            // Total column — multiplicative combination of relation modifier + presence.
+            const totalEffectEl = totalCol?.querySelector(".vendor-relation-effect");
+            if (totalEffectEl) {
+                const relSelect = row.querySelector(".vendor-relation-select");
+                const level = parseInt(relSelect?.value) || 0;
+                const pctInput = html.querySelector(`.vendor-relation-pct-input[data-level="${level}"]`);
+                const pct = pctInput ? (parseInt(pctInput.value) || 0) : 0;
+
+                const relMultiplier = level < 0 ? (1 + pct / 100) : (level > 0 ? (1 - pct / 100) : 1);
+                const presenceMultiplier = 1 - (presencePctRaw / 100);
+                const totalPct = (relMultiplier * presenceMultiplier - 1) * 100;
+
+                if (Math.abs(totalPct) < 0.05) {
+                    totalEffectEl.textContent = "—";
+                    totalEffectEl.className = "vendor-relation-effect effect-neutral";
+                } else if (totalPct < 0) {
+                    totalEffectEl.textContent = `${totalPct.toFixed(1)}%`;
+                    totalEffectEl.className = "vendor-relation-effect effect-down";
+                } else {
+                    totalEffectEl.textContent = `+${totalPct.toFixed(1)}%`;
+                    totalEffectEl.className = "vendor-relation-effect effect-up";
+                }
             }
         });
     }

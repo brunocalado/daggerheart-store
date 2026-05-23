@@ -149,16 +149,15 @@
         <span class="vr-col-char">Character</span>
         <span class="vr-col-status">Status</span>
         <span class="vr-col-rel">Rel. Bonus</span>
-        {{#if vendorPresenceEnabled}}
-        <span class="vr-col-presence">Presence</span>
-        <span class="vr-col-total">Total</span>
-        {{/if}}
+        <span class="vr-col-presence"{{#unless vendorPresenceEnabled}} style="display:none"{{/unless}}>Presence</span>
+        <span class="vr-col-total"{{#unless vendorPresenceEnabled}} style="display:none"{{/unless}}>Total</span>
     </div>
 
     <div class="vendor-relations-list">
         {{#each linkedActors}}
         <div class="vendor-relation-row {{#if ../vendorPresenceEnabled}}has-presence{{/if}}"
-             data-presence-pct="{{presencePctRaw}}">
+             data-presence-pct="{{presencePctRaw}}"
+             data-presence-value="{{presenceValue}}">
             <div class="vr-col-char">
                 <img class="vendor-actor-icon" src="{{img}}" title="{{name}}">
                 <span class="vendor-actor-name">{{name}}</span>
@@ -179,14 +178,12 @@
                 <span class="vendor-relation-effect {{effectClass}}"
                       data-actor-id="{{id}}">{{relationEffect}}</span>
             </div>
-            {{#if ../vendorPresenceEnabled}}
-            <div class="vr-col-presence">
+            <div class="vr-col-presence"{{#unless ../vendorPresenceEnabled}} style="display:none"{{/unless}}>
                 <span class="vendor-relation-effect {{presenceEffectClass}}">{{presenceEffect}}</span>
             </div>
-            <div class="vr-col-total">
+            <div class="vr-col-total"{{#unless ../vendorPresenceEnabled}} style="display:none"{{/unless}}>
                 <span class="vendor-relation-effect {{totalEffectClass}}">{{totalEffect}}</span>
             </div>
-            {{/if}}
         </div>
         {{/each}}
     </div>
