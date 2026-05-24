@@ -1,6 +1,9 @@
 # 0.5.0
 
 - v14 only
+- [Added] `Store.Show()` API now supports profile and player targeting — `Store.Show({ store: "ProfileName", username: "PlayerName" })` loads a profile and sends the store to specific players or all. `Store.Show()` with no arguments remains compatible.
+- [Changed] `Store.Show()` method signature changed from `Show(username)` to `Show(options = {})` where options can include `{ username, store }`. Non-GM callers still receive a warning and no-op.
+- [Changed] Extracted profile-loading logic into public method `applyProfileByName(profileName)` on `DaggerheartStore` class — used by both UI "Load Profile" button and `Store.Show({ store: "..." })` API.
 - [Fixed] `MODULE_ID` now always imported from `store-constants.js` — single source of truth for module ID (was re-declared in 2 files)
 - [Fixed] Removed jQuery instanceof compatibility check from hook handler — v14 ApplicationV2 always delivers HTMLElement directly
 - [Fixed] Added `BASE_APPLICATION` to all 6 ApplicationV2 subclasses for proper v14 hook dispatch and DEFAULT_OPTIONS merging
@@ -14,6 +17,7 @@
 - [Added] `_buildSellTabItems` — builds the sell tab item list by iterating the player's inventory and cross-referencing the full store catalog index
 - [Added] `_buildStoreCatalogIndex` — aggregates all configured compendiums (default + custom categories + custom tab) into a single `Map<name, {basePrice, img, uuid}>` used by the sell tab
 - https://github.com/brunocalado/daggerheart-store/issues/4
+- https://github.com/brunocalado/daggerheart-store/issues/3
 
 # 0.4.4
 

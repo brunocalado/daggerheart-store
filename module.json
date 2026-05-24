@@ -39,6 +39,7 @@
   ],
 
   "socket": true,
+  
   "esmodules": [
     "scripts/module.js"
   ],
@@ -53,7 +54,7 @@
     "styles/dialogs.css",
     "styles/item-tagger.css"
   ],
-  
+
   "packs": [
     {
       "label": "General Items",

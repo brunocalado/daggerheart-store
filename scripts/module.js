@@ -383,10 +383,31 @@ Hooks.once("ready", async () => {
 
             app.render({ force: true });
         },
-        Show: async (username = null) => {
+        /**
+         * Programmatically broadcasts the store open request to one or all clients.
+         * Optionally loads a named profile before broadcasting, so the correct store
+         * is active by the time clients receive the open request.
+         * Only the GM may call this; non-GM callers receive a warning and no-op.
+         * @param {object} [options={}]
+         * @param {string} [options.username] - Target a specific player by name.
+         *   Omit to broadcast to all connected clients.
+         * @param {string} [options.store] - Profile name to load before opening.
+         *   Omit to keep the currently active profile.
+         * @returns {Promise<void>}
+         */
+        Show: async (options = {}) => {
             if (!game.user.isGM) return ui.notifications.warn("Only GM can share store.");
+
+            const { username, store } = options;
+
+            // Load the named profile first so it is committed to world settings before
+            // the openStoreRequest fires — clients render against the already-updated state.
+            if (store !== undefined) {
+                const app = getStoreInstance();
+                await app.applyProfileByName(store);
+            }
+
             let targetId = "all";
-            
             if (username) {
                 const targetUser = game.users.getName(username);
                 if (!targetUser) return ui.notifications.error(`User "${username}" not found.`);

@@ -1,7 +1,11 @@
-2026/04/07-18:00:04.235 3f50 Recovering log #1765
-2026/04/07-18:00:04.239 3f50 Delete type=0 #1765
-2026/04/07-18:00:04.239 3f50 Delete type=3 #1764
-2026/04/07-18:04:10.631 6448 Level-0 table #1769: started
-2026/04/07-18:04:10.631 6448 Level-0 table #1769: 0 bytes OK
-2026/04/07-18:04:10.632 6448 Delete type=0 #1767
-2026/04/07-18:04:10.633 6448 Manual compaction at level-0 from '!folders!dpWURbhadOWAKN9g' @ 72057594037927935 : 1 .. '!items!zleEYOAwnJCAoTek' @ 0 : 0; will stop at (end)
+2026/05/23-21:09:25.381 67c4 Delete type=3 #1
+2026/05/23-21:13:58.320 6efc Level-0 table #1777: started
+2026/05/23-21:13:58.320 6efc Level-0 table #1777: 0 bytes OK
+2026/05/23-21:13:58.321 6efc Delete type=0 #1775
+2026/05/23-21:13:58.325 6efc Manual compaction at level-0 from '!folders!dpWURbhadOWAKN9g' @ 72057594037927935 : 1 .. '!items!zleEYOAwnJCAoTek' @ 0 : 0; will stop at '!items!zleEYOAwnJCAoTek' @ 297 : 1
+2026/05/23-21:13:58.325 6efc Compacting 1@0 + 0@1 files
+2026/05/23-21:13:58.328 6efc Generated table #1778@0: 34 keys, 9374 bytes
+2026/05/23-21:13:58.328 6efc Compacted 1@0 + 0@1 files => 9374 bytes
+2026/05/23-21:13:58.330 6efc compacted to: files[ 0 1 0 0 0 0 0 ]
+2026/05/23-21:13:58.330 6efc Delete type=2 #1487
+2026/05/23-21:13:58.336 6efc Manual compaction at level-0 from '!items!zleEYOAwnJCAoTek' @ 297 : 1 .. '!items!zleEYOAwnJCAoTek' @ 0 : 0; will stop at (end)

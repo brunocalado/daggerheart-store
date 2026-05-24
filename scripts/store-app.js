@@ -2062,7 +2062,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             customContent: selectHtml,
             buttons: { confirm: "Show", confirmIcon: "fas fa-share" }
         });
-        if (result.confirmed && result.formData?.targetPlayer) globalThis.Store.Show(result.formData.targetPlayer);
+        if (result.confirmed && result.formData?.targetPlayer) {
+            await globalThis.Store.Show({ username: result.formData.targetPlayer });
+        }
     }
 
     async _onSavePreset(event, target) {
@@ -2166,6 +2168,15 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         this.render();
     }
 
+    /**
+     * Handles the "Load Profile" button click in the Config UI.
+     * Reads the selected profile name from the DOM, shows a confirmation dialog,
+     * then delegates the actual settings write to applyProfileByName.
+     * Called from _onRender via DEFAULT_OPTIONS.actions (loadPreset).
+     * @param {PointerEvent} event - The originating click event.
+     * @param {HTMLElement} target - The button element that was clicked.
+     * @returns {Promise<void>}
+     */
     async _onLoadPreset(event, target) {
         const selectEl = this.element.querySelector(".preset-select");
         if (!selectEl) return;
@@ -2179,6 +2190,20 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         });
         if (!confirm) return;
 
+        await this.applyProfileByName(profileName);
+        // UI path: store is open, re-render to reflect the newly loaded profile.
+        this.render();
+    }
+
+    /**
+     * Applies a named profile's settings to the world without any UI confirmation.
+     * Shared by _onLoadPreset (interactive UI) and Store.Show() (programmatic API).
+     * Returns early with an error notification if the profile name is not found.
+     * Does not call this.render() — callers are responsible for triggering re-renders.
+     * @param {string} profileName - The profile name to load, or "Default" for factory defaults.
+     * @returns {Promise<void>}
+     */
+    async applyProfileByName(profileName) {
         let profileData;
         if (profileName === "Default") {
             profileData = {
@@ -2200,7 +2225,10 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         } else {
             const profiles = game.settings.get(MODULE_ID, "storeProfiles");
             profileData = profiles[profileName];
-            if (!profileData) return ui.notifications.error(`Profile "${profileName}" not found.`);
+            if (!profileData) {
+                ui.notifications.error(`Profile "${profileName}" not found.`);
+                return;
+            }
         }
 
         const settingsToUpdate = [
@@ -2213,7 +2241,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             "vendorName", "vendorDescription", "vendorImage", "vendorRelationships", "vendorRelationLevels"
         ];
 
-        // Migrate old profile format
+        // Migrate old single-compendium string format to array
         if (!profileData.customTabCompendiums && profileData.customTabCompendium) {
             profileData.customTabCompendiums = [profileData.customTabCompendium];
         }
@@ -2227,8 +2255,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         if (game.user.isGM) {
             await StockManager.initializeStockData();
         }
-
-        this.render();
     }
 
     async _onDeletePreset(event, target) {
