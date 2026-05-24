@@ -1,3 +1,8 @@
+# 0.5.1
+
+- [Added] Weapon and armor features now appear in the item name hover tooltip. If both a description and features exist, a separator line divides them. If only features exist (no description), hovering still shows the tooltip.
+
+
 # 0.5.0
 
 - v14 only

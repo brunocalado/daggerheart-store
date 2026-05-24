@@ -829,6 +829,32 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
     }
 
     /**
+     * Builds the full tooltip HTML for an item, merging the text description and
+     * any weapon/armor features into a single string safe for `data-item-desc`.
+     * Uses only tags permitted by the tooltip sanitizer: <p>, <br>, <hr>, <strong>.
+     * @param {Item} doc - The item document
+     * @param {string} cleanDesc - Pre-cleaned description HTML
+     * @returns {string} Combined tooltip HTML, or empty string if nothing to show
+     */
+    _buildTooltipContent(doc, cleanDesc) {
+        let features = [];
+        if (doc.type === "weapon") {
+            features = this._extractWeaponStats(doc).features || [];
+        } else if (doc.type === "armor") {
+            features = this._extractArmorStats(doc).features || [];
+        }
+
+        if (features.length === 0) return cleanDesc;
+
+        const featuresHtml = features
+            .map(f => `<p><strong>${f.name}:</strong> ${f.description}</p>`)
+            .join("");
+
+        if (cleanDesc) return `${cleanDesc}<hr>${featuresHtml}`;
+        return featuresHtml;
+    }
+
+    /**
      * Separates hidden items into a dedicated group at the bottom (GM only).
      * @param {Array} groups - The item groups array
      * @param {boolean} isGM - Whether the current user is GM
@@ -1102,7 +1128,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         });
                         const rawDesc = String(foundry.utils.getProperty(doc, "system.description.value") ||
                                                foundry.utils.getProperty(doc, "system.description") || "");
-                        itemData.description = this._cleanDescriptionString(rawDesc);
+                        itemData.description = this._buildTooltipContent(doc, this._cleanDescriptionString(rawDesc));
                         Object.assign(itemData, stockFields);
 
                         customItems.push(itemData);
@@ -1208,7 +1234,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     });
                     const rawDesc = String(foundry.utils.getProperty(doc, "system.description.value") ||
                                            foundry.utils.getProperty(doc, "system.description") || "");
-                    itemData.description = this._cleanDescriptionString(rawDesc);
+                    itemData.description = this._buildTooltipContent(doc, this._cleanDescriptionString(rawDesc));
                     Object.assign(itemData, stockFields);
 
                     if (tierGroups[tier]) tierGroups[tier].items.push(itemData);
