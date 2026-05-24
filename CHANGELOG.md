@@ -1,3 +1,12 @@
+# 0.5.2
+
+- [Added] Item Tagger now supports **folder drag-and-drop** for batch tagging — drag a world or compendium folder to load all its items (filtered by valid types) into a checklist, uncheck items as needed, set shared price/tier/header values, and save to all checked items in one operation
+- [Added] Batch tier mode now has three states: "Leave unchanged" (skips tier on all items), "None (clear)" (removes tier flag from consumables/loot, preserves weapon/armor system.tier), or a tier value 1–4
+- [Added] View button per item in folder batch mode — click the eye icon to open an item's sheet for inspection without closing the tagger
+- [Changed] Item Tagger checkbox increased from 14px to 18px and properly center-aligned with item icons for better visual hierarchy
+- [Changed] Item type text in folder list now uses lighter color (#aaa) for improved readability
+- https://github.com/brunocalado/daggerheart-store/issues/7
+
 # 0.5.1
 
 - [Added] Weapon and armor features now appear in the item name hover tooltip. If both a description and features exist, a separator line divides them. If only features exist (no description), hovering still shows the tooltip.

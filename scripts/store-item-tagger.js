@@ -7,7 +7,8 @@ const SYSTEM_TIER_TYPES = ["weapon", "armor"];
 
 /**
  * Store Item Tagger Application
- * Allows dragging and dropping items to edit their Store tags (Price, Tier, Header).
+ * Allows dragging and dropping items or folders to edit their Store tags (Price, Tier, Header).
+ * Supports single-item mode (one item dropped) and folder-batch mode (folder dropped).
  */
 export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
     constructor(options) {
@@ -18,6 +19,8 @@ export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
             tier: null,
             header: null
         };
+        /** @type {Item[]} Items loaded from a folder drop, for batch editing. */
+        this.folderItems = [];
     }
 
     static DEFAULT_OPTIONS = {
@@ -35,7 +38,8 @@ export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
         classes: ["daggerheart-store-tagger"],
         actions: {
             saveTags: StoreItemTagger.prototype._onSaveTags,
-            clearItem: StoreItemTagger.prototype._onClearItem
+            clearItem: StoreItemTagger.prototype._onClearItem,
+            clearFolder: StoreItemTagger.prototype._onClearFolder
         }
     };
 
@@ -50,6 +54,7 @@ export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
     /**
      * Prepares context data for the Handlebars template.
      * Exposes isSystemTierType so the template can branch tier UI for weapon/armor.
+     * In folder-batch mode, exposes folderItems and hasFolderItems instead.
      * @param {object} options - Render options from AppV2 lifecycle
      * @returns {Promise<object>} Template context
      */
@@ -58,7 +63,9 @@ export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
             item: this.item,
             tags: this.tags,
             hasItem: !!this.item,
-            isSystemTierType: this.item ? SYSTEM_TIER_TYPES.includes(this.item.type) : false
+            isSystemTierType: this.item ? SYSTEM_TIER_TYPES.includes(this.item.type) : false,
+            folderItems: this.folderItems,
+            hasFolderItems: this.folderItems.length > 0
         };
     }
 
@@ -109,8 +116,23 @@ export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
         if (priceInput) priceInput.addEventListener("input", updatePreviews);
         if (tierSelect) tierSelect.addEventListener("change", updatePreviews);
         if (headerInput) headerInput.addEventListener("input", updatePreviews);
+
+        // View buttons — open each item's sheet for inspection (folder-batch mode only).
+        html.querySelectorAll(".view-item-btn").forEach(btn => {
+            btn.addEventListener("click", async (e) => {
+                e.stopPropagation();
+                const item = await fromUuid(btn.dataset.uuid);
+                if (item) item.sheet.render(true);
+            });
+        });
     }
 
+    /**
+     * Handles drop events on the drop zone and item preview areas.
+     * Dispatches to single-item or folder handlers based on drag data type.
+     * Attached in _onRender via dragover/dragleave/drop listeners.
+     * @param {DragEvent} event - The native DOM drag event
+     */
     async _onDrop(event) {
         event.preventDefault();
         const dropZone = this.element.querySelector(".drop-zone");
@@ -120,8 +142,20 @@ export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
 
         // Use the modern UX path for TextEditor in v13+.
         const data = foundry.applications.ux.TextEditor.getDragEventData(event);
-        if (!data?.type || data.type !== "Item") return;
+        if (!data?.type) return;
 
+        if (data.type === "Item") {
+            await this._onDropItem(data);
+        } else if (data.type === "Folder") {
+            await this._onDropFolder(data);
+        }
+    }
+
+    /**
+     * Handles a single Item drop — loads the item and enters single-item edit mode.
+     * @param {{type: string, uuid: string}} data - Normalized drag event data
+     */
+    async _onDropItem(data) {
         const item = await fromUuid(data.uuid);
         if (!item) return;
 
@@ -130,6 +164,8 @@ export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
             return;
         }
 
+        // Clear folder mode when switching to single-item mode.
+        this.folderItems = [];
         this.item = item;
 
         // If weapon/armor has a stale tier flag from before this fix, clean it up silently.
@@ -141,6 +177,40 @@ export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
         }
 
         this._parseTags(item);
+        this.render();
+    }
+
+    /**
+     * Handles a Folder drop — loads immediate children filtered by VALID_ITEM_TYPES
+     * and enters folder-batch edit mode. Supports both world folders and compendium folders.
+     * No recursion: only the direct children of the dropped folder are loaded.
+     * @param {{type: string, uuid: string}} data - Normalized drag event data
+     */
+    async _onDropFolder(data) {
+        const folder = await fromUuid(data.uuid);
+        if (!folder) return;
+
+        let items;
+        if (folder.pack) {
+            // Compendium folder: query the pack for items directly in this folder.
+            const pack = game.packs.get(folder.pack);
+            items = await pack.getDocuments({ folder: folder.id });
+        } else {
+            // World folder: contents returns immediate children without recursion.
+            items = folder.contents.filter(d => d.documentName === "Item");
+        }
+
+        const validItems = items.filter(i => VALID_ITEM_TYPES.includes(i.type));
+
+        if (!validItems.length) {
+            ui.notifications.warn(`No valid store items found in that folder. Allowed types: ${VALID_ITEM_TYPES.join(", ")}.`);
+            return;
+        }
+
+        // Enter folder-batch mode; clear single-item state.
+        this.item = null;
+        this.tags = { price: null, tier: null, header: null };
+        this.folderItems = validItems;
         this.render();
     }
 
@@ -165,13 +235,12 @@ export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
 
     /**
      * Writes store metadata to item flags. Never touches system.description.
+     * Dispatches to single-item or folder-batch save path based on current mode.
      * Triggered by the "Save" action button in the tagger form.
      * @param {Event} event - The triggering DOM event
      * @param {HTMLElement} target - The action target element
      */
     async _onSaveTags(event, target) {
-        if (!this.item) return;
-
         const formData = new FormData(event.target.closest("form"));
 
         let newPrice = formData.get("price");
@@ -180,6 +249,21 @@ export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
         const newTier   = formData.get("tier")?.trim()   || null;
         const newHeader = formData.get("header")?.trim() || null;
 
+        if (this.folderItems.length > 0) {
+            await this._saveFolderTags(newPrice, newTier, newHeader);
+        } else if (this.item) {
+            await this._saveSingleItemTags(newPrice, newTier, newHeader);
+        }
+    }
+
+    /**
+     * Writes tags to the currently loaded single item.
+     * For weapon/armor, tier is written to system.tier; for others, to flags.
+     * @param {number|null} newPrice - Parsed price value, or null to clear
+     * @param {string|null} newTier  - Selected tier string ("1"–"4"), or null to clear
+     * @param {string|null} newHeader - Header string, or null to clear
+     */
+    async _saveSingleItemTags(newPrice, newTier, newHeader) {
         if (newPrice !== null) {
             await this.item.setFlag(MODULE_ID, STORE_FLAGS.price, newPrice);
         } else {
@@ -211,9 +295,93 @@ export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
         this.render();
     }
 
+    /**
+     * Writes tags to all checked items in folder-batch mode using a single batched update.
+     * Tier has three states:
+     *   - "" (empty)  → leave unchanged — tier is not modified on any item.
+     *   - "none"      → clear the tier flag for non-weapon/armor items; weapons/armor untouched.
+     *   - "1"–"4"    → set the tier on all items (system.tier for weapons/armor, flag for others).
+     * Items from the same folder always share the same collection context (one pack or world).
+     * @param {number|null} newPrice  - Parsed price value, or null to clear
+     * @param {string|null} newTier   - Tier selection: "1"–"4", "none", or null (leave unchanged)
+     * @param {string|null} newHeader - Header string, or null to clear
+     */
+    async _saveFolderTags(newPrice, newTier, newHeader) {
+        // Checkboxes are DOM state — collect checked UUIDs at save time.
+        const checkedUuids = new Set(
+            [...this.element.querySelectorAll(".folder-item-list input[type=checkbox]:checked")]
+                .map(cb => cb.dataset.uuid)
+        );
+
+        const activeItems = this.folderItems.filter(i => checkedUuids.has(i.uuid));
+        if (!activeItems.length) {
+            ui.notifications.warn("No items are checked.");
+            return;
+        }
+
+        // Build one update object per active item.
+        const updates = activeItems.map(item => {
+            const u = { _id: item.id };
+
+            // Price: null clears the flag via the "-=key" Foundry deletion syntax.
+            if (newPrice !== null) {
+                u[`flags.${MODULE_ID}.${STORE_FLAGS.price}`] = newPrice;
+            } else {
+                u[`flags.${MODULE_ID}.-=${STORE_FLAGS.price}`] = null;
+            }
+
+            // Tier: three states — numeric value sets it, "none" clears it (non-weapon/armor only),
+            // null/empty leaves it untouched on every item.
+            if (newTier === "none") {
+                // Clear tier flag for consumables/loot; weapons/armor system.tier is preserved.
+                if (!SYSTEM_TIER_TYPES.includes(item.type)) {
+                    u[`flags.${MODULE_ID}.-=${STORE_FLAGS.tier}`] = null;
+                }
+            } else if (newTier) {
+                // Numeric tier: write to system.tier for weapons/armor, flag for others.
+                if (SYSTEM_TIER_TYPES.includes(item.type)) {
+                    u["system.tier"] = parseInt(newTier);
+                } else {
+                    u[`flags.${MODULE_ID}.${STORE_FLAGS.tier}`] = parseInt(newTier);
+                }
+            }
+            // else: null/empty → no tier key added → unchanged on all items
+
+            // Header: null clears the flag.
+            if (newHeader) {
+                u[`flags.${MODULE_ID}.${STORE_FLAGS.header}`] = newHeader;
+            } else {
+                u[`flags.${MODULE_ID}.-=${STORE_FLAGS.header}`] = null;
+            }
+
+            return u;
+        });
+
+        // All items come from the same folder, so they share one collection context.
+        const firstItem = activeItems[0];
+        const context = firstItem.pack ? { pack: firstItem.pack } : {};
+
+        await Item.implementation.updateDocuments(updates, context);
+        ui.notifications.info(`Updated tags for ${activeItems.length} item(s).`);
+        this.render();
+    }
+
+    /**
+     * Clears single-item mode and returns to the empty drop zone.
+     * Also defensively resets folderItems in case both modes were somehow active.
+     */
     _onClearItem() {
         this.item = null;
         this.tags = { price: null, tier: null, header: null };
+        this.folderItems = [];
+        this.render();
+    }
+
+    /**
+     * Clears folder-batch mode and returns to the empty drop zone.
+     */
+    _onClearFolder() {
+        this.folderItems = [];
         this.render();
     }
 }

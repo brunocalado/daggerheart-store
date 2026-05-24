@@ -138,4 +138,101 @@
             background: #f1c40f;
         }
     }
+
+    /* ── Folder batch mode ──────────────────────────────────────────── */
+
+    & .folder-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 6px 10px;
+        background: #252525;
+        border: 1px solid #333;
+        border-radius: 5px;
+
+        & span {
+            font-weight: bold;
+            color: #d4af37;
+            font-size: 0.95em;
+
+            & i { margin-right: 6px; }
+        }
+    }
+
+    & .folder-item-list {
+        max-height: 200px;
+        overflow-y: auto;
+        border: 1px solid #333;
+        border-radius: 5px;
+        padding: 4px;
+        background: #1e1e1e;
+
+        & .folder-item-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 6px;
+            border-radius: 4px;
+
+            &:hover { background: rgba(212, 175, 55, 0.08); }
+
+            & .item-check-area {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                flex: 1;
+                min-width: 0;
+                cursor: pointer;
+                user-select: none;
+            }
+
+            & input[type="checkbox"] {
+                flex-shrink: 0;
+                accent-color: #d4af37;
+                width: 18px;
+                height: 18px;
+                cursor: pointer;
+                align-self: center;
+            }
+
+            & .item-thumb {
+                width: 24px;
+                height: 24px;
+                object-fit: cover;
+                border-radius: 3px;
+                border: 1px solid #444;
+                flex-shrink: 0;
+            }
+
+            & .item-name {
+                flex: 1;
+                font-size: 0.85em;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            & .item-type {
+                font-size: 0.75em;
+                color: #aaa;
+                font-style: italic;
+                flex-shrink: 0;
+            }
+
+            & .view-item-btn {
+                flex-shrink: 0;
+                background: none;
+                border: none;
+                color: #666;
+                padding: 2px 5px;
+                cursor: pointer;
+                border-radius: 3px;
+                font-size: 0.8em;
+                line-height: 1;
+                transition: color 0.15s;
+
+                &:hover { color: #d4af37; }
+            }
+        }
+    }
 }
