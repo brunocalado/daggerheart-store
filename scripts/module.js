@@ -310,7 +310,7 @@ function getStoreInstance() {
 /**
  * Handles the incoming request to open the store (triggered by setting change)
  */
-function _handleOpenStoreRequest(value) {
+async function _handleOpenStoreRequest(value) {
     if (!value || !value.target) return;
 
     const targetUser = value.target;
@@ -318,9 +318,10 @@ function _handleOpenStoreRequest(value) {
 
     if (targetUser === "all" || targetUser === currentUser) {
         const app = getStoreInstance();
-        app.render({ force: true, window: { display: "block" } });
-        if (app.minimized) app.maximize();
-        app.bringToFront(); 
+        // Await render so this.element is guaranteed to exist before bringToFront accesses .style
+        await app.render({ force: true, window: { display: "block" } });
+        if (app.minimized) await app.maximize();
+        app.bringToFront();
     }
 }
 

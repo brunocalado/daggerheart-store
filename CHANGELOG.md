@@ -1,5 +1,6 @@
 # 0.5.3
 
+- [Fixed] Store broadcast crash when opening store for all users — made `_handleOpenStoreRequest` async and await `render()` and `maximize()` to ensure element exists before `bringToFront()` accesses it, preventing "Cannot read properties of undefined (reading 'style')" error
 - [Fixed] Armor base score now reads correctly from `system.armor.max` (was reading deprecated `system.baseScore`, always showing 0). Item hover summary and compare feature now display the correct armor score and threshold values.
 - https://github.com/brunocalado/daggerheart-store/issues/9
 - [Added] My Inventory tab now shows items that have a store `price` flag set by the GM, even if they are not registered in the store catalog — valid types (weapon, armor, consumable, loot) with a price flag appear as sellable alongside catalog items. The catalog always takes priority; flag-based items are a fallback. Items sold this way do not affect stock.
