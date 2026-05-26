@@ -1,5 +1,7 @@
 # 0.5.4
 
+- https://github.com/brunocalado/daggerheart-store/issues/10
+- [Added] Integration with dh-unidentified module — when active and an item has `flags["dh-unidentified"].identified === false`, the store displays masked name, image, and description instead of the real ones. Uses `maskedName`, `maskedImg`, and `maskedDescription` from the item flags. Works in both catalog view and "My Inventory" sell tab.
 - [Fixed] Batch edit Price and Header fields now default to "Leave unchanged" — they no longer force-overwrite or clear flags on checked items unless explicitly set. Each field has a three-state select: "Leave unchanged" (skips the field), "Set value" (writes the entered value to all checked items), "Clear" (removes the flag). Matches the existing behaviour of the Tier field. Fixes #10.
 
 # 0.5.3

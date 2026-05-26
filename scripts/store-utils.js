@@ -63,6 +63,31 @@ export function getOriginalName(doc) {
     return (game.modules.get("babele")?.active ? doc.flags?.babele?.originalName : null) ?? doc.name;
 }
 
+/**
+ * Resolves the display data for an item, applying dh-unidentified masking when active.
+ * When the dh-unidentified module is active and flags["dh-unidentified"].identified === false,
+ * returns the masked name, image, and description instead of the real ones.
+ * Falls back to the item's real values when the module is inactive, the flag is absent,
+ * or identified is true.
+ * @param {Object} doc - A Foundry Item document
+ * @returns {{ isUnidentified: boolean, name: string, img: string, maskedDescription: string|null }}
+ */
+export function getUnidentifiedDisplayData(doc) {
+    if (!game.modules.get("dh-unidentified")?.active) {
+        return { isUnidentified: false, name: doc.name, img: doc.img, maskedDescription: null };
+    }
+    const flags = doc.flags?.["dh-unidentified"];
+    if (!flags || flags.identified !== false) {
+        return { isUnidentified: false, name: doc.name, img: doc.img, maskedDescription: null };
+    }
+    return {
+        isUnidentified: true,
+        name: flags.maskedName ?? doc.name,
+        img: flags.maskedImg ?? doc.img,
+        maskedDescription: flags.maskedDescription ?? null
+    };
+}
+
 // --- Currency Helpers ---
 
 /**

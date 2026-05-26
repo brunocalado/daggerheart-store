@@ -10,7 +10,7 @@ import {
     getOriginalName, getSystemCurrency, getActorWealth, deductGold, addGold,
     getChatWhisperRecipients, buildChatCard,
     getEpicTextColor, getEpicBgColor,
-    showStoreDialog
+    showStoreDialog, getUnidentifiedDisplayData
 } from "./store-utils.js";
 import { queryDepositToParty, queryWithdrawFromParty } from "./socket.js";
 
@@ -637,11 +637,16 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             if (itemTrait && bestTraits.includes(itemTrait)) isRecommended = true;
         }
 
+        // Resolve masked display values for dh-unidentified integration.
+        // Internal lookups above (hiddenItems, blockedSaleItems, etc.) intentionally
+        // use doc.name so GM-side visibility rules still target the real item name.
+        const { name: displayName, img: displayImg } = getUnidentifiedDisplayData(doc);
+
         return {
             id: doc.id,
             uuid: doc.uuid,
-            name: doc.name,
-            img: doc.img,
+            name: displayName,
+            img: displayImg,
             price: finalPrice,
             originalPrice: basePrice,
             isSale,
@@ -708,15 +713,16 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 const basePrice = Math.ceil(flagPrice * priceMod);
                 const sellPrice = Math.floor(basePrice * sellRatio);
 
+                const { name: sellDisplayName, img: sellDisplayImg, maskedDescription: sellMaskedDesc } = getUnidentifiedDisplayData(playerItem);
                 sellItems.push({
-                    name: playerItem.name,
-                    img: playerItem.img,
+                    name: sellDisplayName,
+                    img: sellDisplayImg,
                     sellPrice,
                     canSell: !isSaleBlocked,
                     isSaleBlocked,
                     // null UUID → _onSellItem's `stockEnabled && itemUuid` guard skips stock increment
                     catalogUuid: null,
-                    description: "",
+                    description: sellMaskedDesc ?? "",
                     itemId: playerItem.id
                 });
                 continue;
@@ -725,16 +731,18 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             const isSaleBlocked = !!blockedSaleItems[playerItem.name];
             const sellPrice = Math.floor(entry.basePrice * sellRatio);
 
+            const { isUnidentified: sellIsUnidentified, name: sellDisplayName, img: sellDisplayImg, maskedDescription: sellMaskedDesc } = getUnidentifiedDisplayData(playerItem);
             sellItems.push({
-                name: playerItem.name,
-                // Prefer the player's own item image so renamed/reskinned copies look right
-                img: playerItem.img || entry.img,
+                name: sellDisplayName,
+                // When unidentified, use only the masked image — entry.img would reveal the real item.
+                // Otherwise, prefer the player's own item image so renamed/reskinned copies look right.
+                img: sellIsUnidentified ? sellDisplayImg : (playerItem.img || entry.img),
                 sellPrice,
                 canSell: !isSaleBlocked,
                 isSaleBlocked,
                 // Catalog UUID used by _setupItemImages (click to view) and stock management in _onSellItem
                 catalogUuid: entry.uuid,
-                description: entry.description || "",
+                description: sellMaskedDesc ?? (entry.description || ""),
                 itemId: playerItem.id
             });
         }
@@ -1159,9 +1167,15 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                             ...sharedOpts, basePrice, isOverridden, header, tier: itemTier,
                             canCompare, hasEquippedItem, compareCategory
                         });
-                        const rawDesc = String(foundry.utils.getProperty(doc, "system.description.value") ||
-                                               foundry.utils.getProperty(doc, "system.description") || "");
-                        itemData.description = this._buildTooltipContent(doc, this._cleanDescriptionString(rawDesc));
+                        // Use masked description when dh-unidentified marks this item as unidentified.
+                        const { maskedDescription: customTabMaskedDesc } = getUnidentifiedDisplayData(doc);
+                        if (customTabMaskedDesc !== null) {
+                            itemData.description = this._cleanDescriptionString(customTabMaskedDesc);
+                        } else {
+                            const rawDesc = String(foundry.utils.getProperty(doc, "system.description.value") ||
+                                                   foundry.utils.getProperty(doc, "system.description") || "");
+                            itemData.description = this._buildTooltipContent(doc, this._cleanDescriptionString(rawDesc));
+                        }
                         Object.assign(itemData, stockFields);
 
                         customItems.push(itemData);
@@ -1265,9 +1279,15 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         ...sharedOpts, basePrice, isOverridden, header,
                         canCompare, hasEquippedItem
                     });
-                    const rawDesc = String(foundry.utils.getProperty(doc, "system.description.value") ||
-                                           foundry.utils.getProperty(doc, "system.description") || "");
-                    itemData.description = this._buildTooltipContent(doc, this._cleanDescriptionString(rawDesc));
+                    // Use masked description when dh-unidentified marks this item as unidentified.
+                    const { maskedDescription: stdMaskedDesc } = getUnidentifiedDisplayData(doc);
+                    if (stdMaskedDesc !== null) {
+                        itemData.description = this._cleanDescriptionString(stdMaskedDesc);
+                    } else {
+                        const rawDesc = String(foundry.utils.getProperty(doc, "system.description.value") ||
+                                               foundry.utils.getProperty(doc, "system.description") || "");
+                        itemData.description = this._buildTooltipContent(doc, this._cleanDescriptionString(rawDesc));
+                    }
                     Object.assign(itemData, stockFields);
 
                     if (tierGroups[tier]) tierGroups[tier].items.push(itemData);
