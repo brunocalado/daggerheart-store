@@ -1,3 +1,9 @@
+# 0.5.3
+
+- [Added] My Inventory tab now shows items that have a store `price` flag set by the GM, even if they are not registered in the store catalog — valid types (weapon, armor, consumable, loot) with a price flag appear as sellable alongside catalog items. The catalog always takes priority; flag-based items are a fallback. Items sold this way do not affect stock.
+- [Fixed] Selling an item now deletes the exact item by ID instead of the first name match, preventing incorrect deletions when a character has multiple items with the same name.
+- https://github.com/brunocalado/daggerheart-store/issues/8
+
 # 0.5.2
 
 - [Added] Item Tagger now supports **folder drag-and-drop** for batch tagging — drag a world or compendium folder to load all its items (filtered by valid types) into a checklist, uncheck items as needed, set shared price/tier/header values, and save to all checked items in one operation

@@ -3,7 +3,7 @@ import { StockManager } from "./stock-manager.js";
 import { StoreConfig } from "./store-config.js";
 import { StoreRandomizer } from "./store-randomizer.js";
 import {
-    MODULE_ID, STANDARD_CATEGORIES, CATEGORY_ITEM_TYPE, SELL_TAB
+    MODULE_ID, STANDARD_CATEGORIES, CATEGORY_ITEM_TYPE, SELL_TAB, STORE_FLAGS
 } from "./store-constants.js";
 import {
     getValidItemTypes, getItemTier, extractPriceFromDescription, getItemHeader,
@@ -666,15 +666,18 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
     /**
      * Builds the flat list of items displayed in the player's sell tab.
-     * Iterates the player's inventory and cross-references against the full store catalog.
+     * Iterates the player's inventory using a catalog-first strategy:
+     * 1. Catalog path — item name found in the store catalog; uses catalog price and UUID.
+     * 2. Flag fallback — item not in catalog but has a `price` flag set by the GM and a
+     *    valid item type; priceMod and sellRatio are applied to the flag value.
      * Hidden items are intentionally included — hidden ≠ unsellable.
      * Called from `_prepareContext` when the sell tab is the active one.
      * @param {Object} opts
      * @param {Actor} opts.userActor - The player's assigned character
-     * @param {number} opts.sellRatio - Sell price multiplier applied to the catalog base price
+     * @param {number} opts.sellRatio - Sell price multiplier applied to the base price
      * @param {Object} opts.blockedSaleItems - Items blocked from selling, keyed by item name
      * @param {Object} opts.priceOverrides - Manual price overrides, keyed by item name
-     * @param {number} opts.priceMod - Global price modifier (percentage / 100)
+     * @param {number} opts.priceMod - Global price modifier applied to both catalog and flag prices
      * @param {boolean} opts.useDefaultCompendiums - Whether default system compendiums are active
      * @param {Array} opts.customCompendiums - Custom per-category compendium config objects
      * @param {Array} opts.customTabCompendiums - Custom tab compendium pack IDs
@@ -688,7 +691,30 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const sellItems = [];
         for (const playerItem of userActor.items) {
             const entry = catalogIndex.get(playerItem.name);
-            if (!entry) continue; // not registered in the store catalog
+
+            if (!entry) {
+                // Flag-based fallback: item is not in the catalog but was explicitly priced
+                // by the GM via the store price flag. Only valid item types are accepted.
+                const flagPrice = playerItem.getFlag(MODULE_ID, STORE_FLAGS.price);
+                if (!flagPrice || !getValidItemTypes().includes(playerItem.type)) continue;
+
+                const isSaleBlocked = !!blockedSaleItems[playerItem.name];
+                const basePrice = Math.ceil(flagPrice * priceMod);
+                const sellPrice = Math.floor(basePrice * sellRatio);
+
+                sellItems.push({
+                    name: playerItem.name,
+                    img: playerItem.img,
+                    sellPrice,
+                    canSell: !isSaleBlocked,
+                    isSaleBlocked,
+                    // null UUID → _onSellItem's `stockEnabled && itemUuid` guard skips stock increment
+                    catalogUuid: null,
+                    description: "",
+                    itemId: playerItem.id
+                });
+                continue;
+            }
 
             const isSaleBlocked = !!blockedSaleItems[playerItem.name];
             const sellPrice = Math.floor(entry.basePrice * sellRatio);
@@ -702,7 +728,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 isSaleBlocked,
                 // Catalog UUID used by _setupItemImages (click to view) and stock management in _onSellItem
                 catalogUuid: entry.uuid,
-                description: entry.description || ""
+                description: entry.description || "",
+                itemId: playerItem.id
             });
         }
 
@@ -1743,6 +1770,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
         const itemName = target.dataset.name;
         const itemUuid = target.dataset.uuid;
+        const itemId = target.dataset.itemId;
         const sellPrice = parseInt(target.dataset.price);
         const userActor = game.user.character;
         if (!userActor) return ui.notifications.error("You need an assigned character to sell items.");
@@ -1750,7 +1778,10 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const blockedSaleItems = game.settings.get(MODULE_ID, "blockedSaleItems") || {};
         if (blockedSaleItems[itemName]) return ui.notifications.warn("This item cannot be sold.");
 
-        const itemToDelete = userActor.items.find(i => i.name === itemName);
+        // Prefer ID-based lookup for precision; name fallback covers legacy buttons without data-item-id
+        const itemToDelete = itemId
+            ? userActor.items.get(itemId)
+            : userActor.items.find(i => i.name === itemName);
         if (!itemToDelete) return ui.notifications.warn(`You do not have a "${itemName}" to sell.`);
 
         await itemToDelete.delete();

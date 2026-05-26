@@ -27,6 +27,7 @@
                         data-action="sellItem"
                         data-name="{{this.name}}"
                         data-uuid="{{this.catalogUuid}}"
+                        data-item-id="{{this.itemId}}"
                         data-price="{{this.sellPrice}}"
                         title="{{#if this.canSell}}Sell for {{this.sellPrice}}{{else}}Sale blocked for this item{{/if}}"
                         {{#unless this.canSell}}disabled{{/unless}}>
@@ -36,6 +37,6 @@
         </div>
         {{/each}}
     {{else}}
-        <p class="empty-tab">Your inventory has no items registered in the store.</p>
+        <p class="empty-tab">Your inventory has no items registered in the store or tagged for sale.</p>
     {{/if}}
 </div>
