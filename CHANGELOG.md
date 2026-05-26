@@ -1,3 +1,7 @@
+# 0.5.4
+
+- [Fixed] Batch edit Price and Header fields now default to "Leave unchanged" — they no longer force-overwrite or clear flags on checked items unless explicitly set. Each field has a three-state select: "Leave unchanged" (skips the field), "Set value" (writes the entered value to all checked items), "Clear" (removes the flag). Matches the existing behaviour of the Tier field. Fixes #10.
+
 # 0.5.3
 
 - [Fixed] Weapon damage dice, bonus, and damage type no longer appear blank in store item rows and the compare tooltip. The Daggerheart system changed `system.attack.damage.parts` from an array to a named object (`{ hitPoints: { value, type } }`); the module now reads the first value from the object regardless of whether it's an array or object.

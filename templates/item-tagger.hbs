@@ -27,8 +27,19 @@
         <div class="tag-inputs">
             <div class="form-group">
                 <label><i class="fas fa-coins"></i> Price</label>
-                <input type="number" name="price" placeholder="e.g. 50" min="0" step="1">
-                <p class="hint">Leave blank to clear the price flag on all checked items.</p>
+                <div class="batch-field-row">
+                    <select name="price-mode">
+                        <option value="keep">Leave unchanged</option>
+                        <option value="set">Set value</option>
+                        <option value="clear">Clear</option>
+                    </select>
+                    <input type="number" name="price" placeholder="e.g. 50" min="0" step="1" style="display:none;">
+                </div>
+                <p class="hint">
+                    <strong>Leave unchanged</strong> keeps each item's current price.
+                    <strong>Set value</strong> writes the entered price to all checked items.
+                    <strong>Clear</strong> removes the price flag from all checked items.
+                </p>
             </div>
 
             <div class="form-group">
@@ -47,8 +58,19 @@
 
             <div class="form-group">
                 <label><i class="fas fa-heading"></i> Header</label>
-                <input type="text" name="header" placeholder="e.g. Potions" maxlength="60">
-                <p class="hint">Leave blank to clear the header flag on all checked items.</p>
+                <div class="batch-field-row">
+                    <select name="header-mode">
+                        <option value="keep">Leave unchanged</option>
+                        <option value="set">Set value</option>
+                        <option value="clear">Clear</option>
+                    </select>
+                    <input type="text" name="header" placeholder="e.g. Potions" maxlength="60" style="display:none;">
+                </div>
+                <p class="hint">
+                    <strong>Leave unchanged</strong> keeps each item's current header.
+                    <strong>Set value</strong> writes the entered header to all checked items.
+                    <strong>Clear</strong> removes the header flag from all checked items.
+                </p>
             </div>
         </div>
 

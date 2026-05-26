@@ -125,6 +125,24 @@ export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
                 if (item) item.sheet.render(true);
             });
         });
+
+        // Batch mode selects: show/hide the paired input based on mode.
+        // The input must appear after the select inside .batch-field-row for the ~ sibling selector to work.
+        const priceModeSelect  = html.querySelector("select[name='price-mode']");
+        const priceNumberInput = html.querySelector("select[name='price-mode'] ~ input[name='price']");
+        const headerModeSelect  = html.querySelector("select[name='header-mode']");
+        const headerTextInput   = html.querySelector("select[name='header-mode'] ~ input[name='header']");
+
+        const syncBatchInput = (select, input) => {
+            if (!select || !input) return;
+            input.style.display = select.value === "set" ? "" : "none";
+            select.addEventListener("change", () => {
+                input.style.display = select.value === "set" ? "" : "none";
+            });
+        };
+
+        syncBatchInput(priceModeSelect, priceNumberInput);
+        syncBatchInput(headerModeSelect, headerTextInput);
     }
 
     /**
@@ -236,6 +254,12 @@ export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
     /**
      * Writes store metadata to item flags. Never touches system.description.
      * Dispatches to single-item or folder-batch save path based on current mode.
+     * In folder-batch mode, Price and Header each have a mode select:
+     *   - "keep"  → undefined sentinel → field is not written to any item
+     *   - "set"   → value from the paired input is written
+     *   - "clear" → null → the flag is removed from all checked items
+     * In single-item mode, price-mode and header-mode selects are absent, so
+     * formData.get() returns null and the code falls through to the original parsing path.
      * Triggered by the "Save" action button in the tagger form.
      * @param {Event} event - The triggering DOM event
      * @param {HTMLElement} target - The action target element
@@ -243,11 +267,35 @@ export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
     async _onSaveTags(event, target) {
         const formData = new FormData(event.target.closest("form"));
 
-        let newPrice = formData.get("price");
-        newPrice = newPrice ? Math.max(0, Math.floor(Number(newPrice))) : null;
+        // --- Price ---
+        // In single-item mode there is no price-mode select; treat as before.
+        // In batch mode, price-mode drives whether to set, clear, or skip.
+        const priceMode = formData.get("price-mode"); // "keep" | "set" | "clear" | null (single-item)
+        let newPrice;
+        if (priceMode === "keep") {
+            newPrice = undefined; // sentinel: do not touch price
+        } else if (priceMode === "clear") {
+            newPrice = null; // clear the flag
+        } else {
+            // "set" (batch) or no select present (single-item)
+            const raw = formData.get("price");
+            newPrice = raw ? Math.max(0, Math.floor(Number(raw))) : null;
+        }
 
-        const newTier   = formData.get("tier")?.trim()   || null;
-        const newHeader = formData.get("header")?.trim() || null;
+        // --- Tier (unchanged — already has correct three-state select) ---
+        const newTier = formData.get("tier")?.trim() || null;
+
+        // --- Header ---
+        const headerMode = formData.get("header-mode"); // "keep" | "set" | "clear" | null (single-item)
+        let newHeader;
+        if (headerMode === "keep") {
+            newHeader = undefined; // sentinel: do not touch header
+        } else if (headerMode === "clear") {
+            newHeader = null; // clear the flag
+        } else {
+            // "set" (batch) or no select present (single-item)
+            newHeader = formData.get("header")?.trim() || null;
+        }
 
         if (this.folderItems.length > 0) {
             await this._saveFolderTags(newPrice, newTier, newHeader);
@@ -302,9 +350,9 @@ export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
      *   - "none"      → clear the tier flag for non-weapon/armor items; weapons/armor untouched.
      *   - "1"–"4"    → set the tier on all items (system.tier for weapons/armor, flag for others).
      * Items from the same folder always share the same collection context (one pack or world).
-     * @param {number|null} newPrice  - Parsed price value, or null to clear
-     * @param {string|null} newTier   - Tier selection: "1"–"4", "none", or null (leave unchanged)
-     * @param {string|null} newHeader - Header string, or null to clear
+     * @param {number|null|undefined} newPrice  - Price: number to set, null to clear, undefined to leave unchanged
+     * @param {string|null} newTier             - Tier selection: "1"–"4", "none", or null (leave unchanged)
+     * @param {string|null|undefined} newHeader - Header: string to set, null to clear, undefined to leave unchanged
      */
     async _saveFolderTags(newPrice, newTier, newHeader) {
         // Checkboxes are DOM state — collect checked UUIDs at save time.
@@ -323,11 +371,13 @@ export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
         const updates = activeItems.map(item => {
             const u = { _id: item.id };
 
-            // Price: null clears the flag via the "-=key" Foundry deletion syntax.
-            if (newPrice !== null) {
-                u[`flags.${MODULE_ID}.${STORE_FLAGS.price}`] = newPrice;
-            } else {
-                u[`flags.${MODULE_ID}.-=${STORE_FLAGS.price}`] = null;
+            // Price: undefined = leave unchanged; null = clear; number = set.
+            if (newPrice !== undefined) {
+                if (newPrice !== null) {
+                    u[`flags.${MODULE_ID}.${STORE_FLAGS.price}`] = newPrice;
+                } else {
+                    u[`flags.${MODULE_ID}.-=${STORE_FLAGS.price}`] = null;
+                }
             }
 
             // Tier: three states — numeric value sets it, "none" clears it (non-weapon/armor only),
@@ -347,11 +397,13 @@ export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
             }
             // else: null/empty → no tier key added → unchanged on all items
 
-            // Header: null clears the flag.
-            if (newHeader) {
-                u[`flags.${MODULE_ID}.${STORE_FLAGS.header}`] = newHeader;
-            } else {
-                u[`flags.${MODULE_ID}.-=${STORE_FLAGS.header}`] = null;
+            // Header: undefined = leave unchanged; null = clear; string = set.
+            if (newHeader !== undefined) {
+                if (newHeader) {
+                    u[`flags.${MODULE_ID}.${STORE_FLAGS.header}`] = newHeader;
+                } else {
+                    u[`flags.${MODULE_ID}.-=${STORE_FLAGS.header}`] = null;
+                }
             }
 
             return u;
