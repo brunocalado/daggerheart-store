@@ -190,7 +190,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         try {
             if (doc.type !== "armor") return "";
             const system = doc.system;
-            const baseScore = system.baseScore ?? 0;
+            const baseScore = system.armor?.max ?? 0;
             const baseThresholdsMajor = system.baseThresholds?.major ?? 0;
             const baseThresholdsSevere = system.baseThresholds?.severe ?? 0;
             return `Score: ${baseScore} - Thresholds: ${baseThresholdsMajor}/${baseThresholdsSevere}`;
@@ -377,7 +377,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 }
             }
             return {
-                baseScore: system.baseScore ?? 0,
+                baseScore: system.armor?.max ?? 0,
                 thresholdMajor: system.baseThresholds?.major ?? 0,
                 thresholdSevere: system.baseThresholds?.severe ?? 0,
                 features
