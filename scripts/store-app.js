@@ -153,7 +153,10 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             };
             const weaponRange = rangeMap[rangeRaw] || (rangeRaw ? String(rangeRaw).charAt(0).toUpperCase() + String(rangeRaw).slice(1) : "");
 
-            const part0 = system.attack.damage?.parts?.[0] || {};
+            const partsRaw = system.attack.damage?.parts;
+            const part0 = partsRaw
+                ? (Array.isArray(partsRaw) ? (partsRaw[0] || {}) : (Object.values(partsRaw)[0] || {}))
+                : {};
             const val = part0.value || {};
             const weaponCustom = val.custom?.enabled === true;
             let damageSection = "";
@@ -310,7 +313,10 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             };
             const range = rangeMap[rangeRaw] || (rangeRaw ? String(rangeRaw).charAt(0).toUpperCase() + String(rangeRaw).slice(1) : "");
 
-            const part0 = system.attack.damage?.parts?.[0] || {};
+            const partsRaw = system.attack.damage?.parts;
+            const part0 = partsRaw
+                ? (Array.isArray(partsRaw) ? (partsRaw[0] || {}) : (Object.values(partsRaw)[0] || {}))
+                : {};
             const val = part0.value || {};
             const isCustom = val.custom?.enabled === true;
             let damageDisplay = "";

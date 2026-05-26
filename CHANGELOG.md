@@ -1,5 +1,6 @@
 # 0.5.3
 
+- [Fixed] Weapon damage dice, bonus, and damage type no longer appear blank in store item rows and the compare tooltip. The Daggerheart system changed `system.attack.damage.parts` from an array to a named object (`{ hitPoints: { value, type } }`); the module now reads the first value from the object regardless of whether it's an array or object.
 - [Fixed] Store broadcast crash when opening store for all users — made `_handleOpenStoreRequest` async and await `render()` and `maximize()` to ensure element exists before `bringToFront()` accesses it, preventing "Cannot read properties of undefined (reading 'style')" error
 - [Fixed] Armor base score now reads correctly from `system.armor.max` (was reading deprecated `system.baseScore`, always showing 0). Item hover summary and compare feature now display the correct armor score and threshold values.
 - https://github.com/brunocalado/daggerheart-store/issues/9
