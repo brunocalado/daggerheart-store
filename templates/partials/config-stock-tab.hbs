@@ -1,3 +1,27 @@
+<!-- Negotiations Toggle -->
+<label class="stock-toggle-card {{#if negotiationsEnabled}}active{{/if}} {{#unless stockReady}}disabled{{/unless}}">
+    <input type="checkbox" id="negotiationsEnabledCheckbox" name="negotiationsEnabled"
+           {{checked negotiationsEnabled}} {{#unless stockReady}}disabled{{/unless}}>
+    <div class="card-content">
+        <i class="fas fa-handshake stock-icon"></i>
+        <div class="stock-text">
+            <strong>Enable Price Negotiations</strong>
+            <span class="stock-description">
+                {{#if stockReady}}
+                    Allows players to bargain prices with the GM before buying or selling.
+                {{else}}
+                    <em class="warning">Requires a Party Actor to be configured in the General tab.</em>
+                {{/if}}
+            </span>
+        </div>
+    </div>
+    <div class="toggle-switch">
+        <div class="toggle-track"></div>
+        <div class="toggle-thumb"></div>
+    </div>
+</label>
+
+<!-- Stock Toggle -->
 <label class="stock-toggle-card {{#if stockEnabled}}active{{/if}} {{#unless stockReady}}disabled{{/unless}}">
     <input type="checkbox" id="stockEnabledCheckbox" name="stockEnabled" {{checked stockEnabled}} {{#unless stockReady}}disabled{{/unless}}>
     <div class="card-content">

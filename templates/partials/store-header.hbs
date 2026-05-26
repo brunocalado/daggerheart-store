@@ -46,6 +46,17 @@
         <button type="button" class="config-btn" data-action="showToPlayer" title="Show to Player">
             <i class="fas fa-user"></i>
         </button>
+
+        {{#if negotiationActive}}
+        <span class="header-separator">|</span>
+        <button type="button"
+                class="config-btn"
+                data-action="cancelNegotiation"
+                title="Force Cancel Active Negotiation"
+                style="color:#ff9999; border-color:#8b3333;">
+            <i class="fas fa-handshake-slash"></i> Cancel Bargain
+        </button>
+        {{/if}}
     </div>
     {{else}}
         {{#if hasPartyActor}}

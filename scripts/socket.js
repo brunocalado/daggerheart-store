@@ -10,7 +10,7 @@
 
 import { StockManager } from "./stock-manager.js";
 import { deductGold, addGold, getActorWealth } from "./store-utils.js";
-import { MODULE_ID } from "./store-constants.js";
+import { MODULE_ID, NEGOTIATION_FLAG_KEY, NEGOTIATION_STAGES } from "./store-constants.js";
 
 // ---------------------------------------------------------------
 // Query key constants
@@ -20,6 +20,9 @@ const Q = {
     incrementStock:    `${MODULE_ID}.incrementStock`,
     depositToParty:    `${MODULE_ID}.depositToParty`,
     withdrawFromParty: `${MODULE_ID}.withdrawFromParty`,
+    startNegotiation:  `${MODULE_ID}.startNegotiation`,
+    gmRespondNeg:      `${MODULE_ID}.gmRespondNeg`,
+    cancelNegotiation: `${MODULE_ID}.cancelNegotiation`,
 };
 
 // ---------------------------------------------------------------
@@ -140,6 +143,139 @@ export function registerQueryHandlers() {
             return { ok: false, reason: "update_failed" };
         }
     };
+
+    // --- Negotiation: Start ---
+    // Player initiates a price negotiation. Checks the global lock and writes
+    // the initial negotiation state to the Party Actor flags.
+    CONFIG.queries[Q.startNegotiation] = async ({ playerId, playerName, itemUuid, itemId, itemName, basePrice, type, playerOffer }) => {
+        if (!game.user.isGM) return { ok: false, reason: "not_gm" };
+
+        if (!game.settings.get(MODULE_ID, "negotiationsEnabled"))
+            return { ok: false, reason: "disabled" };
+
+        const partyActorId = game.settings.get(MODULE_ID, "partyActorId");
+        const partyActor   = partyActorId ? game.actors.get(partyActorId) : null;
+        if (!partyActor) return { ok: false, reason: "no_party_actor" };
+
+        const existing = partyActor.getFlag(MODULE_ID, NEGOTIATION_FLAG_KEY);
+        if (existing?.active && existing.playerId !== playerId)
+            return { ok: false, reason: "negotiation_locked" };
+
+        try {
+            await partyActor.setFlag(MODULE_ID, NEGOTIATION_FLAG_KEY, {
+                active:      true,
+                playerId,
+                playerName,
+                itemUuid,
+                itemId:      itemId ?? null,
+                itemName,
+                basePrice,
+                type,
+                playerOffer,
+                gmCounter:   null,
+                agreedPrice: null,
+                stage:       NEGOTIATION_STAGES.PENDING_GM
+            });
+            return { ok: true };
+        } catch (err) {
+            console.error(`${MODULE_ID} | startNegotiation query failed:`, err);
+            return { ok: false, reason: "update_failed" };
+        }
+    };
+
+    // --- Negotiation: GM Respond ---
+    // Handles all GM-side responses (counter, accept, reject) and the
+    // player's final offer submission, which routes through the GM for the write.
+    CONFIG.queries[Q.gmRespondNeg] = async ({ action, value }) => {
+        if (!game.user.isGM) return { ok: false, reason: "not_gm" };
+
+        const partyActorId = game.settings.get(MODULE_ID, "partyActorId");
+        const partyActor   = partyActorId ? game.actors.get(partyActorId) : null;
+        if (!partyActor) return { ok: false, reason: "no_party_actor" };
+
+        const flag = partyActor.getFlag(MODULE_ID, NEGOTIATION_FLAG_KEY);
+        if (!flag?.active) return { ok: false, reason: "no_active_negotiation" };
+
+        try {
+            switch (action) {
+                case "counter":
+                    await partyActor.setFlag(MODULE_ID, NEGOTIATION_FLAG_KEY, {
+                        ...flag,
+                        gmCounter: value,
+                        stage:     NEGOTIATION_STAGES.PENDING_PLAYER
+                    });
+                    break;
+
+                case "accept": {
+                    // agreedPrice: use player's offer at PENDING_GM or PENDING_GM_FINAL,
+                    // or the GM's own counter if accepting that.
+                    const agreedPrice = (flag.stage === NEGOTIATION_STAGES.PENDING_GM || flag.stage === NEGOTIATION_STAGES.PENDING_GM_FINAL)
+                        ? flag.playerOffer
+                        : flag.gmCounter;
+                    await partyActor.setFlag(MODULE_ID, NEGOTIATION_FLAG_KEY, {
+                        ...flag,
+                        agreedPrice,
+                        stage: NEGOTIATION_STAGES.ACCEPTED
+                    });
+                    break;
+                }
+
+                case "reject":
+                    // Only valid at PENDING_GM_FINAL; signals definitive refusal.
+                    await partyActor.setFlag(MODULE_ID, NEGOTIATION_FLAG_KEY, {
+                        ...flag,
+                        active: false,
+                        stage:  NEGOTIATION_STAGES.CANCELLED
+                    });
+                    await partyActor.unsetFlag(MODULE_ID, NEGOTIATION_FLAG_KEY);
+                    break;
+
+                case "submitFinal":
+                    // Routed from the player through here so the GM client writes the flag.
+                    await partyActor.setFlag(MODULE_ID, NEGOTIATION_FLAG_KEY, {
+                        ...flag,
+                        playerOffer: value,
+                        stage:       NEGOTIATION_STAGES.PENDING_GM_FINAL
+                    });
+                    break;
+
+                default:
+                    return { ok: false, reason: "unknown_action" };
+            }
+            return { ok: true };
+        } catch (err) {
+            console.error(`${MODULE_ID} | gmRespondNeg query failed (action=${action}):`, err);
+            return { ok: false, reason: "update_failed" };
+        }
+    };
+
+    // --- Negotiation: Cancel ---
+    // Clears the active negotiation flag. Called by the player on close,
+    // by the GM's force-cancel button, and after purchase execution completes.
+    CONFIG.queries[Q.cancelNegotiation] = async () => {
+        if (!game.user.isGM) return { ok: false, reason: "not_gm" };
+
+        const partyActorId = game.settings.get(MODULE_ID, "partyActorId");
+        const partyActor   = partyActorId ? game.actors.get(partyActorId) : null;
+        if (!partyActor) return { ok: false, reason: "no_party_actor" };
+
+        const flag = partyActor.getFlag(MODULE_ID, NEGOTIATION_FLAG_KEY);
+        if (!flag?.active) return { ok: true }; // idempotent
+
+        try {
+            // Set inactive first so listeners detect stage: CANCELLED before the key is removed.
+            await partyActor.setFlag(MODULE_ID, NEGOTIATION_FLAG_KEY, {
+                ...flag,
+                active: false,
+                stage:  NEGOTIATION_STAGES.CANCELLED
+            });
+            await partyActor.unsetFlag(MODULE_ID, NEGOTIATION_FLAG_KEY);
+            return { ok: true };
+        } catch (err) {
+            console.error(`${MODULE_ID} | cancelNegotiation query failed:`, err);
+            return { ok: false, reason: "update_failed" };
+        }
+    };
 }
 
 // ---------------------------------------------------------------
@@ -239,6 +375,95 @@ export async function queryWithdrawFromParty(partyActorId, amount) {
         return await gm.query(Q.withdrawFromParty, { partyActorId, amount }, { timeout: 10000 });
     } catch (err) {
         console.error(`${MODULE_ID} | queryWithdrawFromParty timed out or failed:`, err);
+        return { ok: false, reason: "timeout" };
+    }
+}
+
+// ---------------------------------------------------------------
+// Negotiation query helpers
+// ---------------------------------------------------------------
+
+/**
+ * Requests the GM to start a new price negotiation and set the Party Actor flag.
+ * @param {{ playerId: string, playerName: string, itemUuid: string, itemId: string|null,
+ *           itemName: string, basePrice: number, type: string, playerOffer: number }} params
+ * @returns {Promise<{ok: boolean, reason?: string}>}
+ */
+export async function queryStartNegotiation(params) {
+    if (game.user.isGM) {
+        return await CONFIG.queries[Q.startNegotiation](params);
+    }
+
+    const gm = game.users.activeGM;
+    if (!gm) return { ok: false, reason: "no_gm" };
+
+    try {
+        return await gm.query(Q.startNegotiation, params, { timeout: 15000 });
+    } catch (err) {
+        console.error(`${MODULE_ID} | queryStartNegotiation timed out or failed:`, err);
+        return { ok: false, reason: "timeout" };
+    }
+}
+
+/**
+ * Sends a negotiation response action to the GM handler.
+ * Used for GM-side counter/accept/reject and player-side submitFinal.
+ * @param {string} action - "counter" | "accept" | "reject" | "submitFinal"
+ * @param {number|null} [value] - The offer or counter value (required for counter/submitFinal)
+ * @returns {Promise<{ok: boolean, reason?: string}>}
+ */
+export async function queryGMRespondNeg(action, value = null) {
+    if (game.user.isGM) {
+        return await CONFIG.queries[Q.gmRespondNeg]({ action, value });
+    }
+
+    const gm = game.users.activeGM;
+    if (!gm) return { ok: false, reason: "no_gm" };
+
+    try {
+        return await gm.query(Q.gmRespondNeg, { action, value }, { timeout: 15000 });
+    } catch (err) {
+        console.error(`${MODULE_ID} | queryGMRespondNeg (${action}) timed out or failed:`, err);
+        return { ok: false, reason: "timeout" };
+    }
+}
+
+/**
+ * Player submits their final offer after receiving a GM counter-proposal.
+ * @param {number} finalOffer
+ * @returns {Promise<{ok: boolean, reason?: string}>}
+ */
+export async function querySubmitFinalOffer(finalOffer) {
+    return queryGMRespondNeg("submitFinal", finalOffer);
+}
+
+/**
+ * Player accepts the GM's counter-proposal.
+ * Advances stage to ACCEPTED with the counter value as agreedPrice.
+ * @param {number} agreedPrice - The GM counter value being accepted
+ * @returns {Promise<{ok: boolean, reason?: string}>}
+ */
+export async function queryAcceptCounter(agreedPrice) {
+    return queryGMRespondNeg("accept", agreedPrice);
+}
+
+/**
+ * Cancels the active negotiation and clears the Party Actor flag.
+ * Idempotent — safe to call even when no negotiation is active.
+ * @returns {Promise<{ok: boolean, reason?: string}>}
+ */
+export async function queryCancelNegotiation() {
+    if (game.user.isGM) {
+        return await CONFIG.queries[Q.cancelNegotiation]();
+    }
+
+    const gm = game.users.activeGM;
+    if (!gm) return { ok: false, reason: "no_gm" };
+
+    try {
+        return await gm.query(Q.cancelNegotiation, {}, { timeout: 10000 });
+    } catch (err) {
+        console.error(`${MODULE_ID} | queryCancelNegotiation timed out or failed:`, err);
         return { ok: false, reason: "timeout" };
     }
 }

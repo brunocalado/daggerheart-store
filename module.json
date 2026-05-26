@@ -2,7 +2,7 @@
   "id": "daggerheart-store",
   "title": "Daggerheart: Store",
 
-  "version": "0.5.4",
+  "version": "0.5.5",
 
   "compatibility": {
     "minimum": "14",
@@ -52,7 +52,8 @@
     "styles/randomizer.css",
     "styles/tooltips.css",
     "styles/dialogs.css",
-    "styles/item-tagger.css"
+    "styles/item-tagger.css",
+    "styles/negotiation.css"
   ],
 
   "packs": [

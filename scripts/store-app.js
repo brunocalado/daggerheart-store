@@ -3,7 +3,8 @@ import { StockManager } from "./stock-manager.js";
 import { StoreConfig } from "./store-config.js";
 import { StoreRandomizer } from "./store-randomizer.js";
 import {
-    MODULE_ID, STANDARD_CATEGORIES, CATEGORY_ITEM_TYPE, SELL_TAB, STORE_FLAGS
+    MODULE_ID, STANDARD_CATEGORIES, CATEGORY_ITEM_TYPE, SELL_TAB, STORE_FLAGS,
+    NEGOTIATION_FLAG_KEY
 } from "./store-constants.js";
 import {
     getValidItemTypes, getItemTier, extractPriceFromDescription, getItemHeader,
@@ -12,7 +13,8 @@ import {
     getEpicTextColor, getEpicBgColor,
     showStoreDialog, getUnidentifiedDisplayData
 } from "./store-utils.js";
-import { queryDepositToParty, queryWithdrawFromParty } from "./socket.js";
+import { queryDepositToParty, queryWithdrawFromParty, queryStartNegotiation, queryCancelNegotiation } from "./socket.js";
+import { PlayerNegotiationApp } from "./store-negotiation-player.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api;
 
@@ -92,7 +94,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             toggleEpic: DaggerheartStore.prototype._onToggleEpic,
             clearSearch: DaggerheartStore.prototype._onClearSearch,
             toggleFavorite: DaggerheartStore.prototype._onToggleFavorite,
-            toggleFavoriteFilter: DaggerheartStore.prototype._onToggleFavoriteFilter
+            toggleFavoriteFilter: DaggerheartStore.prototype._onToggleFavoriteFilter,
+            negotiateItem:     DaggerheartStore.prototype._onNegotiateItem,
+            cancelNegotiation: DaggerheartStore.prototype._onCancelNegotiation
         }
     };
 
@@ -1046,6 +1050,15 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const stockEnabled = game.settings.get(MODULE_ID, "stockEnabled") && !!partyActor;
         const showStockQuantity = game.settings.get(MODULE_ID, "showStockQuantity");
 
+        // Negotiation feature — requires Party Actor and the feature toggle to be on.
+        const negotiationsEnabled = game.settings.get(MODULE_ID, "negotiationsEnabled") && !!partyActor;
+        const negotiation = partyActor?.getFlag(MODULE_ID, NEGOTIATION_FLAG_KEY) ?? null;
+        Object.assign(context, {
+            negotiationsEnabled,
+            // Only expose the active indicator to the GM (used by the force-cancel button).
+            negotiationActive: isGM && !!(negotiation?.active)
+        });
+
         // Shared options object for _buildItemData
         const sharedOpts = {
             isGM, userActor, hasActor, userGold, partyGold, hasPartyActor,
@@ -1839,6 +1852,137 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
         if (game.audio) foundry.audio.AudioHelper.play({ src: "modules/daggerheart-store/assets/audio/coins.mp3", volume: 0.8, loop: false }, false);
         this.render();
+    }
+
+    // ---------------------------------------------------------------
+    // Negotiation
+    // ---------------------------------------------------------------
+
+    /**
+     * Opens the PlayerNegotiationApp after prompting the player for an initial offer.
+     * Called from `data-action="negotiateItem"` on buy and sell item rows.
+     * @param {PointerEvent} event
+     * @param {HTMLElement}  target
+     */
+    async _onNegotiateItem(event, target) {
+        if (!game.settings.get(MODULE_ID, "negotiationsEnabled")) return;
+        if (game.user.isGM) return;
+
+        const itemUuid  = target.dataset.uuid  ?? "";
+        const itemId    = target.dataset.itemId ?? null;
+        const itemName  = target.dataset.name  ?? "";
+        const basePrice = parseInt(target.dataset.price ?? "0");
+        const type      = target.dataset.type  ?? "buy";
+
+        const userActor = game.user.character;
+        if (!userActor) return ui.notifications.error("You need an assigned character.");
+
+        const partyActorId = game.settings.get(MODULE_ID, "partyActorId");
+        const partyActor   = partyActorId ? game.actors.get(partyActorId) : null;
+        if (!partyActor) return ui.notifications.error("Party Actor is not configured.");
+
+        // Check the global negotiation lock.
+        const existing = partyActor.getFlag(MODULE_ID, NEGOTIATION_FLAG_KEY);
+        if (existing?.active && existing.playerId !== game.user.id) {
+            return ui.notifications.warn("Another negotiation is already in progress.");
+        }
+
+        // Prompt the player for their opening offer via the shared store dialog helper.
+        const currency     = getSystemCurrency();
+        const defaultOffer = type === "sell"
+            ? Math.ceil(basePrice * 1.2)
+            : Math.floor(basePrice * 0.8);
+
+        const result = await showStoreDialog({
+            title:       "Negotiate Price",
+            icon:        "fas fa-handshake",
+            headerText:  "Make an Offer",
+            headerColor: "#D4AF37",
+            message:     `<strong>${itemName}</strong> — Listed: <strong>${basePrice} ${currency}</strong>`,
+            input: {
+                label:        `Your Offer (${currency})`,
+                name:         "playerOffer",
+                type:         "number",
+                defaultValue: defaultOffer,
+                placeholder:  String(basePrice)
+            },
+            buttons: { confirm: "Send Offer", confirmIcon: "fas fa-paper-plane" }
+        });
+
+        if (!result?.confirmed) return;
+        const playerOffer = parseInt(result.value ?? "");
+        if (isNaN(playerOffer) || playerOffer <= 0) return ui.notifications.warn("Invalid offer amount.");
+
+        // Route the write through the GM via query.
+        const queryResult = await queryStartNegotiation({
+            playerId:    game.user.id,
+            playerName:  game.user.name,
+            itemUuid,
+            itemId:      itemId ?? null,
+            itemName,
+            basePrice,
+            type,
+            playerOffer
+        });
+
+        if (!queryResult.ok) {
+            switch (queryResult.reason) {
+                case "disabled":           return ui.notifications.warn("Negotiations are disabled by the GM.");
+                case "no_party_actor":     return ui.notifications.error("Party Actor not found on the GM's side.");
+                case "negotiation_locked": return ui.notifications.warn("Another negotiation is already in progress.");
+                default:                   return ui.notifications.error("Could not start negotiation. Try again.");
+            }
+        }
+
+        // Open the player's negotiation window — it will stay open and update reactively.
+        new PlayerNegotiationApp({ itemUuid, itemName, basePrice, type }).render(true);
+
+        // Post the "negotiation started" chat announcement.
+        const borderColor = this._getBorderColor("buy");
+        const body = `
+            <p><strong>${game.user.name}</strong> is negotiating for
+            <strong>${itemName}</strong>.</p>
+            <p style="color:var(--color-text-secondary);font-size:0.9em;">
+                Listed: ${basePrice} ${currency} &mdash; Offer: ${playerOffer} ${currency}
+            </p>`;
+        const chatData = {
+            content: buildChatCard({ title: "Negotiation Started", borderColor, body }),
+            speaker: ChatMessage.getSpeaker({ actor: userActor })
+        };
+        const whisperTo = getChatWhisperRecipients();
+        if (whisperTo) chatData.whisper = whisperTo;
+        ChatMessage.create(chatData);
+    }
+
+    /**
+     * Force-cancels the active negotiation. GM-only; available via the store header button.
+     * Called from `data-action="cancelNegotiation"`.
+     * @param {PointerEvent} event
+     * @param {HTMLElement}  target
+     */
+    async _onCancelNegotiation(event, target) {
+        if (!game.user.isGM) return;
+
+        const confirmed = await showStoreDialog({
+            title:      "Cancel Negotiation",
+            icon:       "fas fa-times-circle",
+            headerText: "Force Cancel",
+            headerColor: "#D32F2F",
+            message:    "Force-cancel the active negotiation? The player's window will close."
+        });
+        if (!confirmed) return;
+
+        await queryCancelNegotiation();
+
+        const borderColor = this._getBorderColor(null);
+        const body = "<p>The GM cancelled the active negotiation.</p>";
+        const chatData = {
+            content: buildChatCard({ title: "Negotiation Cancelled", borderColor, body }),
+            speaker: ChatMessage.getSpeaker()
+        };
+        const whisperTo = getChatWhisperRecipients();
+        if (whisperTo) chatData.whisper = whisperTo;
+        ChatMessage.create(chatData);
     }
 
     async _onTransferFunds(event, target) {

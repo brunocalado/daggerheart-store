@@ -1,3 +1,18 @@
+# 0.5.5
+
+- [Added] **Price Negotiations** — players can initiate a bargaining session with the GM. Player clicks "Bargain" button on an item (buy or sell), enters an opening offer, opens `PlayerNegotiationApp` window. GM receives `GMNegotiationApp` automatically. GM can counter, player can accept counter or submit final offer, GM accepts or rejects final. Global lock prevents concurrent negotiations. Feature is toggle-able in Store Config.
+- [Added] `PlayerNegotiationApp` (ApplicationV2) — reactive window showing negotiation state (pending_gm, pending_player, pending_gm_final). Closes on resolution or player-initiated cancellation. Updates in real-time via Party Actor flag changes.
+- [Added] `GMNegotiationApp` (ApplicationV2) — reactive window for GM to counter, accept, or reject player offers. Auto-opens when player initiates negotiation. Updates in real-time.
+- [Added] Three new queries in socket.js: `startNegotiation` (player initiates), `gmRespondNeg` (GM counter/accept/reject/final-offer-submit), `cancelNegotiation` (cleanup). Five helper functions exported for player and GM use.
+- [Added] Negotiation state stored as flag on Party Actor: `flags.daggerheart-store.negotiation` with schema: `{ active, playerId, playerName, itemUuid, itemId, itemName, basePrice, type, playerOffer, gmCounter, agreedPrice, stage }`.
+- [Added] Module-level `updateActor` hook monitors Party Actor negotiation flag. Auto-opens GM window when negotiation starts. Executes purchase/sale on player's client when GM accepts (buy via `_executePurchase`, sell via item delete + gold add). Cleans up flag after execution.
+- [Added] Four new templates: `player-negotiation.hbs`, `gm-negotiation.hbs`, bargain button partials in `store-player-controls.hbs` and `store-sell-tab.hbs`, GM cancel button in `store-header.hbs`, negotiations toggle in `config-stock-tab.hbs`.
+- [Added] New stylesheet `styles/negotiation.css` with `.bargain-btn` (mirrors .buy-btn size/style, gold palette) and window styles for both apps.
+- [Added] Setting `negotiationsEnabled` (world scope, boolean, default false) — toggleable in Store Config, respects Party Actor availability.
+- [Changed] `store-constants.js`: added `NEGOTIATION_FLAG_KEY`, `NEGOTIATION_STAGES` enum, `negotiationsEnabled` to `EXPORTABLE_SETTINGS`.
+- [Changed] `module.json`: added `styles/negotiation.css` to styles array.
+
+
 # 0.5.4
 
 - https://github.com/brunocalado/daggerheart-store/issues/10

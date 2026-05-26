@@ -4,8 +4,10 @@ import { StoreItemTagger } from "./store-item-tagger.js";
 import { StoreWelcome } from "./store-welcome.js";
 import { StockManager } from "./stock-manager.js";
 import { migrateTags } from "./store-migration.js";
-import { registerQueryHandlers } from "./socket.js";
-import { MODULE_ID } from "./store-constants.js";
+import { registerQueryHandlers, queryCancelNegotiation } from "./socket.js";
+import { MODULE_ID, NEGOTIATION_FLAG_KEY, NEGOTIATION_STAGES } from "./store-constants.js";
+import { GMNegotiationApp } from "./store-negotiation-gm.js";
+import { addGold } from "./store-utils.js";
 const { DialogV2 } = foundry.applications.api;
 
 Hooks.once("init", () => {
@@ -152,6 +154,15 @@ Hooks.once("init", () => {
         scope: "world", config: false, type: Number, default: 1.5
     });
 
+    // --- NEGOTIATION SETTINGS ---
+    game.settings.register(MODULE_ID, "negotiationsEnabled", {
+        name: "Enable Price Negotiations",
+        scope: "world",
+        config: false,
+        type: Boolean,
+        default: false
+    });
+
     // --- RANDOMIZER SETTINGS ---
     game.settings.register(MODULE_ID, "randomizerSettings", {
         name: "Randomizer Settings",
@@ -270,6 +281,8 @@ Hooks.once("init", () => {
         "modules/daggerheart-store/templates/partials/config-stock-tab.hbs",
         "modules/daggerheart-store/templates/partials/config-vendor-tab.hbs",
         "modules/daggerheart-store/templates/partials/vendor-tooltip.hbs",
+        "modules/daggerheart-store/templates/player-negotiation.hbs",
+        "modules/daggerheart-store/templates/gm-negotiation.hbs",
     ]);
 
     // --- HANDLEBARS HELPERS FOR COMPARISON ---
@@ -453,24 +466,79 @@ Hooks.on("updateSetting", (setting) => {
     }
 });
 
-Hooks.on("updateActor", (actor, changes, options, userId) => {
-    // Check if this is the configured Party Actor (used for stock)
+Hooks.on("updateActor", async (actor, changes, options, userId) => {
+    // Check if this is the configured Party Actor (used for stock and negotiations)
     const partyActorId = game.settings.get(MODULE_ID, "partyActorId");
     if (!partyActorId || actor.id !== partyActorId) return;
 
-    // Check if stock data changed for any profile namespace.
+    const moduleFlags = foundry.utils.getProperty(changes, `flags.${MODULE_ID}`) || {};
+
+    // --- Stock: refresh store UI when stock data changes ---
     // The changes object may arrive flat (dot-notation keys) or nested,
     // so check both: hasProperty for nested, and key prefix scan for flat.
-    const moduleFlags = foundry.utils.getProperty(changes, `flags.${MODULE_ID}`) || {};
     const stockPrefix = "stock_";
     const stockChanged = Object.keys(moduleFlags).some(k => k.startsWith(stockPrefix))
         || Object.keys(changes).some(k => k.startsWith(`flags.${MODULE_ID}.${stockPrefix}`));
-    if (!stockChanged) return;
-
-    // Refresh store if open
-    if (storeInstance && storeInstance.rendered) {
+    if (stockChanged && storeInstance?.rendered) {
         console.log(`${MODULE_ID} | Stock updated, refreshing store UI`);
         storeInstance.render();
+    }
+
+    // --- Negotiations: react to flag changes ---
+    const negChanged = Object.prototype.hasOwnProperty.call(moduleFlags, NEGOTIATION_FLAG_KEY)
+        || Object.keys(changes).some(k => k === `flags.${MODULE_ID}.${NEGOTIATION_FLAG_KEY}`
+            || k.startsWith(`flags.${MODULE_ID}.${NEGOTIATION_FLAG_KEY}.`));
+    if (!negChanged) return;
+
+    const fullFlag = actor.getFlag(MODULE_ID, NEGOTIATION_FLAG_KEY);
+
+    // GM: auto-open GMNegotiationApp when a new negotiation starts.
+    // foundry.applications.instances is the v14 registry of all open ApplicationV2 windows.
+    if (game.user.isGM && fullFlag?.active) {
+        const existing = foundry.applications.instances.get("daggerheart-store-negotiation-gm");
+        if (!existing) {
+            const gmApp = new GMNegotiationApp();
+            await gmApp.render(true);
+        } else {
+            existing.render();
+            existing.bringToFront?.();
+        }
+    }
+
+    // Player: execute buy/sell and clean up when the GM accepts.
+    if (!game.user.isGM
+        && fullFlag?.stage === NEGOTIATION_STAGES.ACCEPTED
+        && fullFlag?.playerId === game.user.id
+    ) {
+        const userActor = game.user.character;
+        if (userActor && storeInstance) {
+            if (fullFlag.type === "buy") {
+                await storeInstance._executePurchase({
+                    itemUuid:  fullFlag.itemUuid,
+                    itemName:  fullFlag.itemName,
+                    price:     fullFlag.agreedPrice,
+                    recipient: userActor,
+                    payers:    [{ actor: userActor, amount: fullFlag.agreedPrice, name: userActor.name }]
+                });
+            } else {
+                // Sell: delete the owned item and credit the agreed price.
+                const itemToDelete = fullFlag.itemId
+                    ? userActor.items.get(fullFlag.itemId)
+                    : userActor.items.find(i => i.name === fullFlag.itemName);
+                if (itemToDelete) await itemToDelete.delete();
+
+                const stockEnabled = game.settings.get(MODULE_ID, "stockEnabled");
+                if (stockEnabled && fullFlag.itemUuid) {
+                    const { StockManager } = await import("./stock-manager.js");
+                    await StockManager.incrementStock(fullFlag.itemUuid, 1);
+                }
+
+                await addGold(userActor, fullFlag.agreedPrice);
+            }
+        }
+
+        // Clear the flag via query so the GM client performs the write.
+        await queryCancelNegotiation();
     }
 });
 

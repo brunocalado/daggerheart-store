@@ -78,7 +78,8 @@ export const EXPORTABLE_SETTINGS = [
     "useDefaultCompendiums", "sellRatio", "stockEnabled", "showStockQuantity", "randomizerSettings",
     "currencyMode", "chatPrivacy", "chatMessageStyle",
     "vendorName", "vendorDescription", "vendorRelationships", "vendorRelationLevels",
-    "vendorPresenceEnabled", "vendorPresenceModifier"
+    "vendorPresenceEnabled", "vendorPresenceModifier",
+    "negotiationsEnabled"
 ];
 
 /** Settings stored as objects (used for merge logic during import) */
@@ -106,3 +107,18 @@ export const STORE_FLAGS = {
     tier:   "tier",
     header: "header"
 };
+
+/** Flag key for the active negotiation state stored on the Party Actor */
+export const NEGOTIATION_FLAG_KEY = "negotiation";
+
+/**
+ * Negotiation stage identifiers.
+ * Represent the current turn in the buy/sell bargaining flow.
+ */
+export const NEGOTIATION_STAGES = Object.freeze({
+    PENDING_GM:       "pending_gm",
+    PENDING_PLAYER:   "pending_player",
+    PENDING_GM_FINAL: "pending_gm_final",
+    ACCEPTED:         "accepted",
+    CANCELLED:        "cancelled"
+});

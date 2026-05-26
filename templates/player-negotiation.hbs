@@ -1,0 +1,80 @@
+<div class="neg-container">
+
+    {{! ── Item header ─────────────────────────────────── }}
+    <div class="neg-item-header">
+        <span class="neg-item-name">{{itemName}}</span>
+        <span class="neg-base-price">
+            Listed: <strong>{{basePrice}} {{currency}}</strong>
+            {{#if (eq type "sell")}}
+                <span class="neg-type-badge sell">Selling</span>
+            {{else}}
+                <span class="neg-type-badge buy">Buying</span>
+            {{/if}}
+        </span>
+    </div>
+
+    {{! ── Stage: waiting for GM response ─────────────── }}
+    {{#if isPendingGm}}
+        <div class="neg-offer-row">
+            <span class="neg-label">Your Offer</span>
+            <span class="neg-offer-display">{{playerOffer}} {{currency}}</span>
+        </div>
+        <div class="neg-waiting">
+            <i class="fas fa-hourglass-half neg-waiting-icon"></i>
+            <span>Waiting for GM response…</span>
+        </div>
+    {{/if}}
+
+    {{! ── Stage: GM sent a counter-offer ─────────────── }}
+    {{#if isPendingPlayer}}
+        <div class="neg-offer-row">
+            <span class="neg-label">Your Offer</span>
+            <span class="neg-offer-display dim">{{playerOffer}} {{currency}}</span>
+        </div>
+
+        <div class="neg-divider"><i class="fas fa-arrows-alt-v"></i></div>
+
+        <div class="neg-offer-row highlight">
+            <span class="neg-label">GM Counter</span>
+            <span class="neg-offer-display accent">{{gmCounter}} {{currency}}</span>
+        </div>
+
+        <div class="neg-actions">
+            <button type="button" class="neg-btn accept" data-action="acceptCounter">
+                <i class="fas fa-check"></i> Accept Counter
+            </button>
+        </div>
+
+        <div class="neg-section-label">— or submit your final offer —</div>
+
+        <div class="neg-input-group">
+            <label class="neg-input-label">Final Offer ({{currency}})</label>
+            <input type="number" name="finalOffer" class="neg-input"
+                   min="1" step="1"
+                   value="{{gmCounter}}"
+                   placeholder="Enter your final offer">
+        </div>
+        <div class="neg-actions">
+            <button type="button" class="neg-btn final" data-action="submitFinal">
+                <i class="fas fa-gavel"></i> Submit Final Offer
+            </button>
+        </div>
+    {{/if}}
+
+    {{! ── Stage: final offer sent, waiting for GM ──────── }}
+    {{#if isPendingGmFinal}}
+        <div class="neg-offer-row">
+            <span class="neg-label">GM Counter</span>
+            <span class="neg-offer-display dim">{{gmCounter}} {{currency}}</span>
+        </div>
+        <div class="neg-offer-row highlight">
+            <span class="neg-label">Your Final Offer</span>
+            <span class="neg-offer-display accent">{{playerOffer}} {{currency}}</span>
+        </div>
+        <div class="neg-waiting">
+            <i class="fas fa-hourglass-half neg-waiting-icon"></i>
+            <span>Waiting for GM's final decision…</span>
+        </div>
+    {{/if}}
+
+</div>

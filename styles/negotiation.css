@@ -1,0 +1,246 @@
+/* ================================================================
+   Negotiation CSS — Daggerheart Store
+   Scoped under .daggerheart-store (bargain button in item rows)
+   and .daggerheart-store-negotiation-player / -gm (dialog windows).
+   ================================================================ */
+
+/* ── Bargain button (inside store item rows) ───────────────────── */
+/* Mirrors .buy-btn sizing and shape exactly; uses gold palette instead of green. */
+.daggerheart-store {
+    & .bargain-btn {
+        background:      var(--dhs-gold-dark);
+        color:           white;
+        border:          1px solid #4a3208;
+        padding:         6px 14px;
+        cursor:          pointer;
+        border-radius:   3px;
+        display:         flex;
+        align-items:     center;
+        gap:             6px;
+        font-weight:     bold;
+        font-family:     var(--dhs-font-body);
+        text-transform:  uppercase;
+        font-size:       0.9em;
+        transition:      all 0.2s;
+
+        &:hover:not(:disabled) {
+            background:  #8a6820;
+            box-shadow:  0 0 5px #5a4210;
+            border-color: var(--dhs-gold);
+        }
+
+        &:disabled {
+            background:   var(--dhs-border-lighter);
+            border-color: var(--dhs-border-light);
+            opacity:      0.7;
+            cursor:       not-allowed;
+        }
+    }
+}
+
+/* ── Shared window styles ──────────────────────────────────────── */
+.daggerheart-store-negotiation-player,
+.daggerheart-store-negotiation-gm {
+    font-family: var(--dhs-font-body, "Lato", sans-serif);
+    color:       var(--dhs-text);
+
+    /* ── Container ─── */
+    & .neg-container {
+        display:        flex;
+        flex-direction: column;
+        gap:            12px;
+        padding:        12px 14px 14px;
+        background:     var(--dhs-bg);
+    }
+
+    /* ── Item / request header ─── */
+    & .neg-item-header {
+        display:        flex;
+        flex-direction: column;
+        gap:            3px;
+        padding-bottom: 10px;
+        border-bottom:  1px solid var(--dhs-border);
+    }
+
+    & .neg-item-name {
+        font-size:   1.1rem;
+        font-weight: 700;
+        color:       var(--dhs-text-white);
+    }
+
+    & .neg-player-name {
+        font-size: 0.9rem;
+        color:     var(--dhs-text-muted);
+    }
+
+    & .neg-base-price {
+        font-size: 0.85rem;
+        color:     var(--dhs-text-light);
+        display:   flex;
+        gap:       8px;
+        align-items: center;
+    }
+
+    /* ── Type badges ─── */
+    & .neg-type-badge {
+        display:       inline-block;
+        padding:       1px 7px;
+        border-radius: 10px;
+        font-size:     0.75rem;
+        font-weight:   600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+
+        &.buy  { background: rgba(192, 57, 43, 0.25); color: #e74c3c; border: 1px solid #7a1d1d; }
+        &.sell { background: rgba(39, 174, 96, 0.20); color: #2ecc71; border: 1px solid #1a5c1a; }
+    }
+
+    /* ── Offer rows ─── */
+    & .neg-offer-row {
+        display:         flex;
+        justify-content: space-between;
+        align-items:     center;
+        padding:         8px 10px;
+        background:      var(--dhs-bg-light);
+        border:          1px solid var(--dhs-border);
+        border-radius:   6px;
+
+        &.highlight {
+            border-color: var(--dhs-gold-border);
+            background:   rgba(212, 175, 55, 0.07);
+        }
+    }
+
+    & .neg-label {
+        font-size: 0.82rem;
+        color:     var(--dhs-text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    & .neg-offer-display {
+        font-size:   1.25rem;
+        font-weight: 700;
+        color:       var(--dhs-text-white);
+
+        &.accent { color: var(--dhs-gold); }
+        &.dim    { color: var(--dhs-text-muted); font-size: 1rem; }
+    }
+
+    /* ── Divider between offers ─── */
+    & .neg-divider {
+        text-align: center;
+        color:      var(--dhs-border-light);
+        font-size:  0.9rem;
+    }
+
+    /* ── Section label ─── */
+    & .neg-section-label {
+        text-align: center;
+        font-size:  0.8rem;
+        color:      var(--dhs-text-muted);
+        margin:     -4px 0;
+    }
+
+    /* ── Input group ─── */
+    & .neg-input-group {
+        display:        flex;
+        flex-direction: column;
+        gap:            4px;
+    }
+
+    & .neg-input-label {
+        font-size: 0.82rem;
+        color:     var(--dhs-text-muted);
+    }
+
+    & .neg-input {
+        background:    var(--dhs-bg-lighter);
+        border:        1px solid var(--dhs-border-mid);
+        border-radius: 4px;
+        color:         var(--dhs-text-white);
+        padding:       6px 8px;
+        font-size:     1rem;
+        width:         100%;
+        box-sizing:    border-box;
+
+        &:focus {
+            outline:      none;
+            border-color: var(--dhs-gold-border);
+        }
+    }
+
+    /* ── Action buttons ─── */
+    & .neg-actions {
+        display: flex;
+        gap:     8px;
+    }
+
+    & .neg-btn {
+        flex:          1;
+        display:       inline-flex;
+        align-items:   center;
+        justify-content: center;
+        gap:           6px;
+        padding:       8px 12px;
+        border-radius: 5px;
+        font-size:     0.9rem;
+        font-weight:   600;
+        cursor:        pointer;
+        border:        1px solid transparent;
+        transition:    background 0.18s, border-color 0.18s;
+
+        &.accept {
+            background:   rgba(39, 174, 96, 0.18);
+            border-color: #1a5c1a;
+            color:        #2ecc71;
+
+            &:hover { background: rgba(39, 174, 96, 0.30); border-color: #2ecc71; }
+        }
+
+        &.counter {
+            background:   rgba(212, 175, 55, 0.13);
+            border-color: var(--dhs-gold-border);
+            color:        var(--dhs-gold);
+
+            &:hover { background: rgba(212, 175, 55, 0.22); border-color: var(--dhs-gold); }
+        }
+
+        &.final {
+            background:   rgba(142, 68, 173, 0.18);
+            border-color: #5b2980;
+            color:        #c39bd3;
+
+            &:hover { background: rgba(142, 68, 173, 0.30); border-color: #a569bd; }
+        }
+
+        &.reject {
+            background:   rgba(192, 57, 43, 0.18);
+            border-color: var(--dhs-sell);
+            color:        #e74c3c;
+
+            &:hover { background: rgba(192, 57, 43, 0.30); border-color: #e74c3c; }
+        }
+    }
+
+    /* ── Waiting indicator ─── */
+    & .neg-waiting {
+        display:         flex;
+        align-items:     center;
+        justify-content: center;
+        gap:             8px;
+        padding:         12px;
+        background:      var(--dhs-bg-light);
+        border:          1px dashed var(--dhs-border-mid);
+        border-radius:   6px;
+        color:           var(--dhs-text-muted);
+        font-size:       0.9rem;
+        font-style:      italic;
+    }
+
+    & .neg-waiting-icon {
+        color:     var(--dhs-gold);
+        font-size: 1.1rem;
+        opacity:   0.7;
+    }
+}

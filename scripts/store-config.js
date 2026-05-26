@@ -65,6 +65,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         const hasPartyActor = !!(partyActorId && game.actors.get(partyActorId));
         const stockEnabled = game.settings.get(MODULE_ID, "stockEnabled");
         const showStockQuantity = game.settings.get(MODULE_ID, "showStockQuantity");
+        const negotiationsEnabled = game.settings.get(MODULE_ID, "negotiationsEnabled");
 
         const storeActor = StockManager.getStoreActor();
         const stockKey = StockManager.getStockKey();
@@ -255,6 +256,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             hasPartyActor: hasPartyActor,
             stockEnabled: stockEnabled,
             showStockQuantity: showStockQuantity,
+            negotiationsEnabled: negotiationsEnabled,
             stockCategoryDefaults: stockCategoryDefaults,
             epicIcon: epicIcon,
             epicColor: epicColor,
@@ -1091,6 +1093,7 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         }
 
         await game.settings.set(MODULE_ID, "stockEnabled", expanded.stockEnabled || false);
+        await game.settings.set(MODULE_ID, "negotiationsEnabled", expanded.negotiationsEnabled || false);
 
         if (expanded.stockDefaults) {
             const actor = StockManager.getStoreActor();

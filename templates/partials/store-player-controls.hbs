@@ -33,6 +33,21 @@
         </button>
     {{/if}}
 
+    <!-- Negotiate / Bargain Button (shown when feature is enabled, item is in stock) -->
+    {{#if @root.negotiationsEnabled}}
+        <button type="button"
+                class="bargain-btn"
+                data-action="negotiateItem"
+                data-uuid="{{this.uuid}}"
+                data-price="{{this.price}}"
+                data-name="{{this.name}}"
+                data-type="buy"
+                title="Negotiate Price"
+                {{#if (eq this.stockStatus "out")}}disabled{{/if}}>
+            <i class="fas fa-handshake"></i>
+        </button>
+    {{/if}}
+
     <!-- Buy Buttons -->
     {{#if @root.hasPartyActor}}
         <button type="button"

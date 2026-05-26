@@ -22,6 +22,21 @@
                     </span>
                 </div>
 
+                {{#if @root.negotiationsEnabled}}
+                    <button type="button"
+                            class="bargain-btn"
+                            data-action="negotiateItem"
+                            data-uuid="{{this.catalogUuid}}"
+                            data-item-id="{{this.itemId}}"
+                            data-price="{{this.sellPrice}}"
+                            data-name="{{this.name}}"
+                            data-type="sell"
+                            title="Negotiate Sell Price"
+                            {{#unless this.canSell}}disabled{{/unless}}>
+                        <i class="fas fa-handshake"></i>
+                    </button>
+                {{/if}}
+
                 <button type="button"
                         class="sell-btn"
                         data-action="sellItem"
