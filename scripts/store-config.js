@@ -5,6 +5,10 @@ import {
     EXCLUDED_SYSTEM_PACKS, CATEGORY_ICONS, VENDOR_RELATION_LEVELS
 } from "./store-constants.js";
 import { getValidItemTypes, getItemTier, getOriginalName, showStoreDialog } from "./store-utils.js";
+import {
+    getRelationMultiplier, getPresenceMultiplier,
+    formatRelationBadge, formatPresenceBadge, formatTotalBadge
+} from "./vendor-pricing.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -160,15 +164,9 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             if (!actor) continue;
             const level = cleanedRelationships[actor.id] ?? 0;
             const pct = vendorRelationLevels[String(level)] ?? 0;
-            let relationEffect = "—";
-            let effectClass = "effect-neutral";
-            if (level < 0) {
-                relationEffect = `+${pct}%`;
-                effectClass = "effect-up";
-            } else if (level > 0) {
-                relationEffect = `-${pct}%`;
-                effectClass = "effect-down";
-            }
+            const relationBadge = formatRelationBadge(level, pct);
+            const relationEffect = relationBadge.text;
+            const effectClass = relationBadge.className;
 
             // Presence effect — calculated per actor when presence modifier is enabled
             let presenceEffect = "—";
@@ -186,29 +184,15 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             if (vendorPresenceEnabled) {
                 presencePctRaw = presenceValue * vendorPresenceModifier;
 
-                if (presenceValue > 0) {
-                    presenceEffect = `-${Math.abs(presencePctRaw).toFixed(1)}%`;
-                    presenceEffectClass = "effect-down";
-                } else if (presenceValue < 0) {
-                    presenceEffect = `+${Math.abs(presencePctRaw).toFixed(1)}%`;
-                    presenceEffectClass = "effect-up";
-                }
+                const presenceBadge = formatPresenceBadge(presenceValue, presencePctRaw);
+                presenceEffect = presenceBadge.text;
+                presenceEffectClass = presenceBadge.className;
 
                 // Combined multiplicative total (relationship × presence)
-                const relMultiplier = level < 0 ? (1 + pct / 100) : (level > 0 ? (1 - pct / 100) : 1);
-                const presenceMultiplier = 1 - (presencePctRaw / 100);
-                const combinedMultiplier = relMultiplier * presenceMultiplier;
-                const totalPct = (combinedMultiplier - 1) * 100;
-
-                if (Math.abs(totalPct) >= 0.05) {
-                    if (totalPct < 0) {
-                        totalEffect = `${totalPct.toFixed(1)}%`;
-                        totalEffectClass = "effect-down";
-                    } else {
-                        totalEffect = `+${totalPct.toFixed(1)}%`;
-                        totalEffectClass = "effect-up";
-                    }
-                }
+                const combinedMultiplier = getRelationMultiplier(level, pct) * getPresenceMultiplier(presenceValue, vendorPresenceModifier);
+                const totalBadge = formatTotalBadge((combinedMultiplier - 1) * 100);
+                totalEffect = totalBadge.text;
+                totalEffectClass = totalBadge.className;
             }
 
             linkedActors.push({
@@ -498,16 +482,9 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
                 const pctInput = html.querySelector(`.vendor-relation-pct-input[data-level="${level}"]`);
                 const pct = pctInput ? (parseInt(pctInput.value) || 0) : 0;
 
-                if (level === 0) {
-                    effectEl.textContent = "—";
-                    effectEl.className = "vendor-relation-effect effect-neutral";
-                } else if (level < 0) {
-                    effectEl.textContent = `+${pct}%`;
-                    effectEl.className = "vendor-relation-effect effect-up";
-                } else {
-                    effectEl.textContent = `-${pct}%`;
-                    effectEl.className = "vendor-relation-effect effect-down";
-                }
+                const relBadge = formatRelationBadge(level, pct);
+                effectEl.textContent = relBadge.text;
+                effectEl.className = `vendor-relation-effect ${relBadge.className}`;
 
                 // Also recalculate the total column if presence is active
                 const row = e.target.closest(".vendor-relation-row");
@@ -519,21 +496,10 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
                 // when the modifier input was changed before saving.
                 const rowPresenceValue = parseFloat(row.dataset.presenceValue) || 0;
                 const currentMod = parseFloat(presenceModifierInput?.value) || 0;
-                const presencePctRaw = rowPresenceValue * currentMod;
-                const relMultiplier = level < 0 ? (1 + pct / 100) : (level > 0 ? (1 - pct / 100) : 1);
-                const presenceMultiplier = 1 - (presencePctRaw / 100);
-                const totalPct = (relMultiplier * presenceMultiplier - 1) * 100;
-
-                if (Math.abs(totalPct) < 0.05) {
-                    totalEl.textContent = "—";
-                    totalEl.className = "vendor-relation-effect effect-neutral";
-                } else if (totalPct < 0) {
-                    totalEl.textContent = `${totalPct.toFixed(1)}%`;
-                    totalEl.className = "vendor-relation-effect effect-down";
-                } else {
-                    totalEl.textContent = `+${totalPct.toFixed(1)}%`;
-                    totalEl.className = "vendor-relation-effect effect-up";
-                }
+                const combinedMultiplier = getRelationMultiplier(level, pct) * getPresenceMultiplier(rowPresenceValue, currentMod);
+                const totalBadge = formatTotalBadge((combinedMultiplier - 1) * 100);
+                totalEl.textContent = totalBadge.text;
+                totalEl.className = `vendor-relation-effect ${totalBadge.className}`;
             });
         });
 
@@ -740,16 +706,9 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             // Presence column effect badge.
             const presenceEffectEl = presenceCol?.querySelector(".vendor-relation-effect");
             if (presenceEffectEl) {
-                if (presenceValue > 0) {
-                    presenceEffectEl.textContent = `-${Math.abs(presencePctRaw).toFixed(1)}%`;
-                    presenceEffectEl.className = "vendor-relation-effect effect-down";
-                } else if (presenceValue < 0) {
-                    presenceEffectEl.textContent = `+${Math.abs(presencePctRaw).toFixed(1)}%`;
-                    presenceEffectEl.className = "vendor-relation-effect effect-up";
-                } else {
-                    presenceEffectEl.textContent = "—";
-                    presenceEffectEl.className = "vendor-relation-effect effect-neutral";
-                }
+                const presenceBadge = formatPresenceBadge(presenceValue, presencePctRaw);
+                presenceEffectEl.textContent = presenceBadge.text;
+                presenceEffectEl.className = `vendor-relation-effect ${presenceBadge.className}`;
             }
 
             // Total column — multiplicative combination of relation modifier + presence.
@@ -760,20 +719,10 @@ export class StoreConfig extends HandlebarsApplicationMixin(ApplicationV2) {
                 const pctInput = html.querySelector(`.vendor-relation-pct-input[data-level="${level}"]`);
                 const pct = pctInput ? (parseInt(pctInput.value) || 0) : 0;
 
-                const relMultiplier = level < 0 ? (1 + pct / 100) : (level > 0 ? (1 - pct / 100) : 1);
-                const presenceMultiplier = 1 - (presencePctRaw / 100);
-                const totalPct = (relMultiplier * presenceMultiplier - 1) * 100;
-
-                if (Math.abs(totalPct) < 0.05) {
-                    totalEffectEl.textContent = "—";
-                    totalEffectEl.className = "vendor-relation-effect effect-neutral";
-                } else if (totalPct < 0) {
-                    totalEffectEl.textContent = `${totalPct.toFixed(1)}%`;
-                    totalEffectEl.className = "vendor-relation-effect effect-down";
-                } else {
-                    totalEffectEl.textContent = `+${totalPct.toFixed(1)}%`;
-                    totalEffectEl.className = "vendor-relation-effect effect-up";
-                }
+                const combinedMultiplier = getRelationMultiplier(level, pct) * getPresenceMultiplier(presenceValue, modifierPct);
+                const totalBadge = formatTotalBadge((combinedMultiplier - 1) * 100);
+                totalEffectEl.textContent = totalBadge.text;
+                totalEffectEl.className = `vendor-relation-effect ${totalBadge.className}`;
             }
         });
     }

@@ -15,6 +15,14 @@ import {
 } from "./store-utils.js";
 import { queryDepositToParty, queryWithdrawFromParty, queryStartNegotiation, queryCancelNegotiation } from "./socket.js";
 import { PlayerNegotiationApp } from "./store-negotiation-player.js";
+import { cleanDescriptionString } from "./item-display.js";
+import {
+    getWeaponSummary, getArmorSummary, buildTooltipContent
+} from "./item-stats.js";
+import {
+    isComparableCategory, getEquippedItem, buildComparisonData
+} from "./item-comparison.js";
+import { buildStoreCatalogIndex } from "./item-catalog.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api;
 
@@ -134,377 +142,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
              await this._handleCurrencyConversion(game.user.character);
         }
         return super.render(options, _options);
-    }
-
-    // --- Weapon / Armor Summaries ---
-
-    /**
-     * Generates the weapon summary string based on updated rules.
-     */
-    _getWeaponSummary(doc) {
-        try {
-            if (doc.type !== "weapon") return "";
-            const system = doc.system;
-            if (!system.attack) return "";
-
-            const traitRaw = String(system.attack.roll?.trait || "");
-            const weaponTrait = traitRaw.length >= 3 ? traitRaw.substring(0, 3).toUpperCase() : traitRaw.toUpperCase();
-
-            const rangeRaw = system.attack.range || "";
-            const rangeMap = {
-                "melee": "Melee", "veryClose": "Very Close", "close": "Close",
-                "far": "Far", "veryFar": "Very Far"
-            };
-            const weaponRange = rangeMap[rangeRaw] || (rangeRaw ? String(rangeRaw).charAt(0).toUpperCase() + String(rangeRaw).slice(1) : "");
-
-            const partsRaw = system.attack.damage?.parts;
-            const part0 = partsRaw
-                ? (Array.isArray(partsRaw) ? (partsRaw[0] || {}) : (Object.values(partsRaw)[0] || {}))
-                : {};
-            const val = part0.value || {};
-            const weaponCustom = val.custom?.enabled === true;
-            let damageSection = "";
-
-            if (weaponCustom) {
-                const formula = val.custom?.formula || "C";
-                const damageType = this._parseDamageTypes(part0.type, true);
-                damageSection = damageType ? `${formula}(${damageType})` : formula;
-            } else {
-                const weaponDamage = val.dice || "";
-                const damageType = this._parseDamageTypes(part0.type, true);
-                const bonusVal = val.bonus;
-                let weaponBonus = "";
-                if (bonusVal !== null && bonusVal !== undefined && String(bonusVal).trim() !== "") {
-                    weaponBonus = `+${bonusVal}`;
-                }
-                damageSection = `${weaponDamage}${weaponBonus}`;
-                if (damageType) damageSection += `(${damageType})`;
-            }
-
-            const burdenRaw = String(system.burden || "");
-            const burdenMap = { "1": "One-Handed", "2": "Two-Handed", "oneHanded": "One-Handed", "twoHanded": "Two-Handed" };
-            const weaponBurden = burdenMap[burdenRaw] || burdenRaw;
-
-            const parts = [weaponTrait, weaponRange, damageSection, weaponBurden];
-            return parts.filter(p => p && String(p).trim() !== "").join(" - ");
-        } catch (err) {
-            console.error(`${MODULE_ID} | Error generating weapon summary for ${doc.name}:`, err);
-            return "";
-        }
-    }
-
-    _getArmorSummary(doc) {
-        try {
-            if (doc.type !== "armor") return "";
-            const system = doc.system;
-            const baseScore = system.armor?.max ?? 0;
-            const baseThresholdsMajor = system.baseThresholds?.major ?? 0;
-            const baseThresholdsSevere = system.baseThresholds?.severe ?? 0;
-            return `Score: ${baseScore} - Thresholds: ${baseThresholdsMajor}/${baseThresholdsSevere}`;
-        } catch (err) {
-            console.error(`${MODULE_ID} | Error generating armor summary for ${doc.name}:`, err);
-            return "";
-        }
-    }
-
-    /**
-     * Parses damage type from the various formats Foundry can store it in.
-     * @param {*} typeRaw - The raw type value (string, array, Set, or object)
-     * @param {boolean} abbreviated - If true, returns 3-char abbreviations; otherwise full names
-     * @returns {string} Joined damage type string
-     */
-    _parseDamageTypes(typeRaw, abbreviated = false) {
-        let typesList = [];
-        if (Array.isArray(typeRaw)) {
-            typesList = typeRaw;
-        } else if (typeRaw instanceof Set) {
-            typesList = Array.from(typeRaw);
-        } else if (typeof typeRaw === "string") {
-            typesList = typeRaw.includes(",") ? typeRaw.split(",") : [typeRaw];
-        } else if (typeRaw && typeof typeRaw === "object") {
-            typesList = Object.values(typeRaw);
-        }
-
-        const fullNameMap = {
-            "physical": "Physical", "phy": "Physical",
-            "magic": "Magic", "mag": "Magic"
-        };
-
-        return typesList
-            .map(t => {
-                const s = String(t || "").trim();
-                if (!s) return "";
-                if (abbreviated) {
-                    return s.length >= 3 ? s.substring(0, 3).toUpperCase() : s.toUpperCase();
-                }
-                const lower = s.toLowerCase();
-                return fullNameMap[lower] || (s.charAt(0).toUpperCase() + s.slice(1));
-            })
-            .filter(t => t)
-            .join("/");
-    }
-
-    // --- Comparison Helpers ---
-
-    /**
-     * Checks if a category supports item comparison.
-     * @param {string} categoryId - The category ID
-     * @returns {boolean}
-     */
-    _isComparableCategory(categoryId) {
-        return ["primary", "secondary", "wheelchairs", "armors"].includes(categoryId);
-    }
-
-    /**
-     * Gets the currently equipped item for a given category.
-     * @param {Actor} actor - The actor to check
-     * @param {string} category - The category ID
-     * @returns {Item|null}
-     */
-    _getEquippedItem(actor, category) {
-        if (!actor) return null;
-        switch (category) {
-            case "primary":
-                return actor.items.find(x => x.type === "weapon" && x.system.equipped && !x.system.secondary && !x.name.includes("Wheelchair"));
-            case "secondary":
-                return actor.items.find(x => x.type === "weapon" && x.system.equipped && x.system.secondary && !x.name.includes("Wheelchair"));
-            case "wheelchairs":
-                return actor.items.find(x => x.type === "weapon" && x.system.equipped && !x.system.secondary);
-            case "armors":
-                return actor.items.find(x => x.type === "armor" && x.system.equipped);
-            default:
-                return null;
-        }
-    }
-
-    /**
-     * Cleans unsafe HTML from a description for tooltip display.
-     * Store tags no longer exist in descriptions after migration to flags.
-     * @param {string} html - The raw HTML description
-     * @returns {string}
-     */
-    _cleanDescription(html) {
-        if (!html) return "";
-        return String(html)
-            .replace(/<(?!\/?(?:p|br)\b)[^>]*>/gi, '')
-            .trim()
-            .substring(0, 300);
-    }
-
-    /**
-     * Extracts weapon stats from a document.
-     * @param {Item} doc - The weapon item document
-     * @returns {Object}
-     */
-    _extractWeaponStats(doc) {
-        try {
-            const system = doc.system;
-            if (!system.attack) return {};
-
-            const traitMap = {
-                "agility": "Agility", "strength": "Strength", "finesse": "Finesse",
-                "instinct": "Instinct", "presence": "Presence", "knowledge": "Knowledge",
-                "agi": "Agility", "str": "Strength", "fin": "Finesse",
-                "ins": "Instinct", "pre": "Presence", "kno": "Knowledge"
-            };
-            const traitRaw = String(system.attack.roll?.trait || "").toLowerCase();
-            const trait = traitMap[traitRaw] || (traitRaw ? traitRaw.charAt(0).toUpperCase() + traitRaw.slice(1) : "");
-
-            const rangeRaw = system.attack.range || "";
-            const rangeMap = {
-                "melee": "Melee", "veryClose": "Very Close", "close": "Close",
-                "far": "Far", "veryFar": "Very Far"
-            };
-            const range = rangeMap[rangeRaw] || (rangeRaw ? String(rangeRaw).charAt(0).toUpperCase() + String(rangeRaw).slice(1) : "");
-
-            const partsRaw = system.attack.damage?.parts;
-            const part0 = partsRaw
-                ? (Array.isArray(partsRaw) ? (partsRaw[0] || {}) : (Object.values(partsRaw)[0] || {}))
-                : {};
-            const val = part0.value || {};
-            const isCustom = val.custom?.enabled === true;
-            let damageDisplay = "";
-            let damageType = "";
-
-            if (isCustom) {
-                damageDisplay = "Custom";
-            } else {
-                const weaponDamage = val.dice || "";
-                damageType = this._parseDamageTypes(part0.type, false);
-
-                const bonusVal = val.bonus;
-                let weaponBonus = "";
-                if (bonusVal !== null && bonusVal !== undefined && String(bonusVal).trim() !== "") {
-                    weaponBonus = `+${bonusVal}`;
-                }
-                damageDisplay = `${weaponDamage}${weaponBonus}`;
-                if (damageType) damageDisplay += ` (${damageType})`;
-            }
-
-            const isDirect = system.attack.damage?.direct === true;
-            const burdenRaw = String(system.burden || "");
-            const burdenMap = { "1": "One-Handed", "2": "Two-Handed", "oneHanded": "One-Handed", "twoHanded": "Two-Handed" };
-            const burden = burdenMap[burdenRaw] || burdenRaw;
-
-            const features = [];
-            const weaponFeatures = system.weaponFeatures || [];
-            for (const feature of weaponFeatures) {
-                const featureValue = feature.value;
-                if (featureValue) {
-                    try {
-                        const featureName = featureValue.charAt(0).toUpperCase() + featureValue.slice(1);
-                        const featureDesc = game.i18n.localize(`${CONFIG.DH.ITEM.weaponFeatures[featureValue]?.description}`) || "";
-                        if (featureDesc) features.push({ name: featureName, description: featureDesc });
-                    } catch (e) { /* Feature not found in config, skip */ }
-                }
-            }
-
-            return { trait, range, damageDisplay, damageType, isDirect, burden, features };
-        } catch (err) {
-            console.error(`${MODULE_ID} | Error extracting weapon stats:`, err);
-            return {};
-        }
-    }
-
-    /**
-     * Extracts armor stats from a document.
-     * @param {Item} doc - The armor item document
-     * @returns {Object}
-     */
-    _extractArmorStats(doc) {
-        try {
-            const system = doc.system;
-            const features = [];
-            const armorFeatures = system.armorFeatures || [];
-            for (const feature of armorFeatures) {
-                const featureValue = feature.value;
-                if (featureValue) {
-                    try {
-                        const featureName = featureValue.charAt(0).toUpperCase() + featureValue.slice(1);
-                        const featureDesc = game.i18n.localize(`${CONFIG.DH.ITEM.armorFeatures[featureValue]?.description}`) || "";
-                        if (featureDesc) features.push({ name: featureName, description: featureDesc });
-                    } catch (e) { /* Feature not found in config, skip */ }
-                }
-            }
-            return {
-                baseScore: system.armor?.max ?? 0,
-                thresholdMajor: system.baseThresholds?.major ?? 0,
-                thresholdSevere: system.baseThresholds?.severe ?? 0,
-                features
-            };
-        } catch (err) {
-            console.error(`${MODULE_ID} | Error extracting armor stats:`, err);
-            return { baseScore: 0, thresholdMajor: 0, thresholdSevere: 0, features: [] };
-        }
-    }
-
-    /**
-     * Formats an item for comparison display.
-     * @param {Item} item - The item to format
-     * @returns {Object|null}
-     */
-    _formatItemForComparison(item) {
-        if (!item) return null;
-        const isWeapon = item.type === "weapon";
-        const rawDesc = foundry.utils.getProperty(item, "system.description.value") ||
-                        foundry.utils.getProperty(item, "system.description") || "";
-        const base = {
-            name: item.name, img: item.img,
-            tier: getItemTier(item),
-            description: this._cleanDescription(rawDesc),
-            isWeapon
-        };
-        if (isWeapon) return { ...base, ...this._extractWeaponStats(item) };
-        return { ...base, ...this._extractArmorStats(item) };
-    }
-
-    /**
-     * Builds comparison data for the tooltip.
-     * @param {string} storeItemUuid - UUID of the store item
-     * @param {string} category - The category ID
-     * @param {Actor} actor - The player's actor
-     * @returns {Promise<Object>}
-     */
-    async _buildComparisonData(storeItemUuid, category, actor) {
-        const storeDoc = await fromUuid(storeItemUuid);
-        if (!storeDoc) return null;
-
-        const equippedItem = this._getEquippedItem(actor, category);
-        const equipped = this._formatItemForComparison(equippedItem);
-        const storeItem = this._formatItemForComparison(storeDoc);
-
-        if (equipped && storeItem) this._addComparisonIndicators(equipped, storeItem);
-
-        return { equipped, storeItem, hasEquipped: !!equippedItem };
-    }
-
-    /**
-     * Adds comparison indicators (up/down arrows, colors) to the store item.
-     */
-    _addComparisonIndicators(equipped, storeItem) {
-        const rangeOrder = ["Melee", "Very Close", "Close", "Far", "Very Far"];
-
-        if (storeItem.isWeapon && equipped.isWeapon) {
-            const equippedRangeIdx = rangeOrder.indexOf(equipped.range);
-            const storeRangeIdx = rangeOrder.indexOf(storeItem.range);
-            if (equippedRangeIdx !== -1 && storeRangeIdx !== -1) {
-                if (storeRangeIdx > equippedRangeIdx) storeItem.rangeCompare = "up";
-                else if (storeRangeIdx < equippedRangeIdx) storeItem.rangeCompare = "down";
-            }
-
-            const equippedDamage = this._parseDamageValue(equipped.damageDisplay);
-            const storeDamage = this._parseDamageValue(storeItem.damageDisplay);
-            if (equippedDamage !== null && storeDamage !== null) {
-                if (storeDamage > equippedDamage) storeItem.damageCompare = "up";
-                else if (storeDamage < equippedDamage) storeItem.damageCompare = "down";
-            }
-
-            this._compareFeatures(equipped, storeItem);
-        } else if (!storeItem.isWeapon && !equipped.isWeapon) {
-            if (storeItem.baseScore > equipped.baseScore) storeItem.baseScoreCompare = "up";
-            else if (storeItem.baseScore < equipped.baseScore) storeItem.baseScoreCompare = "down";
-
-            if (storeItem.thresholdMajor > equipped.thresholdMajor) storeItem.thresholdMajorCompare = "up";
-            else if (storeItem.thresholdMajor < equipped.thresholdMajor) storeItem.thresholdMajorCompare = "down";
-
-            if (storeItem.thresholdSevere > equipped.thresholdSevere) storeItem.thresholdSevereCompare = "up";
-            else if (storeItem.thresholdSevere < equipped.thresholdSevere) storeItem.thresholdSevereCompare = "down";
-
-            this._compareFeatures(equipped, storeItem);
-        }
-    }
-
-    /**
-     * Compares features between equipped and store item, marking gained/lost features.
-     */
-    _compareFeatures(equipped, storeItem) {
-        if (equipped.features && equipped.features.length > 0) {
-            const storeFeatureNames = (storeItem.features || []).map(f => f.name.toLowerCase());
-            storeItem.lostFeatures = equipped.features
-                .filter(f => !storeFeatureNames.includes(f.name.toLowerCase()));
-        }
-        if (storeItem.features && storeItem.features.length > 0) {
-            const equippedFeatureNames = (equipped.features || []).map(f => f.name.toLowerCase());
-            storeItem.features.forEach(f => {
-                f.isGained = !equippedFeatureNames.includes(f.name.toLowerCase());
-            });
-        }
-    }
-
-    /**
-     * Parses a damage display string and returns a comparable numeric value.
-     * @param {string} damageStr - The damage string
-     * @returns {number|null}
-     */
-    _parseDamageValue(damageStr) {
-        if (!damageStr || damageStr === "Custom") return null;
-        const cleanStr = damageStr.replace(/\s*\([^)]*\)\s*$/, "").trim();
-        const match = cleanStr.match(/^(\d*)d(\d+)(?:\+(\d+))?$/i);
-        if (!match) return null;
-        const numDice = parseInt(match[1]) || 1;
-        const dieSize = parseInt(match[2]);
-        const bonus = parseInt(match[3]) || 0;
-        return numDice * ((dieSize + 1) / 2) + bonus;
     }
 
     // --- Currency Conversion (update_all mode) ---
@@ -632,8 +269,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const canBuyParty = hasPartyActor && hasActor && (combinedWealth >= finalPrice) && !isPurchaseBlocked;
 
         let itemSummary = "";
-        if (doc.type === "weapon") itemSummary = this._getWeaponSummary(doc);
-        else if (doc.type === "armor") itemSummary = this._getArmorSummary(doc);
+        if (doc.type === "weapon") itemSummary = getWeaponSummary(doc);
+        else if (doc.type === "armor") itemSummary = getArmorSummary(doc);
 
         let isRecommended = false;
         if (hasActor && !isGM && doc.type === "weapon") {
@@ -699,7 +336,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
      * @returns {Promise<Array>} Alphabetically sorted array of sell-tab item data objects
      */
     async _buildSellTabItems({ userActor, sellRatio, blockedSaleItems, priceOverrides, priceMod, useDefaultCompendiums, customCompendiums, customTabCompendiums }) {
-        const catalogIndex = await this._buildStoreCatalogIndex({
+        const catalogIndex = await buildStoreCatalogIndex({
             priceMod, priceOverrides, useDefaultCompendiums, customCompendiums, customTabCompendiums
         });
 
@@ -756,80 +393,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
     }
 
     /**
-     * Builds a Map of every store item name to its catalog metadata, spanning all
-     * configured compendiums (default + custom categories + custom tab).
-     * Used exclusively by the sell tab to validate and price the player's inventory.
-     * Hidden items are included by design: store visibility does not affect sellability.
-     * @param {Object} opts
-     * @param {number} opts.priceMod - Global price modifier (percentage / 100)
-     * @param {Object} opts.priceOverrides - Manual price overrides, keyed by item name
-     * @param {boolean} opts.useDefaultCompendiums - Whether default system compendiums are active
-     * @param {Array} opts.customCompendiums - Custom per-category compendium config objects
-     * @param {Array} opts.customTabCompendiums - Custom tab compendium pack IDs
-     * @returns {Promise<Map<string, {basePrice: number, img: string, uuid: string}>>}
-     */
-    async _buildStoreCatalogIndex({ priceMod, priceOverrides, useDefaultCompendiums, customCompendiums, customTabCompendiums }) {
-        const catalog = new Map();
-        const seenNames = new Set();
-
-        // --- Default system compendiums (standard category packs) ---
-        if (useDefaultCompendiums) {
-            const defaultPackIds = [...new Set(Object.values(PACK_MAPPING))];
-            const results = await Promise.all(
-                defaultPackIds.map(id => game.packs.get(id)?.getDocuments() ?? Promise.resolve([]))
-            );
-            for (const docs of results) {
-                for (const doc of docs) {
-                    if (seenNames.has(doc.name)) continue;
-                    seenNames.add(doc.name);
-
-                    const originalName = getOriginalName(doc);
-                    let basePrice = 0;
-                    // Search all category price tables; items can appear under multiple keys
-                    for (const catKey of Object.keys(PRICE_DATA)) {
-                        if (PRICE_DATA[catKey][originalName]) {
-                            basePrice = Math.ceil(PRICE_DATA[catKey][originalName].price * priceMod);
-                            break;
-                        }
-                    }
-                    if (priceOverrides.hasOwnProperty(doc.name)) basePrice = priceOverrides[doc.name];
-
-                    const rawDesc = String(foundry.utils.getProperty(doc, "system.description.value") ||
-                                          foundry.utils.getProperty(doc, "system.description") || "");
-                    catalog.set(doc.name, { basePrice, img: doc.img, uuid: doc.uuid, description: this._cleanDescriptionString(rawDesc) });
-                }
-            }
-        }
-
-        // --- Custom category compendiums + custom tab compendiums ---
-        const customCategoryPackIds = (customCompendiums || [])
-            .filter(c => c?.pack)
-            .map(c => c.pack);
-        const customTabPackIds = (customTabCompendiums || [])
-            .filter(p => p?.trim());
-        const allCustomPackIds = [...new Set([...customCategoryPackIds, ...customTabPackIds])];
-
-        const customResults = await Promise.all(
-            allCustomPackIds.map(id => game.packs.get(id)?.getDocuments() ?? Promise.resolve([]))
-        );
-        for (const docs of customResults) {
-            for (const doc of docs) {
-                if (seenNames.has(doc.name)) continue;
-                seenNames.add(doc.name);
-
-                let basePrice = extractPriceFromDescription(doc);
-                if (priceOverrides.hasOwnProperty(doc.name)) basePrice = priceOverrides[doc.name];
-
-                const rawDescCustom = String(foundry.utils.getProperty(doc, "system.description.value") ||
-                                            foundry.utils.getProperty(doc, "system.description") || "");
-                catalog.set(doc.name, { basePrice, img: doc.img, uuid: doc.uuid, description: this._cleanDescriptionString(rawDescCustom) });
-            }
-        }
-
-        return catalog;
-    }
-
-    /**
      * Fetches stock data for an item and returns stock-related fields.
      * @param {string} uuid - The item UUID
      * @param {boolean} stockEnabled - Whether stock system is active
@@ -859,44 +422,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
      */
     _extractHeaderTag(item) {
         return getItemHeader(item);
-    }
-
-    /**
-     * Cleans a description string by removing unsafe HTML.
-     * Store tags no longer exist in descriptions after migration to flags.
-     * @param {string} descString - The raw description string
-     * @returns {string}
-     */
-    _cleanDescriptionString(descString) {
-        return descString
-            .replace(/<(?!\/?(?:p|br)\b)[^>]*>/gi, '')
-            .trim();
-    }
-
-    /**
-     * Builds the full tooltip HTML for an item, merging the text description and
-     * any weapon/armor features into a single string safe for `data-item-desc`.
-     * Uses only tags permitted by the tooltip sanitizer: <p>, <br>, <hr>, <strong>.
-     * @param {Item} doc - The item document
-     * @param {string} cleanDesc - Pre-cleaned description HTML
-     * @returns {string} Combined tooltip HTML, or empty string if nothing to show
-     */
-    _buildTooltipContent(doc, cleanDesc) {
-        let features = [];
-        if (doc.type === "weapon") {
-            features = this._extractWeaponStats(doc).features || [];
-        } else if (doc.type === "armor") {
-            features = this._extractArmorStats(doc).features || [];
-        }
-
-        if (features.length === 0) return cleanDesc;
-
-        const featuresHtml = features
-            .map(f => `<p><strong>${f.name}:</strong> ${f.description}</p>`)
-            .join("");
-
-        if (cleanDesc) return `${cleanDesc}<hr>${featuresHtml}`;
-        return featuresHtml;
     }
 
     /**
@@ -1167,11 +692,11 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                                 const isSecondary = foundry.utils.getProperty(doc, "system.secondary") === true;
                                 compareCategory = isSecondary ? "secondary" : "primary";
                                 canCompare = true;
-                                hasEquippedItem = !!this._getEquippedItem(userActor, compareCategory);
+                                hasEquippedItem = !!getEquippedItem(userActor, compareCategory);
                             } else if (doc.type === "armor") {
                                 compareCategory = "armors";
                                 canCompare = true;
-                                hasEquippedItem = !!this._getEquippedItem(userActor, compareCategory);
+                                hasEquippedItem = !!getEquippedItem(userActor, compareCategory);
                             }
                         }
 
@@ -1183,11 +708,11 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         // Use masked description when dh-unidentified marks this item as unidentified.
                         const { maskedDescription: customTabMaskedDesc } = getUnidentifiedDisplayData(doc);
                         if (customTabMaskedDesc !== null) {
-                            itemData.description = this._cleanDescriptionString(customTabMaskedDesc);
+                            itemData.description = cleanDescriptionString(customTabMaskedDesc);
                         } else {
                             const rawDesc = String(foundry.utils.getProperty(doc, "system.description.value") ||
                                                    foundry.utils.getProperty(doc, "system.description") || "");
-                            itemData.description = this._buildTooltipContent(doc, this._cleanDescriptionString(rawDesc));
+                            itemData.description = buildTooltipContent(doc, cleanDescriptionString(rawDesc));
                         }
                         Object.assign(itemData, stockFields);
 
@@ -1284,8 +809,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
                     const header = this._extractHeaderTag(doc);
 
-                    const canCompare = !isGM && hasActor && this._isComparableCategory(cat.id);
-                    const hasEquippedItem = canCompare && !!this._getEquippedItem(userActor, cat.id);
+                    const canCompare = !isGM && hasActor && isComparableCategory(cat.id);
+                    const hasEquippedItem = canCompare && !!getEquippedItem(userActor, cat.id);
 
                     const stockFields = await this._getStockFields(doc.uuid, stockEnabled, showStockQuantity);
                     const itemData = this._buildItemData(doc, {
@@ -1295,11 +820,11 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     // Use masked description when dh-unidentified marks this item as unidentified.
                     const { maskedDescription: stdMaskedDesc } = getUnidentifiedDisplayData(doc);
                     if (stdMaskedDesc !== null) {
-                        itemData.description = this._cleanDescriptionString(stdMaskedDesc);
+                        itemData.description = cleanDescriptionString(stdMaskedDesc);
                     } else {
                         const rawDesc = String(foundry.utils.getProperty(doc, "system.description.value") ||
                                                foundry.utils.getProperty(doc, "system.description") || "");
-                        itemData.description = this._buildTooltipContent(doc, this._cleanDescriptionString(rawDesc));
+                        itemData.description = buildTooltipContent(doc, cleanDescriptionString(rawDesc));
                     }
                     Object.assign(itemData, stockFields);
 
@@ -1624,7 +1149,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 compareTooltipTimeout = setTimeout(async () => {
                     document.querySelectorAll(".dhs-comparison-tooltip").forEach(t => t.remove());
 
-                    const comparisonData = await this._buildComparisonData(itemUuid, category, actor);
+                    const comparisonData = await buildComparisonData(itemUuid, category, actor);
                     if (!comparisonData) return;
 
                     const templatePath = "modules/daggerheart-store/templates/item-comparison.hbs";

@@ -1,3 +1,15 @@
+# 0.5.6
+
+- [Changed] **Maintainability Refactor** — extracted ~700 lines of pure helper functions from `store-app.js` into 5 focused modules to reduce AI context load and improve code organization. No behavioral changes.
+- [Added] `item-display.js` — pure string sanitizers and damage parsers (`cleanDescription`, `cleanDescriptionString`, `parseDamageTypes`, `parseDamageValue`). Used by stat extraction and tooltip building.
+- [Added] `item-stats.js` — weapon and armor stat extraction, comparison formatting (`getWeaponSummary`, `getArmorSummary`, `extractWeaponStats`, `extractArmorStats`, `formatItemForComparison`, `buildTooltipContent`).
+- [Added] `item-comparison.js` — item comparison helpers for the tooltip feature (`isComparableCategory`, `getEquippedItem`, `compareFeatures`, `addComparisonIndicators`, `buildComparisonData`).
+- [Added] `vendor-pricing.js` — vendor relationship and presence pricing math extracted and deduplicated (`getRelationMultiplier`, `getPresenceMultiplier`, `formatRelationBadge`, `formatPresenceBadge`, `formatTotalBadge`). Removed 3 duplicated formula blocks from `store-config.js`.
+- [Added] `item-catalog.js` — store catalog index builder (`buildStoreCatalogIndex`). Extracted from `store-app.js` as a pure async function.
+- [Changed] `store-app.js` reduced from 2304 to 1883 lines (-18%) by extracting pure helpers while preserving all action-bound methods and state-dependent render logic.
+- [Changed] `store-config.js` reduced from 958 to 910 lines (-5%) by consolidating 3 duplicated vendor-pricing formula blocks into parameterized helpers.
+- [Changed] Updated all call sites in `store-app.js` and `store-config.js` to import and use the new focused modules. Removed all stale `this._methodName` references.
+
 # 0.5.5
 
 - [Added] **Price Negotiations** — players can initiate a bargaining session with the GM. Player clicks "Bargain" button on an item (buy or sell), enters an opening offer, opens `PlayerNegotiationApp` window. GM receives `GMNegotiationApp` automatically. GM can counter, player can accept counter or submit final offer, GM accepts or rejects final. Global lock prevents concurrent negotiations. Feature is toggle-able in Store Config.
