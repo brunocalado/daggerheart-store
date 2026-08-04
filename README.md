@@ -21,7 +21,9 @@ A dynamic, interactive, and fully configurable store for the **Daggerheart** sys
 * **Real-Time Search:** Find the desired item instantly by typing its name. Clear the search with a single button.
 * **Visual Details:** Clear icons, names, and prices. Click on the item image to open the full compendium sheet.
 * **Automated Purchase:** Clicking "Buy" automatically deducts currency from the character sheet and adds the item to the inventory.
-* **💰 Sell System:** Sell items from your inventory directly to the store. The sell value is configurable by the GM.
+* **💰 Sell System:** Sell items from your inventory directly to the store, split into "Store Items" (catalog- or GM-priced) and "Other Items — Negotiation Only" (unpriced items, sellable only by proposing your own offer). The sell value is configurable by the GM.
+* **🎒 Party Inventory:** Players with Owner permission on the configured Party Actor get a second tab to sell items straight from the party's shared inventory, crediting the party's wealth instead of their own.
+* **🤝 Price Negotiations:** Click "Bargain" on a buy or sell item to open a negotiation with the GM — propose an offer, receive counter-offers, and accept or settle in real time, with your funds protected from ending up negative on an accepted deal.
 * **✨ Auto-Treasure Conversion:** Automatically converts *Handfuls*, *Bags*, and *Chests* into coins when the store is opened.
 * **Party Funds & Split Payment:** View Party Wealth and split the cost of purchases between your character and the Party's treasury.
 * **Visual & Audio Feedback:** Coin sounds upon purchase/sale and stylized chat messages confirm the transaction.
@@ -43,6 +45,8 @@ A dynamic, interactive, and fully configurable store for the **Daggerheart** sys
 * **Dynamic Pricing:**
   * **Global Multiplier:** Adjust world inflation (e.g., 50% to 300%) using a slider.
   * **Manual Override:** Change the price of any individual item on the fly.
+
+* **Price Negotiations:** Toggle player bargaining on/off in Store Config. When a player negotiates, a reactive window opens automatically letting you counter, accept, or reject their offer — deals are blocked from finalizing if the player can no longer afford the agreed price.
 
 * **Inventory Management:**
   * **Visibility Toggle, Block Sales and Block Purchases:** Full per-item control.
