@@ -17,6 +17,19 @@ export const SELL_TAB = {
     iconOnly: true
 };
 
+/**
+ * Party inventory tab definition — prepended right after the sell tab for
+ * non-GM players when a Party Actor is configured. Icon-only, same square
+ * layout as SELL_TAB. Shows the Party Actor's items and lets players sell
+ * them directly, mirroring the personal "My Inventory" tab.
+ */
+export const PARTY_SELL_TAB = {
+    id: "party-sell",
+    label: "Party Inventory",
+    icon: "fa-users",
+    iconOnly: true
+};
+
 /** Standard store categories with their display labels and data keys */
 export const STANDARD_CATEGORIES = [
     { id: "primary", label: "Primary Weapons", key: "Primary Weapons" },

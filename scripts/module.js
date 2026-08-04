@@ -4,7 +4,7 @@ import { StoreItemTagger } from "./store-item-tagger.js";
 import { StoreWelcome } from "./store-welcome.js";
 import { StockManager } from "./stock-manager.js";
 import { migrateTags } from "./store-migration.js";
-import { registerQueryHandlers, queryCancelNegotiation } from "./socket.js";
+import { registerQueryHandlers, queryCancelNegotiation, querySellFromParty } from "./socket.js";
 import { MODULE_ID, NEGOTIATION_FLAG_KEY, NEGOTIATION_STAGES } from "./store-constants.js";
 import { GMNegotiationApp } from "./store-negotiation-gm.js";
 import { addGold, getActorWealth, createStoreChatMessage } from "./store-utils.js";
@@ -274,6 +274,7 @@ Hooks.once("init", () => {
         "modules/daggerheart-store/templates/partials/store-gm-controls.hbs",
         "modules/daggerheart-store/templates/partials/store-player-controls.hbs",
         "modules/daggerheart-store/templates/partials/store-sell-tab.hbs",
+        "modules/daggerheart-store/templates/partials/store-party-sell-tab.hbs",
         "modules/daggerheart-store/templates/partials/config-general-tab.hbs",
         "modules/daggerheart-store/templates/partials/config-categories-tab.hbs",
         "modules/daggerheart-store/templates/partials/config-tiers-tab.hbs",
@@ -530,6 +531,22 @@ Hooks.on("updateActor", async (actor, changes, options, userId) => {
                         recipient: userActor,
                         payers:    [{ actor: userActor, amount: fullFlag.agreedPrice, name: userActor.name }]
                     });
+                }
+            } else if (fullFlag.itemSource === "party") {
+                // Sell from the Party Actor: delegated to the GM since players only
+                // hold Observer access on it. Proceeds go to the party's own wealth.
+                const partyActorId = game.settings.get(MODULE_ID, "partyActorId");
+                if (fullFlag.itemId && partyActorId) {
+                    const sellResult = await querySellFromParty(partyActorId, fullFlag.itemId, fullFlag.agreedPrice);
+                    if (!sellResult.ok) {
+                        ui.notifications.error("Could not complete the party sale. The item may already be gone.");
+                    } else {
+                        const stockEnabled = game.settings.get(MODULE_ID, "stockEnabled");
+                        if (stockEnabled && fullFlag.itemUuid) {
+                            const { StockManager } = await import("./stock-manager.js");
+                            await StockManager.incrementStock(fullFlag.itemUuid, 1);
+                        }
+                    }
                 }
             } else {
                 // Sell: delete the owned item and credit the agreed price.

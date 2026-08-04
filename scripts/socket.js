@@ -20,6 +20,7 @@ const Q = {
     incrementStock:    `${MODULE_ID}.incrementStock`,
     depositToParty:    `${MODULE_ID}.depositToParty`,
     withdrawFromParty: `${MODULE_ID}.withdrawFromParty`,
+    sellFromParty:     `${MODULE_ID}.sellFromParty`,
     startNegotiation:  `${MODULE_ID}.startNegotiation`,
     gmRespondNeg:      `${MODULE_ID}.gmRespondNeg`,
     cancelNegotiation: `${MODULE_ID}.cancelNegotiation`,
@@ -144,10 +145,33 @@ export function registerQueryHandlers() {
         }
     };
 
+    // --- Party Inventory: Sell ---
+    // Deletes an item from the Party Actor and credits the sale price to the
+    // party's own wealth (not the selling player's). Delegated to the GM
+    // because players only hold Observer access on the Party Actor.
+    CONFIG.queries[Q.sellFromParty] = async ({ partyActorId, itemId, amount }) => {
+        if (!game.user.isGM) return { ok: false, reason: "not_gm" };
+
+        const partyActor = game.actors.get(partyActorId);
+        if (!partyActor) return { ok: false, reason: "no_party_actor" };
+
+        const item = partyActor.items.get(itemId);
+        if (!item) return { ok: false, reason: "item_not_found" };
+
+        try {
+            await item.delete();
+            await addGold(partyActor, amount);
+            return { ok: true };
+        } catch (err) {
+            console.error(`${MODULE_ID} | sellFromParty query failed:`, err);
+            return { ok: false, reason: "update_failed" };
+        }
+    };
+
     // --- Negotiation: Start ---
     // Player initiates a price negotiation. Checks the global lock and writes
     // the initial negotiation state to the Party Actor flags.
-    CONFIG.queries[Q.startNegotiation] = async ({ playerId, playerName, itemUuid, itemId, itemName, basePrice, type, playerOffer }) => {
+    CONFIG.queries[Q.startNegotiation] = async ({ playerId, playerName, itemUuid, itemId, itemName, basePrice, type, itemSource, playerOffer }) => {
         if (!game.user.isGM) return { ok: false, reason: "not_gm" };
 
         if (!game.settings.get(MODULE_ID, "negotiationsEnabled"))
@@ -171,6 +195,9 @@ export function registerQueryHandlers() {
                 itemName,
                 basePrice,
                 type,
+                // "personal" (default) deletes from the player's own character on accept;
+                // "party" deletes from the Party Actor via the sellFromParty query instead.
+                itemSource:  itemSource ?? "personal",
                 playerOffer,
                 gmCounter:   null,
                 agreedPrice: null,
@@ -389,6 +416,30 @@ export async function queryWithdrawFromParty(partyActorId, amount) {
     }
 }
 
+/**
+ * Requests the GM to delete an item from the Party Actor and credit the
+ * sale price to the party's wealth.
+ * @param {string} partyActorId - Party Actor ID
+ * @param {string} itemId - ID of the item to delete from the Party Actor
+ * @param {number} amount - Sale price to credit to the party
+ * @returns {Promise<{ok: boolean, reason?: string}>}
+ */
+export async function querySellFromParty(partyActorId, itemId, amount) {
+    if (game.user.isGM) {
+        return await CONFIG.queries[Q.sellFromParty]({ partyActorId, itemId, amount });
+    }
+
+    const gm = game.users.activeGM;
+    if (!gm) return { ok: false, reason: "no_gm" };
+
+    try {
+        return await gm.query(Q.sellFromParty, { partyActorId, itemId, amount }, { timeout: 10000 });
+    } catch (err) {
+        console.error(`${MODULE_ID} | querySellFromParty timed out or failed:`, err);
+        return { ok: false, reason: "timeout" };
+    }
+}
+
 // ---------------------------------------------------------------
 // Negotiation query helpers
 // ---------------------------------------------------------------
@@ -396,7 +447,8 @@ export async function queryWithdrawFromParty(partyActorId, amount) {
 /**
  * Requests the GM to start a new price negotiation and set the Party Actor flag.
  * @param {{ playerId: string, playerName: string, itemUuid: string, itemId: string|null,
- *           itemName: string, basePrice: number, type: string, playerOffer: number }} params
+ *           itemName: string, basePrice: number, type: string, itemSource?: string,
+ *           playerOffer: number }} params
  * @returns {Promise<{ok: boolean, reason?: string}>}
  */
 export async function queryStartNegotiation(params) {

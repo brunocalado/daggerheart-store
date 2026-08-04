@@ -3,6 +3,7 @@
     {{! ── Title: who wants to do what ─────────────────── }}
     <h2 class="neg-title">
         {{playerName}} wants to {{#if (eq type "sell")}}sell{{else}}buy{{/if}}
+        {{#if (eq itemSource "party")}}<span class="neg-source-tag">(Party Inventory)</span>{{/if}}
     </h2>
 
     {{! ── Item header: icon + name + listed price ─────── }}

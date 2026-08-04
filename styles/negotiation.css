@@ -63,6 +63,15 @@
         letter-spacing: 0.03em;
     }
 
+    & .neg-source-tag {
+        margin-left:    6px;
+        font-size:      0.75rem;
+        font-weight:    600;
+        text-transform: none;
+        letter-spacing: normal;
+        color:          var(--dhs-text-muted);
+    }
+
     /* ── Item / request header ─── */
     & .neg-item-header {
         display:        flex;

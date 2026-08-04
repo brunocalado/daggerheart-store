@@ -1,0 +1,59 @@
+<div class="sell-tab party-sell-tab">
+    {{#if @root.partySellItems.length}}
+        {{#each @root.partySellItems}}
+        <div class="store-row {{#unless this.canSell}}gm-hidden-item{{/unless}}">
+
+            <div class="row-left">
+                <div class="item-icon-wrapper">
+                    <img src="{{this.img}}"
+                         title="Click to view details"
+                         class="item-image"
+                         data-uuid="{{this.catalogUuid}}"
+                         width="36" height="36" />
+                </div>
+
+                <span class="store-item-name" {{#if this.description}}data-item-desc="{{this.description}}"{{/if}}>{{this.name}}</span>
+            </div>
+
+            <div class="row-right">
+                <div class="price-display">
+                    <span class="item-price">
+                        <i class="fas fa-coins price-coin-icon"></i> {{this.sellPrice}}
+                    </span>
+                </div>
+
+                {{#if @root.negotiationsEnabled}}
+                    <button type="button"
+                            class="bargain-btn"
+                            data-action="negotiateItem"
+                            data-uuid="{{this.catalogUuid}}"
+                            data-item-id="{{this.itemId}}"
+                            data-price="{{this.sellPrice}}"
+                            data-name="{{this.name}}"
+                            data-img="{{this.img}}"
+                            data-type="sell"
+                            data-source="party"
+                            title="Negotiate Sell Price"
+                            {{#unless this.canSell}}disabled{{/unless}}>
+                        <i class="fas fa-handshake"></i>
+                    </button>
+                {{/if}}
+
+                <button type="button"
+                        class="sell-btn"
+                        data-action="sellPartyItem"
+                        data-name="{{this.name}}"
+                        data-uuid="{{this.catalogUuid}}"
+                        data-item-id="{{this.itemId}}"
+                        data-price="{{this.sellPrice}}"
+                        title="{{#if this.canSell}}Sell for {{this.sellPrice}}{{else}}Sale blocked for this item{{/if}}"
+                        {{#unless this.canSell}}disabled{{/unless}}>
+                    <i class="fas fa-hand-holding-dollar"></i> Sell
+                </button>
+            </div>
+        </div>
+        {{/each}}
+    {{else}}
+        <p class="empty-tab">The party inventory has no items registered in the store or tagged for sale.</p>
+    {{/if}}
+</div>

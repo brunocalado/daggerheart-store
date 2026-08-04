@@ -1,3 +1,9 @@
+# 0.5.8
+
+- https://github.com/brunocalado/daggerheart-store/issues/11
+- [Added] "Party Inventory" tab — a second icon-only tab next to "My Inventory", shown to players whenever a Party Actor is configured in Store Config. Lists the Party Actor's items with the same catalog-priced sell rows, negotiation (bargain), and stock behavior as the personal sell tab. Selling from it credits the party's own wealth instead of the seller's, and (like all other Party Actor writes) is delegated to the GM via a new `sellFromParty` query since players only hold Observer access on that actor. `PARTY_SELL_TAB` in `store-constants.js`, `_buildPartySellTabItems`/`_onSellPartyItem` in `store-app.js`, `store-party-sell-tab.hbs`.
+- [Added] Negotiating a sale from the new Party Inventory tab is tracked via an `itemSource` field ("personal" | "party") on the negotiation flag, so `module.js`'s trade-finalization hook knows to delete the item from the Party Actor (via `querySellFromParty`) rather than the player's own character. The GM's negotiation window now shows a "(Party Inventory)" tag next to the offer when applicable.
+
 # 0.5.7
 
 - [Fixed] Negotiated purchases could complete with a negative balance — a player could negotiate a price they couldn't afford and have the GM accept it, silently sending the actor's gold below zero. Negotiating below your current balance is still allowed (that's the point of bargaining), but finalizing the deal is now blocked once the agreed price exceeds the player's actual funds. Checked when the GM clicks Accept (`GMNegotiationApp._onAccept`) and when the player accepts a GM counter-offer (`socket.js` `gmRespondNeg` "accept" case), with a re-check right before purchase execution (`module.js`) as a safety net against funds changing mid-negotiation.

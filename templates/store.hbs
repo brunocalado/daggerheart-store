@@ -31,6 +31,8 @@
 
             {{#if (eq cat.id "sell")}}
                 {{> "modules/daggerheart-store/templates/partials/store-sell-tab.hbs"}}
+            {{else if (eq cat.id "party-sell")}}
+                {{> "modules/daggerheart-store/templates/partials/store-party-sell-tab.hbs"}}
             {{else}}
                 {{> "modules/daggerheart-store/templates/partials/store-search-bar.hbs"}}
 

@@ -3,7 +3,7 @@ import { StockManager } from "./stock-manager.js";
 import { StoreConfig } from "./store-config.js";
 import { StoreRandomizer } from "./store-randomizer.js";
 import {
-    MODULE_ID, STANDARD_CATEGORIES, CATEGORY_ITEM_TYPE, SELL_TAB, STORE_FLAGS,
+    MODULE_ID, STANDARD_CATEGORIES, CATEGORY_ITEM_TYPE, SELL_TAB, PARTY_SELL_TAB, STORE_FLAGS,
     NEGOTIATION_FLAG_KEY
 } from "./store-constants.js";
 import {
@@ -13,7 +13,7 @@ import {
     getEpicTextColor, getEpicBgColor,
     showStoreDialog, getUnidentifiedDisplayData
 } from "./store-utils.js";
-import { queryDepositToParty, queryWithdrawFromParty, queryStartNegotiation, queryCancelNegotiation } from "./socket.js";
+import { queryDepositToParty, queryWithdrawFromParty, querySellFromParty, queryStartNegotiation, queryCancelNegotiation } from "./socket.js";
 import { PlayerNegotiationApp } from "./store-negotiation-player.js";
 import { cleanDescriptionString } from "./item-display.js";
 import {
@@ -74,6 +74,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         actions: {
             buyItem: DaggerheartStore.prototype._onBuyItem,
             sellItem: DaggerheartStore.prototype._onSellItem,
+            sellPartyItem: DaggerheartStore.prototype._onSellPartyItem,
             openConfig: DaggerheartStore.prototype._onOpenConfig,
             openRandomizer: DaggerheartStore.prototype._onOpenRandomizer,
             resetPrice: DaggerheartStore.prototype._onResetPrice,
@@ -393,6 +394,72 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
     }
 
     /**
+     * Builds the flat list of items displayed in the player's Party Inventory tab.
+     * Identical strategy to `_buildSellTabItems`, but iterates the Party Actor's
+     * items instead of the player's own character.
+     * @param {Object} opts
+     * @param {Actor} opts.partyActor - The configured Party Actor
+     * @param {number} opts.sellRatio - Sell price multiplier applied to the base price
+     * @param {Object} opts.blockedSaleItems - Items blocked from selling, keyed by item name
+     * @param {Object} opts.priceOverrides - Manual price overrides, keyed by item name
+     * @param {number} opts.priceMod - Global price modifier applied to both catalog and flag prices
+     * @param {boolean} opts.useDefaultCompendiums - Whether default system compendiums are active
+     * @param {Array} opts.customCompendiums - Custom per-category compendium config objects
+     * @param {Array} opts.customTabCompendiums - Custom tab compendium pack IDs
+     * @returns {Promise<Array>} Alphabetically sorted array of party sell-tab item data objects
+     */
+    async _buildPartySellTabItems({ partyActor, sellRatio, blockedSaleItems, priceOverrides, priceMod, useDefaultCompendiums, customCompendiums, customTabCompendiums }) {
+        const catalogIndex = await buildStoreCatalogIndex({
+            priceMod, priceOverrides, useDefaultCompendiums, customCompendiums, customTabCompendiums
+        });
+
+        const sellItems = [];
+        for (const partyItem of partyActor.items) {
+            const entry = catalogIndex.get(partyItem.name);
+
+            if (!entry) {
+                const flagPrice = partyItem.getFlag(MODULE_ID, STORE_FLAGS.price);
+                if (!flagPrice || !getValidItemTypes().includes(partyItem.type)) continue;
+
+                const isSaleBlocked = !!blockedSaleItems[partyItem.name];
+                const basePrice = Math.ceil(flagPrice * priceMod);
+                const sellPrice = Math.floor(basePrice * sellRatio);
+
+                const { name: sellDisplayName, img: sellDisplayImg, maskedDescription: sellMaskedDesc } = getUnidentifiedDisplayData(partyItem);
+                sellItems.push({
+                    name: sellDisplayName,
+                    img: sellDisplayImg,
+                    sellPrice,
+                    canSell: !isSaleBlocked,
+                    isSaleBlocked,
+                    catalogUuid: null,
+                    description: sellMaskedDesc ?? "",
+                    itemId: partyItem.id
+                });
+                continue;
+            }
+
+            const isSaleBlocked = !!blockedSaleItems[partyItem.name];
+            const sellPrice = Math.floor(entry.basePrice * sellRatio);
+
+            const { isUnidentified: sellIsUnidentified, name: sellDisplayName, img: sellDisplayImg, maskedDescription: sellMaskedDesc } = getUnidentifiedDisplayData(partyItem);
+            sellItems.push({
+                name: sellDisplayName,
+                img: sellIsUnidentified ? sellDisplayImg : (partyItem.img || entry.img),
+                sellPrice,
+                canSell: !isSaleBlocked,
+                isSaleBlocked,
+                catalogUuid: entry.uuid,
+                description: sellMaskedDesc ?? (entry.description || ""),
+                itemId: partyItem.id
+            });
+        }
+
+        sellItems.sort((a, b) => a.name.localeCompare(b.name));
+        return sellItems;
+    }
+
+    /**
      * Fetches stock data for an item and returns stock-related fields.
      * @param {string} uuid - The item UUID
      * @param {boolean} stockEnabled - Whether stock system is active
@@ -472,6 +539,12 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         // so players only need Observer access (the default) to read gold data.
         // No ownership check needed here.
         let hasPartyActor = !!partyActor;
+
+        // The Party Inventory tab lists (and lets players delete) the actor's items
+        // directly in the UI, so it requires actual Owner permission — Observer access
+        // is not enough to justify showing it, even though the delete itself is
+        // delegated to the GM query.
+        const hasPartyActorOwnership = hasPartyActor && partyActor.isOwner;
 
         const userGold = userActor ? getActorWealth(userActor) : 0;
         const partyGold = partyActor ? getActorWealth(partyActor) : 0;
@@ -607,15 +680,18 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
         categories = categories.filter(c => !hiddenCategories[c.key]);
 
-        // Prepend the sell tab for non-GM players who have an assigned actor.
-        // The sell tab is not compendium-based so it is never subject to hiddenCategories.
-        if (!isGM && hasActor) {
-            categories.unshift({ ...SELL_TAB });
-        }
+        // Prepend the sell tab(s) for non-GM players. Neither is compendium-based,
+        // so they are never subject to hiddenCategories. Order: My Inventory, then
+        // Party Inventory (only when a Party Actor is configured).
+        const leadingTabs = [];
+        if (!isGM && hasActor) leadingTabs.push({ ...SELL_TAB });
+        if (!isGM && hasPartyActorOwnership) leadingTabs.push({ ...PARTY_SELL_TAB });
+        categories.unshift(...leadingTabs);
 
         context.categories = categories;
-        // Default sell items — populated below when the sell tab is the active one.
+        // Default sell items — populated below when the corresponding tab is active.
         context.sellItems = [];
+        context.partySellItems = [];
 
         if (categories.length > 0) {
             const currentTabExists = categories.find(c => c.id === this.activeTab);
@@ -640,6 +716,17 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     priceMod, useDefaultCompendiums, customCompendiums, customTabCompendiums
                 });
                 context.tabs["sell"] = [];
+                continue;
+            }
+
+            // Party inventory tab: same catalog-first strategy as the sell tab,
+            // but iterating the Party Actor's items instead of the player's own.
+            if (cat.id === "party-sell") {
+                context.partySellItems = await this._buildPartySellTabItems({
+                    partyActor, sellRatio, blockedSaleItems, priceOverrides,
+                    priceMod, useDefaultCompendiums, customCompendiums, customTabCompendiums
+                });
+                context.tabs["party-sell"] = [];
                 continue;
             }
 
@@ -1379,6 +1466,66 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         this.render();
     }
 
+    /**
+     * Sells an item out of the configured Party Actor's inventory.
+     * Mirrors `_onSellItem`, but the item write is delegated to the GM via
+     * `querySellFromParty` (players only hold Observer access on the Party
+     * Actor) and the sale proceeds are credited to the party's own wealth.
+     * Called from `data-action="sellPartyItem"` in the party inventory tab.
+     * @param {PointerEvent} event
+     * @param {HTMLElement}  target
+     */
+    async _onSellPartyItem(event, target) {
+        if (target.disabled) return;
+
+        const itemName = target.dataset.name;
+        const itemUuid = target.dataset.uuid;
+        const itemId = target.dataset.itemId;
+        const sellPrice = parseInt(target.dataset.price);
+
+        const partyActorId = game.settings.get(MODULE_ID, "partyActorId");
+        const partyActor = partyActorId ? game.actors.get(partyActorId) : null;
+        if (!partyActor) return ui.notifications.error("Party sheet is not configured.");
+        // Mirrors the Party Inventory tab's visibility rule — the tab is only rendered
+        // for Owners, but re-check here in case permission was revoked mid-session.
+        if (!partyActor.isOwner) return ui.notifications.error("You no longer have permission to sell from the party inventory.");
+
+        const blockedSaleItems = game.settings.get(MODULE_ID, "blockedSaleItems") || {};
+        if (blockedSaleItems[itemName]) return ui.notifications.warn("This item cannot be sold.");
+        if (!itemId) return ui.notifications.warn(`Could not find "${itemName}" in the party inventory.`);
+
+        const result = await querySellFromParty(partyActorId, itemId, sellPrice);
+        if (!result.ok) {
+            if (result.reason === "item_not_found") return ui.notifications.warn(`The party no longer has a "${itemName}" to sell.`);
+            return ui.notifications.error("Failed to sell the item from the party inventory.");
+        }
+
+        const stockEnabled = game.settings.get(MODULE_ID, "stockEnabled") && !!partyActor;
+        if (stockEnabled && itemUuid) await StockManager.incrementStock(itemUuid, 1);
+
+        const currency = getSystemCurrency();
+        const borderColor = this._getBorderColor("sell");
+        const sellerName = game.user.character?.name ?? game.user.name;
+        const body = `
+            <span style="color: #ffffff; font-size: 1.1em; font-weight: bold; font-family: 'Lato', sans-serif;">
+                <strong>${sellerName}</strong> sold <strong>${itemName}</strong> from the party inventory
+            </span>
+            <span style="color: #d4af37; font-size: 1.2em; font-weight: bold; margin-top: 10px;">
+                +${sellPrice} ${currency}
+            </span>`;
+
+        const chatData = {
+            content: buildChatCard({ title: "Item Sold", borderColor, body }),
+            speaker: ChatMessage.getSpeaker({ actor: game.user.character ?? partyActor })
+        };
+        const whisperTo = getChatWhisperRecipients();
+        if (whisperTo) chatData.whisper = whisperTo;
+        await createStoreChatMessage(chatData);
+
+        if (game.audio) foundry.audio.AudioHelper.play({ src: "modules/daggerheart-store/assets/audio/coins.mp3", volume: 0.8, loop: false }, false);
+        this.render();
+    }
+
     // ---------------------------------------------------------------
     // Negotiation
     // ---------------------------------------------------------------
@@ -1399,6 +1546,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const itemImg   = target.dataset.img   ?? "icons/svg/item-bag.svg";
         const basePrice = parseInt(target.dataset.price ?? "0");
         const type      = target.dataset.type  ?? "buy";
+        // Where the sold item is deleted from on acceptance: the player's own
+        // character ("personal", default) or the Party Actor ("party").
+        const itemSource = target.dataset.source ?? "personal";
 
         const userActor = game.user.character;
         if (!userActor) return ui.notifications.error("You need an assigned character.");
@@ -1406,6 +1556,12 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const partyActorId = game.settings.get(MODULE_ID, "partyActorId");
         const partyActor   = partyActorId ? game.actors.get(partyActorId) : null;
         if (!partyActor) return ui.notifications.error("Party Actor is not configured.");
+
+        // Mirrors the Party Inventory tab's visibility rule — re-check here in case
+        // permission was revoked mid-session.
+        if (itemSource === "party" && !partyActor.isOwner) {
+            return ui.notifications.error("You no longer have permission to sell from the party inventory.");
+        }
 
         // Check the global negotiation lock.
         const existing = partyActor.getFlag(MODULE_ID, NEGOTIATION_FLAG_KEY);
@@ -1496,6 +1652,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             itemName,
             basePrice,
             type,
+            itemSource,
             playerOffer
         });
 

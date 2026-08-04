@@ -116,6 +116,7 @@ export class GMNegotiationApp extends HandlebarsApplicationMixin(ApplicationV2) 
             itemUuid:    flag.itemUuid    ?? "",
             basePrice:   flag.basePrice   ?? 0,
             type:        flag.type        ?? "buy",
+            itemSource:  flag.itemSource  ?? "personal",
             playerOffer: flag.playerOffer ?? 0,
             gmCounter:   flag.gmCounter   ?? null,
             currency:    getSystemCurrency(),
