@@ -4,7 +4,7 @@
     <div class="neg-item-header">
         <span class="neg-item-name">{{itemName}}</span>
         <span class="neg-base-price">
-            Listed: <strong>{{basePrice}} {{currency}}</strong>
+            {{#if basePrice}}Listed: <strong>{{basePrice}} {{currency}}</strong>{{else}}Listed: <em>no fixed price</em>{{/if}}
             {{#if (eq type "sell")}}
                 <span class="neg-type-badge sell">Selling</span>
             {{else}}

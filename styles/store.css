@@ -169,6 +169,16 @@
             color: #c06060;
             text-shadow: 0 2px 4px #000;
         }
+
+        /* Second header in the sell tabs — items with no catalog/flag price,
+           sellable only through negotiation. */
+        &.unpriced-separator {
+            background: linear-gradient(to right, #1c1c1c, var(--dhs-bg));
+            border-color: var(--dhs-border-mid);
+            border-left-color: var(--dhs-text-muted);
+            color: var(--dhs-text-muted);
+            text-shadow: 0 2px 4px #000;
+        }
     }
 
     /* ---- ITEM NAMES & STATS ---- */
@@ -683,6 +693,15 @@
                 font-weight: normal;
                 text-decoration: line-through;
             }
+        }
+
+        &.no-price {
+            background: transparent;
+            border: 1px dashed var(--dhs-border-mid);
+            color: var(--dhs-text-muted);
+            font-style: italic;
+            font-weight: normal;
+            font-size: 0.85em;
         }
     }
 

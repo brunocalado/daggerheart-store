@@ -1,3 +1,9 @@
+# 0.5.9
+
+- [Fixed] The new "Party Inventory" tab could fail to render with "The partial ... store-party-sell-tab.hbs could not be found" — the partial was never registered in `module.js`'s `loadTemplates` preload list.
+- [Added] The "Party Inventory" tab now only appears for players with actual Owner permission on the configured Party Actor (Observer access, the default, is no longer enough). Re-checked defensively in `_onSellPartyItem` and `_onNegotiateItem` in case permission changes mid-session.
+- [Added] Both "My Inventory" and "Party Inventory" now list items under two headers: "Store Items" (unchanged — catalog- or flag-priced items) and "Other Items — Negotiation Only", covering items of an accepted type (weapon/armor/consumable/loot) with no catalog match and no price flag, e.g. something created on the fly that hasn't been priced yet. These can only be sold through the negotiation flow, where the player proposes their own offer — no direct Sell button is shown for them.
+
 # 0.5.8
 
 - https://github.com/brunocalado/daggerheart-store/issues/11

@@ -13,7 +13,7 @@
                  title="Click to view item" width="36" height="36">
             <span class="neg-item-name">{{itemName}}</span>
         </div>
-        <span class="neg-base-price">Listed: <strong>{{basePrice}} {{currency}}</strong></span>
+        <span class="neg-base-price">{{#if basePrice}}Listed: <strong>{{basePrice}} {{currency}}</strong>{{else}}Listed: <em>no fixed price</em>{{/if}}</span>
     </div>
 
     {{! ── Stage: initial offer from player ───────────── }}
@@ -36,7 +36,7 @@
                 <div class="neg-input-wrapper">
                     <input type="number" name="counterOffer" id="counterOffer" class="neg-input"
                            min="1" step="1"
-                           value="{{basePrice}}"
+                           value="{{#if basePrice}}{{basePrice}}{{else}}1{{/if}}"
                            placeholder="Your counter-offer">
                     <span class="neg-input-suffix">{{currency}}</span>
                 </div>

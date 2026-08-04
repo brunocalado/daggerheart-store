@@ -1,4 +1,5 @@
 <div class="sell-tab">
+    <div class="tier-separator">Store Items</div>
     {{#if @root.sellItems.length}}
         {{#each @root.sellItems}}
         <div class="store-row {{#unless this.canSell}}gm-hidden-item{{/unless}}">
@@ -54,5 +55,47 @@
         {{/each}}
     {{else}}
         <p class="empty-tab">Your inventory has no items registered in the store or tagged for sale.</p>
+    {{/if}}
+
+    {{#if @root.sellItemsUnpriced.length}}
+    <div class="tier-separator unpriced-separator">Other Items — Negotiation Only</div>
+        {{#each @root.sellItemsUnpriced}}
+        <div class="store-row {{#unless this.canSell}}gm-hidden-item{{/unless}}">
+
+            <div class="row-left">
+                <div class="item-icon-wrapper">
+                    <img src="{{this.img}}"
+                         title="Click to view details"
+                         class="item-image"
+                         data-uuid="{{this.catalogUuid}}"
+                         width="36" height="36" />
+                </div>
+
+                <span class="store-item-name" {{#if this.description}}data-item-desc="{{this.description}}"{{/if}}>{{this.name}}</span>
+            </div>
+
+            <div class="row-right">
+                <div class="price-display">
+                    <span class="item-price no-price">No price — negotiate to sell</span>
+                </div>
+
+                {{#if @root.negotiationsEnabled}}
+                    <button type="button"
+                            class="bargain-btn"
+                            data-action="negotiateItem"
+                            data-uuid="{{this.catalogUuid}}"
+                            data-item-id="{{this.itemId}}"
+                            data-price="{{this.sellPrice}}"
+                            data-name="{{this.name}}"
+                            data-img="{{this.img}}"
+                            data-type="sell"
+                            title="Negotiate a price for this item"
+                            {{#unless this.canSell}}disabled{{/unless}}>
+                        <i class="fas fa-handshake"></i>
+                    </button>
+                {{/if}}
+            </div>
+        </div>
+        {{/each}}
     {{/if}}
 </div>

@@ -1,7 +1,7 @@
 {
   "id": "daggerheart-store",
   "title": "Daggerheart: Store",
-  "version": "0.5.8",
+  "version": "0.5.9",
   "compatibility": {
     "minimum": "14",
     "verified": "14"

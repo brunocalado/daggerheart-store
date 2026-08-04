@@ -318,11 +318,15 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
     }
 
     /**
-     * Builds the flat list of items displayed in the player's sell tab.
+     * Builds the two lists displayed in the player's sell tab.
      * Iterates the player's inventory using a catalog-first strategy:
      * 1. Catalog path — item name found in the store catalog; uses catalog price and UUID.
      * 2. Flag fallback — item not in catalog but has a `price` flag set by the GM and a
      *    valid item type; priceMod and sellRatio are applied to the flag value.
+     * 3. Unpriced — item not in catalog, no `price` flag, but still of an accepted item
+     *    type (e.g. a weapon created on the fly that the GM hasn't priced yet). Returned
+     *    separately so the UI can list it under its own header with no direct Sell price —
+     *    it can only move through negotiation, where the player proposes their own offer.
      * Hidden items are intentionally included — hidden ≠ unsellable.
      * Called from `_prepareContext` when the sell tab is the active one.
      * @param {Object} opts
@@ -334,7 +338,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
      * @param {boolean} opts.useDefaultCompendiums - Whether default system compendiums are active
      * @param {Array} opts.customCompendiums - Custom per-category compendium config objects
      * @param {Array} opts.customTabCompendiums - Custom tab compendium pack IDs
-     * @returns {Promise<Array>} Alphabetically sorted array of sell-tab item data objects
+     * @returns {Promise<{items: Array, unpriced: Array}>} Alphabetically sorted item lists
      */
     async _buildSellTabItems({ userActor, sellRatio, blockedSaleItems, priceOverrides, priceMod, useDefaultCompendiums, customCompendiums, customTabCompendiums }) {
         const catalogIndex = await buildStoreCatalogIndex({
@@ -342,20 +346,38 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         });
 
         const sellItems = [];
+        const unpricedItems = [];
         for (const playerItem of userActor.items) {
             const entry = catalogIndex.get(playerItem.name);
 
             if (!entry) {
-                // Flag-based fallback: item is not in the catalog but was explicitly priced
-                // by the GM via the store price flag. Only valid item types are accepted.
                 const flagPrice = playerItem.getFlag(MODULE_ID, STORE_FLAGS.price);
-                if (!flagPrice || !getValidItemTypes().includes(playerItem.type)) continue;
+                if (!getValidItemTypes().includes(playerItem.type)) continue;
 
                 const isSaleBlocked = !!blockedSaleItems[playerItem.name];
+                const { name: sellDisplayName, img: sellDisplayImg, maskedDescription: sellMaskedDesc } = getUnidentifiedDisplayData(playerItem);
+
+                if (!flagPrice) {
+                    // No catalog entry and no price flag: sellable only via negotiation.
+                    unpricedItems.push({
+                        name: sellDisplayName,
+                        img: sellDisplayImg,
+                        sellPrice: 0,
+                        noPrice: true,
+                        canSell: !isSaleBlocked,
+                        isSaleBlocked,
+                        catalogUuid: null,
+                        description: sellMaskedDesc ?? "",
+                        itemId: playerItem.id
+                    });
+                    continue;
+                }
+
+                // Flag-based fallback: item is not in the catalog but was explicitly priced
+                // by the GM via the store price flag.
                 const basePrice = Math.ceil(flagPrice * priceMod);
                 const sellPrice = Math.floor(basePrice * sellRatio);
 
-                const { name: sellDisplayName, img: sellDisplayImg, maskedDescription: sellMaskedDesc } = getUnidentifiedDisplayData(playerItem);
                 sellItems.push({
                     name: sellDisplayName,
                     img: sellDisplayImg,
@@ -390,13 +412,14 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         }
 
         sellItems.sort((a, b) => a.name.localeCompare(b.name));
-        return sellItems;
+        unpricedItems.sort((a, b) => a.name.localeCompare(b.name));
+        return { items: sellItems, unpriced: unpricedItems };
     }
 
     /**
-     * Builds the flat list of items displayed in the player's Party Inventory tab.
-     * Identical strategy to `_buildSellTabItems`, but iterates the Party Actor's
-     * items instead of the player's own character.
+     * Builds the two lists displayed in the player's Party Inventory tab.
+     * Identical strategy to `_buildSellTabItems` (including the unpriced/negotiation-only
+     * bucket), but iterates the Party Actor's items instead of the player's own character.
      * @param {Object} opts
      * @param {Actor} opts.partyActor - The configured Party Actor
      * @param {number} opts.sellRatio - Sell price multiplier applied to the base price
@@ -406,7 +429,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
      * @param {boolean} opts.useDefaultCompendiums - Whether default system compendiums are active
      * @param {Array} opts.customCompendiums - Custom per-category compendium config objects
      * @param {Array} opts.customTabCompendiums - Custom tab compendium pack IDs
-     * @returns {Promise<Array>} Alphabetically sorted array of party sell-tab item data objects
+     * @returns {Promise<{items: Array, unpriced: Array}>} Alphabetically sorted item lists
      */
     async _buildPartySellTabItems({ partyActor, sellRatio, blockedSaleItems, priceOverrides, priceMod, useDefaultCompendiums, customCompendiums, customTabCompendiums }) {
         const catalogIndex = await buildStoreCatalogIndex({
@@ -414,18 +437,35 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         });
 
         const sellItems = [];
+        const unpricedItems = [];
         for (const partyItem of partyActor.items) {
             const entry = catalogIndex.get(partyItem.name);
 
             if (!entry) {
                 const flagPrice = partyItem.getFlag(MODULE_ID, STORE_FLAGS.price);
-                if (!flagPrice || !getValidItemTypes().includes(partyItem.type)) continue;
+                if (!getValidItemTypes().includes(partyItem.type)) continue;
 
                 const isSaleBlocked = !!blockedSaleItems[partyItem.name];
+                const { name: sellDisplayName, img: sellDisplayImg, maskedDescription: sellMaskedDesc } = getUnidentifiedDisplayData(partyItem);
+
+                if (!flagPrice) {
+                    unpricedItems.push({
+                        name: sellDisplayName,
+                        img: sellDisplayImg,
+                        sellPrice: 0,
+                        noPrice: true,
+                        canSell: !isSaleBlocked,
+                        isSaleBlocked,
+                        catalogUuid: null,
+                        description: sellMaskedDesc ?? "",
+                        itemId: partyItem.id
+                    });
+                    continue;
+                }
+
                 const basePrice = Math.ceil(flagPrice * priceMod);
                 const sellPrice = Math.floor(basePrice * sellRatio);
 
-                const { name: sellDisplayName, img: sellDisplayImg, maskedDescription: sellMaskedDesc } = getUnidentifiedDisplayData(partyItem);
                 sellItems.push({
                     name: sellDisplayName,
                     img: sellDisplayImg,
@@ -456,7 +496,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         }
 
         sellItems.sort((a, b) => a.name.localeCompare(b.name));
-        return sellItems;
+        unpricedItems.sort((a, b) => a.name.localeCompare(b.name));
+        return { items: sellItems, unpriced: unpricedItems };
     }
 
     /**
@@ -691,7 +732,9 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         context.categories = categories;
         // Default sell items — populated below when the corresponding tab is active.
         context.sellItems = [];
+        context.sellItemsUnpriced = [];
         context.partySellItems = [];
+        context.partySellItemsUnpriced = [];
 
         if (categories.length > 0) {
             const currentTabExists = categories.find(c => c.id === this.activeTab);
@@ -711,10 +754,12 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             // Sell tab: inventory-centric — iterates the player's items and cross-references
             // against all configured store compendiums, including hidden ones.
             if (cat.id === "sell") {
-                context.sellItems = await this._buildSellTabItems({
+                const { items: sellItems, unpriced: sellItemsUnpriced } = await this._buildSellTabItems({
                     userActor, sellRatio, blockedSaleItems, priceOverrides,
                     priceMod, useDefaultCompendiums, customCompendiums, customTabCompendiums
                 });
+                context.sellItems = sellItems;
+                context.sellItemsUnpriced = sellItemsUnpriced;
                 context.tabs["sell"] = [];
                 continue;
             }
@@ -722,10 +767,12 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             // Party inventory tab: same catalog-first strategy as the sell tab,
             // but iterating the Party Actor's items instead of the player's own.
             if (cat.id === "party-sell") {
-                context.partySellItems = await this._buildPartySellTabItems({
+                const { items: partySellItems, unpriced: partySellItemsUnpriced } = await this._buildPartySellTabItems({
                     partyActor, sellRatio, blockedSaleItems, priceOverrides,
                     priceMod, useDefaultCompendiums, customCompendiums, customTabCompendiums
                 });
+                context.partySellItems = partySellItems;
+                context.partySellItemsUnpriced = partySellItemsUnpriced;
                 context.tabs["party-sell"] = [];
                 continue;
             }
@@ -1572,10 +1619,15 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         // Prompt the player for their opening offer — custom layout so the item being
         // negotiated (icon, name, listed price) and the operation (buy/sell) read clearly.
         const currency     = getSystemCurrency();
-        const isBuy        = type !== "sell";
-        const defaultOffer = isBuy
-            ? Math.floor(basePrice * 0.8)
-            : Math.ceil(basePrice * 1.2);
+        const isBuy = type !== "sell";
+        // Unpriced items (no catalog entry, no price flag) reach here with basePrice 0 —
+        // there is nothing to scale a default offer from, so just seed it at 1.
+        const defaultOffer = basePrice > 0
+            ? (isBuy ? Math.floor(basePrice * 0.8) : Math.ceil(basePrice * 1.2))
+            : 1;
+        const listedText = basePrice > 0
+            ? `Listed: ${basePrice} <i class="fas fa-coins"></i> ${currency}`
+            : `Listed: <em>no fixed price</em>`;
 
         const content = `
             <div class="negotiate-offer-content">
@@ -1586,13 +1638,13 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                              title="Click to view item" width="40" height="40">
                         <span class="negotiate-offer-name">${itemName}</span>
                     </div>
-                    <span class="negotiate-offer-listed">Listed: ${basePrice} <i class="fas fa-coins"></i> ${currency}</span>
+                    <span class="negotiate-offer-listed">${listedText}</span>
                 </div>
                 <div class="negotiate-offer-input-group">
                     <label>Your Offer (${currency})</label>
                     <div class="negotiate-offer-input-wrapper">
                         <i class="fas fa-coins"></i>
-                        <input type="number" name="playerOffer" value="${defaultOffer}" min="1" placeholder="${basePrice}">
+                        <input type="number" name="playerOffer" value="${defaultOffer}" min="1" placeholder="${basePrice > 0 ? basePrice : ""}">
                     </div>
                 </div>
             </div>
