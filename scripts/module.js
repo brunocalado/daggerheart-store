@@ -7,7 +7,7 @@ import { migrateTags } from "./store-migration.js";
 import { registerQueryHandlers, queryCancelNegotiation } from "./socket.js";
 import { MODULE_ID, NEGOTIATION_FLAG_KEY, NEGOTIATION_STAGES } from "./store-constants.js";
 import { GMNegotiationApp } from "./store-negotiation-gm.js";
-import { addGold } from "./store-utils.js";
+import { addGold, getActorWealth, createStoreChatMessage } from "./store-utils.js";
 const { DialogV2 } = foundry.applications.api;
 
 Hooks.once("init", () => {
@@ -388,7 +388,7 @@ Hooks.once("ready", async () => {
                 const recipients = ChatMessage.getWhisperRecipients("GM").map(u => u.id);
                 if (!recipients.includes(game.user.id)) recipients.push(game.user.id);
 
-                await ChatMessage.create({
+                await createStoreChatMessage({
                     content: messageContent,
                     speaker: { alias: "Store System" },
                     whisper: recipients
@@ -498,7 +498,11 @@ Hooks.on("updateActor", async (actor, changes, options, userId) => {
         const existing = foundry.applications.instances.get("daggerheart-store-negotiation-gm");
         if (!existing) {
             const gmApp = new GMNegotiationApp();
-            await gmApp.render(true);
+            try {
+                await gmApp.render(true);
+            } catch (err) {
+                console.error(`${MODULE_ID} | Failed to open GMNegotiationApp:`, err);
+            }
         } else {
             existing.render();
             existing.bringToFront?.();
@@ -513,13 +517,20 @@ Hooks.on("updateActor", async (actor, changes, options, userId) => {
         const userActor = game.user.character;
         if (userActor && storeInstance) {
             if (fullFlag.type === "buy") {
-                await storeInstance._executePurchase({
-                    itemUuid:  fullFlag.itemUuid,
-                    itemName:  fullFlag.itemName,
-                    price:     fullFlag.agreedPrice,
-                    recipient: userActor,
-                    payers:    [{ actor: userActor, amount: fullFlag.agreedPrice, name: userActor.name }]
-                });
+                // Safety net: the client-side checks block unaffordable offers up front, but
+                // the player's wealth may have dropped in the meantime (e.g. another purchase
+                // while this negotiation was pending GM review). Re-check before spending.
+                if (getActorWealth(userActor) < fullFlag.agreedPrice) {
+                    ui.notifications.error("You no longer have enough coins to cover this offer. Purchase cancelled.");
+                } else {
+                    await storeInstance._executePurchase({
+                        itemUuid:  fullFlag.itemUuid,
+                        itemName:  fullFlag.itemName,
+                        price:     fullFlag.agreedPrice,
+                        recipient: userActor,
+                        payers:    [{ actor: userActor, amount: fullFlag.agreedPrice, name: userActor.name }]
+                    });
+                }
             } else {
                 // Sell: delete the owned item and credit the agreed price.
                 const itemToDelete = fullFlag.itemId

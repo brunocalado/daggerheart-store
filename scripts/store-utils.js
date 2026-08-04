@@ -226,6 +226,17 @@ export function buildChatCard({ title, borderColor, body }) {
     </div>`;
 }
 
+/**
+ * Creates a chat message, working around a Daggerheart system bug where
+ * DhpChatMessage.migrateData does `source.rolls.length` unconditionally and throws
+ * when a message is created without a `rolls` array (as every store chat card is).
+ * @param {object} chatData - Standard ChatMessage.create() data
+ * @returns {Promise<ChatMessage>}
+ */
+export async function createStoreChatMessage(chatData) {
+    return ChatMessage.create({ rolls: [], ...chatData });
+}
+
 // --- Epic Item Helpers ---
 
 /**

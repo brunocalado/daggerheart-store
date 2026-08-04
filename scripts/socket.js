@@ -212,6 +212,16 @@ export function registerQueryHandlers() {
                     const agreedPrice = (flag.stage === NEGOTIATION_STAGES.PENDING_GM || flag.stage === NEGOTIATION_STAGES.PENDING_GM_FINAL)
                         ? flag.playerOffer
                         : flag.gmCounter;
+
+                    // A buy is paid from the player's own funds — block finalizing the
+                    // purchase if they can no longer cover the agreed price.
+                    if (flag.type === "buy") {
+                        const playerActor = game.users.get(flag.playerId)?.character;
+                        if (playerActor && getActorWealth(playerActor) < agreedPrice) {
+                            return { ok: false, reason: "insufficient_funds" };
+                        }
+                    }
+
                     await partyActor.setFlag(MODULE_ID, NEGOTIATION_FLAG_KEY, {
                         ...flag,
                         agreedPrice,

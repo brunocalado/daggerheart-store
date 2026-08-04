@@ -1,46 +1,46 @@
 <div class="neg-container">
 
-    {{! ── Request header ──────────────────────────────── }}
+    {{! ── Title: who wants to do what ─────────────────── }}
+    <h2 class="neg-title">
+        {{playerName}} wants to {{#if (eq type "sell")}}sell{{else}}buy{{/if}}
+    </h2>
+
+    {{! ── Item header: icon + name + listed price ─────── }}
     <div class="neg-item-header">
-        <span class="neg-player-name">
-            <i class="fas fa-user"></i> {{playerName}} wants to
-            {{#if (eq type "sell")}}sell{{else}}buy{{/if}}
-        </span>
-        <span class="neg-item-name">{{itemName}}</span>
-        <span class="neg-base-price">
-            Listed: <strong>{{basePrice}} {{currency}}</strong>
-            {{#if (eq type "sell")}}
-                <span class="neg-type-badge sell">Selling</span>
-            {{else}}
-                <span class="neg-type-badge buy">Buying</span>
-            {{/if}}
-        </span>
+        <div class="neg-item-row">
+            <img src="{{itemImg}}" class="neg-item-icon" data-action="viewItem" data-uuid="{{itemUuid}}"
+                 title="Click to view item" width="36" height="36">
+            <span class="neg-item-name">{{itemName}}</span>
+        </div>
+        <span class="neg-base-price">Listed: <strong>{{basePrice}} {{currency}}</strong></span>
     </div>
 
     {{! ── Stage: initial offer from player ───────────── }}
     {{#if isPendingGm}}
-        <div class="neg-offer-row highlight">
-            <span class="neg-label">Player's Offer</span>
-            <span class="neg-offer-display accent">{{playerOffer}} {{currency}}</span>
-        </div>
-
-        <div class="neg-actions">
-            <button type="button" class="neg-btn accept" data-action="accept">
+        <div class="neg-action-row">
+            <div class="neg-action-left">
+                <span class="neg-label">Player's Offer</span>
+                <span class="neg-offer-display accent">{{playerOffer}} {{currency}}</span>
+            </div>
+            <button type="button" class="neg-btn accept compact" data-action="accept">
                 <i class="fas fa-check"></i> Accept
             </button>
         </div>
 
         <div class="neg-section-label">— or send a counter-offer —</div>
 
-        <div class="neg-input-group">
-            <label class="neg-input-label">Counter-Offer ({{currency}})</label>
-            <input type="number" name="counterOffer" class="neg-input"
-                   min="1" step="1"
-                   value="{{basePrice}}"
-                   placeholder="Your counter-offer">
-        </div>
-        <div class="neg-actions">
-            <button type="button" class="neg-btn counter" data-action="counter">
+        <div class="neg-action-row">
+            <div class="neg-action-left">
+                <label class="neg-label" for="counterOffer">Counter-Offer</label>
+                <div class="neg-input-wrapper">
+                    <input type="number" name="counterOffer" id="counterOffer" class="neg-input"
+                           min="1" step="1"
+                           value="{{basePrice}}"
+                           placeholder="Your counter-offer">
+                    <span class="neg-input-suffix">{{currency}}</span>
+                </div>
+            </div>
+            <button type="button" class="neg-btn counter compact" data-action="counter">
                 <i class="fas fa-exchange-alt"></i> Send Counter
             </button>
         </div>

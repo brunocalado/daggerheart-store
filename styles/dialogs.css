@@ -199,6 +199,124 @@
         }
     }
 
+    /* Negotiate Offer (sibling class on same dialog element) */
+    & .negotiate-offer-content {
+        padding: 0;
+    }
+
+    & .negotiate-offer-header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        padding: 14px 15px;
+        background: var(--dhs-bg);
+        border-radius: 6px;
+        margin-bottom: 15px;
+        border: 1px solid var(--dhs-border-mid);
+    }
+
+    & .negotiate-offer-action {
+        font-size: 1em;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+
+        &.is-buy {
+            color: #e74c3c;
+        }
+
+        &.is-sell {
+            color: #2ecc71;
+        }
+    }
+
+    & .negotiate-offer-item {
+        display: flex;
+        align-items: center;
+        align-self: flex-start;
+        gap: 10px;
+    }
+
+    & .negotiate-offer-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 4px;
+        border: 1px solid var(--dhs-border-mid);
+        object-fit: cover;
+        cursor: pointer;
+
+        &:hover {
+            border-color: var(--dhs-gold);
+        }
+    }
+
+    & .negotiate-offer-name {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: var(--dhs-text-white);
+    }
+
+    & .negotiate-offer-listed {
+        align-self: flex-start;
+        font-size: 0.95em;
+        color: var(--dhs-gold);
+        font-weight: bold;
+
+        & .fa-coins {
+            font-size: 0.85em;
+            margin: 0 2px;
+        }
+    }
+
+    & .negotiate-offer-input-group {
+        text-align: left;
+
+        & label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--dhs-text-white);
+            font-weight: bold;
+        }
+    }
+
+    & .negotiate-offer-input-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--dhs-bg);
+        border: 1px solid var(--dhs-border-light);
+        border-radius: 4px;
+        padding: 8px 10px;
+
+        & .fa-coins {
+            color: var(--dhs-gold);
+            font-size: 0.9em;
+        }
+
+        & input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--dhs-text-white);
+            font-size: 1.05em;
+            padding: 2px;
+
+            &:focus {
+                outline: none;
+            }
+        }
+    }
+
+    /* Negotiate Offer dialog sizing — wide enough that the footer buttons never wrap */
+    &.negotiate-offer-dialog {
+        min-width: 360px !important;
+
+        & button {
+            white-space: nowrap;
+        }
+    }
+
     /* Split Payment (sibling class on same dialog element) */
     &.split-payment-dialog {
         min-width: 340px !important;

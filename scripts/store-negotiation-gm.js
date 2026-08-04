@@ -6,7 +6,7 @@
  */
 
 import { MODULE_ID, NEGOTIATION_FLAG_KEY, NEGOTIATION_STAGES } from "./store-constants.js";
-import { getSystemCurrency } from "./store-utils.js";
+import { getSystemCurrency, getActorWealth } from "./store-utils.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api;
 
@@ -19,12 +19,13 @@ export class GMNegotiationApp extends HandlebarsApplicationMixin(ApplicationV2) 
             resizable: false,
             controls:  []
         },
-        position: { width: 460, height: "auto" },
-        classes:  ["daggerheart-store", "daggerheart-store-negotiation-gm"],
+        position: { width: 340, height: "auto" },
+        classes:  ["daggerheart-store-negotiation-gm"],
         actions: {
-            counter: GMNegotiationApp.prototype._onCounter,
-            accept:  GMNegotiationApp.prototype._onAccept,
-            reject:  GMNegotiationApp.prototype._onReject
+            counter:  GMNegotiationApp.prototype._onCounter,
+            accept:   GMNegotiationApp.prototype._onAccept,
+            reject:   GMNegotiationApp.prototype._onReject,
+            viewItem: GMNegotiationApp.prototype._onViewItem
         }
     };
 
@@ -93,11 +94,26 @@ export class GMNegotiationApp extends HandlebarsApplicationMixin(ApplicationV2) 
         const flag  = this._getFlag() ?? {};
         const stage = flag.stage ?? NEGOTIATION_STAGES.PENDING_GM;
 
+        // A failed/slow-to-resolve lookup (e.g. the item's compendium pack hasn't been
+        // indexed yet on this client) must never abort the whole render — fall back to a
+        // generic icon instead of leaving the window stuck unrendered.
+        let itemImg = "icons/svg/item-bag.svg";
+        if (flag.itemUuid) {
+            try {
+                const item = await fromUuid(flag.itemUuid);
+                if (item?.img) itemImg = item.img;
+            } catch (err) {
+                console.warn(`${MODULE_ID} | GMNegotiationApp: could not resolve item image for ${flag.itemUuid}`, err);
+            }
+        }
+
         return {
             flag,
             stage,
             playerName:  flag.playerName  ?? "Unknown",
             itemName:    flag.itemName    ?? "",
+            itemImg,
+            itemUuid:    flag.itemUuid    ?? "",
             basePrice:   flag.basePrice   ?? 0,
             type:        flag.type        ?? "buy",
             playerOffer: flag.playerOffer ?? 0,
@@ -158,6 +174,16 @@ export class GMNegotiationApp extends HandlebarsApplicationMixin(ApplicationV2) 
         // At PENDING_GM or PENDING_GM_FINAL the agreed price is the player's offer.
         const agreedPrice = flag.playerOffer;
 
+        // A buy is paid from the player's own funds — the negotiation itself can go
+        // ahead regardless of the player's balance, but the purchase can only be
+        // finalized if they can actually cover the agreed price.
+        if (flag.type === "buy") {
+            const playerActor = game.users.get(flag.playerId)?.character;
+            if (playerActor && getActorWealth(playerActor) < agreedPrice) {
+                return ui.notifications.warn(`${flag.playerName} does not have enough coins to cover this offer.`);
+            }
+        }
+
         try {
             await partyActor.setFlag(MODULE_ID, NEGOTIATION_FLAG_KEY, {
                 ...flag,
@@ -191,6 +217,19 @@ export class GMNegotiationApp extends HandlebarsApplicationMixin(ApplicationV2) 
             console.error(`${MODULE_ID} | GMNegotiationApp._onReject failed:`, err);
             ui.notifications.error("Could not reject the offer.");
         }
+    }
+
+    /**
+     * Opens the item's sheet for a quick reference look.
+     * Called from `data-action="viewItem"` on the item icon in the template.
+     * @param {PointerEvent} event
+     * @param {HTMLElement}  target
+     */
+    async _onViewItem(event, target) {
+        const uuid = target.dataset.uuid;
+        if (!uuid) return;
+        const doc = await fromUuid(uuid);
+        if (doc?.sheet) doc.sheet.render(true);
     }
 
     // ---------------------------------------------------------------

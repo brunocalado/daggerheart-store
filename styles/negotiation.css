@@ -53,24 +53,46 @@
         background:     var(--dhs-bg);
     }
 
+    /* ── Title: "PlayerName wants to buy/sell" ─── */
+    & .neg-title {
+        margin:        0;
+        font-size:     1.05rem;
+        font-weight:   700;
+        color:         var(--dhs-gold);
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
     /* ── Item / request header ─── */
     & .neg-item-header {
         display:        flex;
         flex-direction: column;
-        gap:            3px;
+        gap:            6px;
         padding-bottom: 10px;
         border-bottom:  1px solid var(--dhs-border);
+    }
+
+    & .neg-item-row {
+        display:     flex;
+        align-items: center;
+        gap:         8px;
+    }
+
+    & .neg-item-icon {
+        width:         36px;
+        height:        36px;
+        border-radius: 4px;
+        border:        1px solid var(--dhs-border-mid);
+        object-fit:    cover;
+        cursor:        pointer;
+
+        &:hover { border-color: var(--dhs-gold); }
     }
 
     & .neg-item-name {
         font-size:   1.1rem;
         font-weight: 700;
         color:       var(--dhs-text-white);
-    }
-
-    & .neg-player-name {
-        font-size: 0.9rem;
-        color:     var(--dhs-text-muted);
     }
 
     & .neg-base-price {
@@ -116,6 +138,7 @@
         color:     var(--dhs-text-muted);
         text-transform: uppercase;
         letter-spacing: 0.05em;
+        white-space: nowrap;
     }
 
     & .neg-offer-display {
@@ -125,6 +148,26 @@
 
         &.accent { color: var(--dhs-gold); }
         &.dim    { color: var(--dhs-text-muted); font-size: 1rem; }
+    }
+
+    /* ── Compact action row: offer/input on the left, button on the right ─── */
+    & .neg-action-row {
+        display:         flex;
+        align-items:     flex-end;
+        justify-content: space-between;
+        gap:             10px;
+        padding:         8px 10px;
+        background:      var(--dhs-bg-light);
+        border:          1px solid var(--dhs-border);
+        border-radius:   6px;
+    }
+
+    & .neg-action-left {
+        display:        flex;
+        flex-direction: column;
+        gap:            3px;
+        flex:           1;
+        min-width:      0;
     }
 
     /* ── Divider between offers ─── */
@@ -170,6 +213,21 @@
         }
     }
 
+    /* ── Input with an inline unit suffix (e.g. "Coins") ─── */
+    & .neg-input-wrapper {
+        display:     flex;
+        align-items: center;
+        gap:         6px;
+
+        & .neg-input { flex: 1; min-width: 0; }
+    }
+
+    & .neg-input-suffix {
+        font-size:   0.8rem;
+        color:       var(--dhs-text-muted);
+        white-space: nowrap;
+    }
+
     /* ── Action buttons ─── */
     & .neg-actions {
         display: flex;
@@ -189,6 +247,11 @@
         cursor:        pointer;
         border:        1px solid transparent;
         transition:    background 0.18s, border-color 0.18s;
+        white-space:   nowrap;
+
+        &.compact {
+            flex: 0 0 auto;
+        }
 
         &.accept {
             background:   rgba(39, 174, 96, 0.18);

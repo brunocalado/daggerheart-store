@@ -6,7 +6,7 @@
  */
 
 import { MODULE_ID, NEGOTIATION_FLAG_KEY, NEGOTIATION_STAGES } from "./store-constants.js";
-import { getChatWhisperRecipients, buildChatCard, getSystemCurrency } from "./store-utils.js";
+import { getChatWhisperRecipients, buildChatCard, getSystemCurrency, createStoreChatMessage } from "./store-utils.js";
 import { queryCancelNegotiation, queryAcceptCounter, querySubmitFinalOffer } from "./socket.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api;
@@ -20,8 +20,8 @@ export class PlayerNegotiationApp extends HandlebarsApplicationMixin(Application
             resizable: false,
             controls:  []
         },
-        position: { width: 420, height: "auto" },
-        classes:  ["daggerheart-store", "daggerheart-store-negotiation-player"],
+        position: { width: 320, height: "auto" },
+        classes:  ["daggerheart-store-negotiation-player"],
         actions: {
             acceptCounter: PlayerNegotiationApp.prototype._onAcceptCounter,
             submitFinal:   PlayerNegotiationApp.prototype._onSubmitFinal
@@ -136,7 +136,11 @@ export class PlayerNegotiationApp extends HandlebarsApplicationMixin(Application
 
         const result = await queryAcceptCounter(flag.gmCounter);
         if (!result.ok) {
-            ui.notifications.error(`${MODULE_ID} | Could not accept counter: ${result.reason}`);
+            if (result.reason === "insufficient_funds") {
+                ui.notifications.warn("You do not have enough coins to cover this offer.");
+            } else {
+                ui.notifications.error(`${MODULE_ID} | Could not accept counter: ${result.reason}`);
+            }
         }
         // updateActor hook detects ACCEPTED → _onFlagChanged closes this app
     }
@@ -247,7 +251,7 @@ export class PlayerNegotiationApp extends HandlebarsApplicationMixin(Application
         const whisperTo = getChatWhisperRecipients();
         if (whisperTo) chatData.whisper = whisperTo;
 
-        await ChatMessage.create(chatData);
+        await createStoreChatMessage(chatData);
     }
 
     /**

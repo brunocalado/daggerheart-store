@@ -9,7 +9,7 @@ import {
 import {
     getValidItemTypes, getItemTier, extractPriceFromDescription, getItemHeader,
     getOriginalName, getSystemCurrency, getActorWealth, deductGold, addGold,
-    getChatWhisperRecipients, buildChatCard,
+    getChatWhisperRecipients, buildChatCard, createStoreChatMessage,
     getEpicTextColor, getEpicBgColor,
     showStoreDialog, getUnidentifiedDisplayData
 } from "./store-utils.js";
@@ -198,7 +198,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const whisperTo = getChatWhisperRecipients();
         if (whisperTo) chatData.whisper = whisperTo;
 
-        await ChatMessage.create(chatData);
+        await createStoreChatMessage(chatData);
     }
 
     // --- Item Data Builder (shared between standard and custom tab) ---
@@ -1373,7 +1373,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         };
         const whisperTo = getChatWhisperRecipients();
         if (whisperTo) chatData.whisper = whisperTo;
-        await ChatMessage.create(chatData);
+        await createStoreChatMessage(chatData);
 
         if (game.audio) foundry.audio.AudioHelper.play({ src: "modules/daggerheart-store/assets/audio/coins.mp3", volume: 0.8, loop: false }, false);
         this.render();
@@ -1396,6 +1396,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const itemUuid  = target.dataset.uuid  ?? "";
         const itemId    = target.dataset.itemId ?? null;
         const itemName  = target.dataset.name  ?? "";
+        const itemImg   = target.dataset.img   ?? "icons/svg/item-bag.svg";
         const basePrice = parseInt(target.dataset.price ?? "0");
         const type      = target.dataset.type  ?? "buy";
 
@@ -1412,26 +1413,74 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             return ui.notifications.warn("Another negotiation is already in progress.");
         }
 
-        // Prompt the player for their opening offer via the shared store dialog helper.
+        // Prompt the player for their opening offer — custom layout so the item being
+        // negotiated (icon, name, listed price) and the operation (buy/sell) read clearly.
         const currency     = getSystemCurrency();
-        const defaultOffer = type === "sell"
-            ? Math.ceil(basePrice * 1.2)
-            : Math.floor(basePrice * 0.8);
+        const isBuy        = type !== "sell";
+        const defaultOffer = isBuy
+            ? Math.floor(basePrice * 0.8)
+            : Math.ceil(basePrice * 1.2);
 
-        const result = await showStoreDialog({
-            title:       "Negotiate Price",
-            icon:        "fas fa-handshake",
-            headerText:  "Make an Offer",
-            headerColor: "#D4AF37",
-            message:     `<strong>${itemName}</strong> — Listed: <strong>${basePrice} ${currency}</strong>`,
-            input: {
-                label:        `Your Offer (${currency})`,
-                name:         "playerOffer",
-                type:         "number",
-                defaultValue: defaultOffer,
-                placeholder:  String(basePrice)
-            },
-            buttons: { confirm: "Send Offer", confirmIcon: "fas fa-paper-plane" }
+        const content = `
+            <div class="negotiate-offer-content">
+                <div class="negotiate-offer-header">
+                    <span class="negotiate-offer-action ${isBuy ? "is-buy" : "is-sell"}">${isBuy ? "Buying" : "Selling"}</span>
+                    <div class="negotiate-offer-item">
+                        <img src="${itemImg}" class="negotiate-offer-icon" data-uuid="${itemUuid}"
+                             title="Click to view item" width="40" height="40">
+                        <span class="negotiate-offer-name">${itemName}</span>
+                    </div>
+                    <span class="negotiate-offer-listed">Listed: ${basePrice} <i class="fas fa-coins"></i> ${currency}</span>
+                </div>
+                <div class="negotiate-offer-input-group">
+                    <label>Your Offer (${currency})</label>
+                    <div class="negotiate-offer-input-wrapper">
+                        <i class="fas fa-coins"></i>
+                        <input type="number" name="playerOffer" value="${defaultOffer}" min="1" placeholder="${basePrice}">
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const result = await new Promise((resolve) => {
+            const negotiateDialog = new DialogV2({
+                window:   { title: "Negotiate Price", icon: "fas fa-handshake", resizable: false },
+                content,
+                classes:  ["dhs-dialog", "negotiate-offer-dialog"],
+                position: { width: 360 },
+                // Not modal: modal dialogs render in a top layer Foundry keeps above every
+                // other window, so the item sheet opened from the icon below would always be
+                // stuck behind it regardless of z-index.
+                modal:    false,
+                buttons: [
+                    {
+                        action:   "confirm",
+                        label:    "Send Offer",
+                        icon:     "fas fa-paper-plane",
+                        callback: (ev, button) => resolve({ confirmed: true, value: button.form.elements["playerOffer"]?.value })
+                    },
+                    {
+                        action:   "cancel",
+                        label:    "Cancel",
+                        icon:     "fas fa-times",
+                        callback: () => resolve({ confirmed: false })
+                    }
+                ],
+                close: () => resolve({ confirmed: false })
+            });
+
+            Hooks.once("renderDialogV2", (app, element) => {
+                if (app !== negotiateDialog) return;
+                const icon = element.querySelector(".negotiate-offer-icon");
+                icon?.addEventListener("click", async (e) => {
+                    const uuid = e.currentTarget.dataset.uuid;
+                    if (!uuid) return;
+                    const doc = await fromUuid(uuid);
+                    if (doc?.sheet) doc.sheet.render(true);
+                });
+            });
+
+            negotiateDialog.render(true);
         });
 
         if (!result?.confirmed) return;
@@ -1476,7 +1525,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         };
         const whisperTo = getChatWhisperRecipients();
         if (whisperTo) chatData.whisper = whisperTo;
-        ChatMessage.create(chatData);
+        createStoreChatMessage(chatData);
     }
 
     /**
@@ -1507,7 +1556,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         };
         const whisperTo = getChatWhisperRecipients();
         if (whisperTo) chatData.whisper = whisperTo;
-        ChatMessage.create(chatData);
+        createStoreChatMessage(chatData);
     }
 
     async _onTransferFunds(event, target) {
@@ -1637,7 +1686,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         };
         const whisperTo = getChatWhisperRecipients();
         if (whisperTo) chatData.whisper = whisperTo;
-        await ChatMessage.create(chatData);
+        await createStoreChatMessage(chatData);
 
         if (game.audio) foundry.audio.AudioHelper.play({ src: "modules/daggerheart-store/assets/audio/coins.mp3", volume: 0.8, loop: false }, false);
     }
@@ -1783,7 +1832,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             const whisperTo = getChatWhisperRecipients();
             if (whisperTo) chatData.whisper = whisperTo;
         }
-        ChatMessage.create(chatData);
+        createStoreChatMessage(chatData);
 
         if (game.audio) {
             const epicItems = game.settings.get(MODULE_ID, "epicItems") || {};
