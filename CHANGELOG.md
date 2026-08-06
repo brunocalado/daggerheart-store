@@ -1,5 +1,6 @@
 # 0.6.0
 
+- Removed AI assets
 - [Fixed] Weapon damage was missing from the compare tooltip (both the equipped item and the store item) and from the weapon summary line in item rows. The Daggerheart system reshaped action damage again: `DHBaseAction.migrateData` now converts `system.attack.damage.parts` into `damage.main` (the hit-points part, with `direct` and `includeBase` folded into it) plus `damage.resources`, and **deletes** `parts` on load. The module still read `parts`, so `damageDisplay` came out empty and the template's `{{#if}}` hid the whole Damage row — which also removed the up/down comparison arrow, since neither side had a value to compare. Added `getPrimaryDamagePart()` in `item-stats.js`, used by `extractWeaponStats` and `getWeaponSummary`, which reads `damage.main` first and falls back to `damage.parts` (preferring the `hitPoints` key) for unmigrated source data. `isDirect` now reads `part0.direct`, with the old top-level `damage.direct` kept as a fallback. Supersedes the 0.5.3 fix for the previous shape change.
 
 # 0.5.9

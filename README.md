@@ -62,11 +62,11 @@ A dynamic, interactive, and fully configurable store for the **Daggerheart** sys
 
 * **Store Randomizer:** Generate dynamic inventory per category with configurable parameters. Includes a shortcut to restore maximum item counts. Options saved per profile.
 
-## ⚙️ Instructions & Usage
+## 📖 Learn More
 
-You need to read the instructions to use this module!
+This page covers *what* the module does. For *how* to set it up — linking player characters, opening the store, configuring prices, profiles, and homebrew content — check the full guide:
 
-[Click Here!](https://github.com/brunocalado/daggerheart-store/wiki)
+**➡️ [docs/WIKI.md](docs/WIKI.md)**
 
 ## 💰 Pricing Rules
 
@@ -82,6 +82,22 @@ Clean interface with search, quick buy, sell options, and party fund integration
 
 <p align="center"><img width="700" src="docs/player-view.webp"></p>
 
+Selling from your personal inventory — "Store Items" priced by the GM and "Other Items" available for negotiation only.
+
+<p align="center"><img width="700" src="docs/player-view-inventory.webp"></p>
+
+Players with Owner permission on the Party Actor can sell straight from the shared Party Inventory tab.
+
+<p align="center"><img width="700" src="docs/player-view-party.webp"></p>
+
+Comparing a store item against what your character currently has equipped before buying.
+
+<p align="center"><img width="500" src="docs/compare.webp"></p>
+
+Price negotiations in action — propose an offer, receive a counter-offer, and settle in real time.
+
+<p align="center"><img width="900" src="docs/negociate.webp"></p>
+
 ### 🎛️ GM View (Editing)
 
 Price controls, hide toggles, sale buttons, and profile management.
@@ -93,6 +109,14 @@ Price controls, hide toggles, sale buttons, and profile management.
 <p align="center"><img width="700" src="docs/settingsstock.webp"></p>
 
 <p align="center"><img width="700" src="docs/randomizer.webp"></p>
+
+Save, load, and manage Store Profiles to quickly switch between towns, merchants, or campaign acts.
+
+<p align="center"><img width="400" src="docs/profiles.webp"></p>
+
+Add homebrew compendiums or create a dedicated Custom Tab for special merchant inventories.
+
+<p align="center"><img width="700" src="docs/homebrew.webp"></p>
 
 ## 🚀 Installation
 
