@@ -1,10 +1,11 @@
 {
   "id": "daggerheart-store",
   "title": "Daggerheart: Store",
-  "version": "0.5.9",
+  "version": "0.6.0",
   "compatibility": {
     "minimum": "14",
-    "verified": "14"
+    "verified": "14",
+    "maximum": "14"
   },
   "authors": [
     {
@@ -37,15 +38,33 @@
     "scripts/module.js"
   ],
   "styles": [
-    "styles/variables.css",
-    "styles/store.css",
-    "styles/config.css",
-    "styles/welcome.css",
-    "styles/randomizer.css",
-    "styles/tooltips.css",
-    "styles/dialogs.css",
-    "styles/item-tagger.css",
-    "styles/negotiation.css"
+    {
+      "src": "styles/variables.css"
+    },
+    {
+      "src": "styles/store.css"
+    },
+    {
+      "src": "styles/config.css"
+    },
+    {
+      "src": "styles/welcome.css"
+    },
+    {
+      "src": "styles/randomizer.css"
+    },
+    {
+      "src": "styles/tooltips.css"
+    },
+    {
+      "src": "styles/dialogs.css"
+    },
+    {
+      "src": "styles/item-tagger.css"
+    },
+    {
+      "src": "styles/negotiation.css"
+    }
   ],
   "packs": [
     {

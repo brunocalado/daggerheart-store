@@ -124,21 +124,4 @@
         }
     }
 
-    & .welcome-avatar {
-        width: 75px;
-        height: auto;
-        display: block;
-        margin: 0 auto;
-        border: none;
-        animation: dhs-welcome-float 3s ease-in-out infinite;
-    }
-}
-
-@keyframes dhs-welcome-float {
-    0%, 100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-8px);
-    }
 }

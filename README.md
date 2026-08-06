@@ -1,15 +1,6 @@
 # 🗡️ Daggerheart: Store
 
-<p align="center"><img width="1200" src="docs/welcome.webp"></p>
-
 A dynamic, interactive, and fully configurable store for the **Daggerheart** system in Foundry VTT. Allow your players to purchase weapons, armor, potions, and miscellaneous items directly from an elegant visual interface, while the GM maintains full control over prices and what is displayed.
-
-<video src="https://github.com/user-attachments/assets/d60c3fa5-8a34-4ab9-b58a-e7baf7c1e261" 
-       controls 
-       width="720"
-       autoplay 
-       loop 
-       muted></video>
 
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy_Me_a_Coffee-Donate-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/mestredigital) [![More Modules](https://img.shields.io/badge/Foundry%20VTT-More%20Modules-red?style=for-the-badge&logo=gamepad)](https://mestredigital.online/pages/projetos-en)
 
@@ -115,7 +106,7 @@ https://raw.githubusercontent.com/brunocalado/daggerheart-store/main/module.json
 
 * **Code License:** GNU GPLv3.
 
-* **epic.mp3** [Zapsplat](https://www.zapsplat.com). The audio assets are used in accordance with the Zapsplat Standard License.
+* **epic.mp3 and coins.mp3** [Zapsplat](https://www.zapsplat.com). The audio assets are used in accordance with the Zapsplat Standard License.
 
 **Disclaimer:** This module is an independent creation and is not affiliated with Darrington Press.
 

@@ -13,6 +13,30 @@ import { getItemTier } from "./store-utils.js";
 import { cleanDescription, parseDamageTypes } from "./item-display.js";
 
 /**
+ * Resolves the primary (hit points) damage part of an action.
+ *
+ * The Daggerheart system reshaped action damage: `damage.parts` — a keyed
+ * object of parts — was replaced by `damage.main` (the hit-points part, with
+ * `direct` and `includeBase` folded in) plus `damage.resources` for everything
+ * else. `DHBaseAction.migrateData` deletes `parts` on load, so on a current
+ * system only `main` exists. The `parts` fallback stays for raw/unmigrated
+ * source data (e.g. objects read straight from a pack file).
+ *
+ * @param {Object} attack - The action data (`system.attack`)
+ * @returns {Object} The primary damage part, or an empty object when absent
+ */
+function getPrimaryDamagePart(attack) {
+    const damage = attack?.damage;
+    if (!damage) return {};
+    if (damage.main) return damage.main;
+
+    const partsRaw = damage.parts;
+    if (!partsRaw) return {};
+    if (Array.isArray(partsRaw)) return partsRaw[0] || {};
+    return partsRaw.hitPoints || Object.values(partsRaw)[0] || {};
+}
+
+/**
  * Generates the weapon summary string used in the inventory row.
  * @param {Item} doc - The weapon item document
  * @returns {string}
@@ -33,10 +57,7 @@ export function getWeaponSummary(doc) {
         };
         const weaponRange = rangeMap[rangeRaw] || (rangeRaw ? String(rangeRaw).charAt(0).toUpperCase() + String(rangeRaw).slice(1) : "");
 
-        const partsRaw = system.attack.damage?.parts;
-        const part0 = partsRaw
-            ? (Array.isArray(partsRaw) ? (partsRaw[0] || {}) : (Object.values(partsRaw)[0] || {}))
-            : {};
+        const part0 = getPrimaryDamagePart(system.attack);
         const val = part0.value || {};
         const weaponCustom = val.custom?.enabled === true;
         let damageSection = "";
@@ -114,10 +135,7 @@ export function extractWeaponStats(doc) {
         };
         const range = rangeMap[rangeRaw] || (rangeRaw ? String(rangeRaw).charAt(0).toUpperCase() + String(rangeRaw).slice(1) : "");
 
-        const partsRaw = system.attack.damage?.parts;
-        const part0 = partsRaw
-            ? (Array.isArray(partsRaw) ? (partsRaw[0] || {}) : (Object.values(partsRaw)[0] || {}))
-            : {};
+        const part0 = getPrimaryDamagePart(system.attack);
         const val = part0.value || {};
         const isCustom = val.custom?.enabled === true;
         let damageDisplay = "";
@@ -138,7 +156,9 @@ export function extractWeaponStats(doc) {
             if (damageType) damageDisplay += ` (${damageType})`;
         }
 
-        const isDirect = system.attack.damage?.direct === true;
+        // `direct` moved onto the damage part itself; the old top-level flag is
+        // only present on unmigrated source data.
+        const isDirect = part0.direct === true || system.attack.damage?.direct === true;
         const burdenRaw = String(system.burden || "");
         const burdenMap = { "1": "One-Handed", "2": "Two-Handed", "oneHanded": "One-Handed", "twoHanded": "Two-Handed" };
         const burden = burdenMap[burdenRaw] || burdenRaw;
