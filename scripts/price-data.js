@@ -171,7 +171,101 @@ export const PRICE_DATA = {
         "Midas Scythe": { price: 1800, tier: 4 },
         "Bloodstaff": { price: 1900, tier: 4 },
         "Fusion Gloves": { price: 1900, tier: 4 },
-        "Sword of Light & Flame": { price: 2000, tier: 4 }
+        "Sword of Light & Flame": { price: 2000, tier: 4 },
+
+        // --- Hope & Fear (added to the system compendiums in daggerheart 2.8) ---
+        // Tier 1
+        "Brass Knuckles": { price: 20, tier: 1 },
+        "Scimitar": { price: 20, tier: 1 },
+        "Rope Dart": { price: 22, tier: 1 },
+        "Twisted Dagger": { price: 25, tier: 1 },
+        "Whipsword": { price: 28, tier: 1 },
+        "Casting Dagger": { price: 35, tier: 1 },
+        "Katana": { price: 35, tier: 1 },
+        "Enchanted Chakram": { price: 38, tier: 1 },
+        "Shadowblade": { price: 40, tier: 1 },
+        "Runelock Pistol": { price: 42, tier: 1 },
+        "Brightsword": { price: 45, tier: 1 },
+        "Arcane Rifle": { price: 50, tier: 1 },
+        // Tier 2
+        "Improved Brass Knuckles": { price: 110, tier: 2 },
+        "Improved Scimitar": { price: 110, tier: 2 },
+        "Improved Rope Dart": { price: 115, tier: 2 },
+        "Improved Twisted Dagger": { price: 120, tier: 2 },
+        "Cane Sword": { price: 125, tier: 2 },
+        "Improved Whipsword": { price: 125, tier: 2 },
+        "Cyrurgien's Scalpel": { price: 130, tier: 2 },
+        "Lance": { price: 130, tier: 2 },
+        "War Pick": { price: 130, tier: 2 },
+        "Bladed Fan": { price: 135, tier: 2 },
+        "Javelins": { price: 135, tier: 2 },
+        "Improved Katana": { price: 140, tier: 2 },
+        "Improved Casting Dagger": { price: 155, tier: 2 },
+        "Improved Enchanted Chakram": { price: 160, tier: 2 },
+        "Fury Gem": { price: 165, tier: 2 },
+        "Improved Shadowblade": { price: 165, tier: 2 },
+        "Enchanted Lute": { price: 170, tier: 2 },
+        "Enchanted Shillelagh": { price: 170, tier: 2 },
+        "Improved Runelock Pistol": { price: 170, tier: 2 },
+        "Displacement Razor": { price: 175, tier: 2 },
+        "Improved Brightsword": { price: 180, tier: 2 },
+        "Splintershaft Bow": { price: 180, tier: 2 },
+        "Spellbound Bangles": { price: 185, tier: 2 },
+        "Improved Arcane Rifle": { price: 190, tier: 2 },
+        // Tier 3
+        "Advanced Brass Knuckles": { price: 550, tier: 3 },
+        "Advanced Scimitar": { price: 550, tier: 3 },
+        "Advanced Rope Dart": { price: 570, tier: 3 },
+        "Advanced Twisted Dagger": { price: 600, tier: 3 },
+        "Advanced Whipsword": { price: 620, tier: 3 },
+        // Both spellings: the system compendium ships the name misspelled.
+        "Soldier's Pike": { price: 650, tier: 3 },
+        "Solider's Pike": { price: 650, tier: 3 },
+        "Singing Sword": { price: 660, tier: 3 },
+        // Priced and listed as tier 3: the system marks it tier 1, but its d8+7 damage
+        // matches the tier 3 weapons. Drop to tier 1 here if the system ever confirms tier 1.
+        "Bladed Star": { price: 680, tier: 3 },
+        "Platinum Estoc": { price: 680, tier: 3 },
+        "Advanced Katana": { price: 700, tier: 3 },
+        "Chained Scythe": { price: 700, tier: 3 },
+        "Blitz Hammer": { price: 750, tier: 3 },
+        "Advanced Casting Dagger": { price: 780, tier: 3 },
+        "Advanced Enchanted Chakram": { price: 800, tier: 3 },
+        "Advanced Shadowblade": { price: 820, tier: 3 },
+        "Gunblade": { price: 840, tier: 3 },
+        "Advanced Runelock Pistol": { price: 850, tier: 3 },
+        "Crystal Spear": { price: 860, tier: 3 },
+        "Rime Scepter": { price: 870, tier: 3 },
+        "Rocket Maul": { price: 880, tier: 3 },
+        "Advanced Brightsword": { price: 900, tier: 3 },
+        "Arc Wand": { price: 900, tier: 3 },
+        "Staff of Augma": { price: 920, tier: 3 },
+        "Advanced Arcane Rifle": { price: 950, tier: 3 },
+        // Tier 4
+        "Legendary Brass Knuckles": { price: 1100, tier: 4 },
+        "Legendary Scimitar": { price: 1100, tier: 4 },
+        "Legendary Rope Dart": { price: 1150, tier: 4 },
+        "Legendary Twisted Dagger": { price: 1200, tier: 4 },
+        "Legendary Whipsword": { price: 1250, tier: 4 },
+        "Arquebus": { price: 1300, tier: 4 },
+        "Infinite Staff": { price: 1350, tier: 4 },
+        "Clockwork Crossbow": { price: 1400, tier: 4 },
+        "Legendary Katana": { price: 1400, tier: 4 },
+        "Bec de Corbin": { price: 1450, tier: 4 },
+        "Black Powder Serpentine": { price: 1500, tier: 4 },
+        "Severed Dragon Claw": { price: 1500, tier: 4 },
+        "Legendary Casting Dagger": { price: 1550, tier: 4 },
+        "Legendary Enchanted Chakram": { price: 1600, tier: 4 },
+        "Legendary Shadowblade": { price: 1650, tier: 4 },
+        "Adder's Fang": { price: 1700, tier: 4 },
+        "Legendary Runelock Pistol": { price: 1700, tier: 4 },
+        "Demon's Edge": { price: 1720, tier: 4 },
+        "Starmetal Blade": { price: 1750, tier: 4 },
+        "Ethereal Zweihänder": { price: 1800, tier: 4 },
+        "Legendary Brightsword": { price: 1800, tier: 4 },
+        "Gravity Arbalest": { price: 1850, tier: 4 },
+        "Legendary Arcane Rifle": { price: 1900, tier: 4 },
+        "Storm God's Greataxe": { price: 1900, tier: 4 }
     },
     "Secondary Weapons": {
         // Tier 1
@@ -214,7 +308,51 @@ export const PRICE_DATA = {
         "Primer Shard": { price: 1400, tier: 4 },
         "Legendary Grappler": { price: 1500, tier: 4 },
         "Legendary Tower Shield": { price: 1600, tier: 4 },
-        "Braveshield": { price: 1700, tier: 4 }
+        "Braveshield": { price: 1700, tier: 4 },
+
+        // --- Hope & Fear (added to the system compendiums in daggerheart 2.8) ---
+        // Tier 1
+        "Fighting Cloak": { price: 12, tier: 1 },
+        "Hatchet": { price: 15, tier: 1 },
+        "Offhand Brass Knuckles": { price: 15, tier: 1 },
+        "Throwing Knives": { price: 16, tier: 1 },
+        "Rune Shield": { price: 18, tier: 1 },
+        "Focus Runes": { price: 20, tier: 1 },
+        // Tier 2
+        "Collapsible Baton": { price: 100, tier: 2 },
+        "Improved Fighting Cloak": { price: 100, tier: 2 },
+        "Improved Hatchet": { price: 105, tier: 2 },
+        "Improved Offhand Brass Knuckles": { price: 105, tier: 2 },
+        "Improved Throwing Knives": { price: 110, tier: 2 },
+        "Improved Focus Runes": { price: 115, tier: 2 },
+        "Improved Rune Shield": { price: 120, tier: 2 },
+        "Razor Wire": { price: 120, tier: 2 },
+        "Eldritch Vambrace": { price: 130, tier: 2 },
+        "Segmented Staff": { price: 135, tier: 2 },
+        // Tier 3
+        "Advanced Fighting Cloak": { price: 500, tier: 3 },
+        "Advanced Hatchet": { price: 520, tier: 3 },
+        // Both spellings: the system compendium ships the name misspelled.
+        "Advanced Offhand Brass Knuckles": { price: 520, tier: 3 },
+        "Advanced Offhand Brass Knucles": { price: 520, tier: 3 },
+        "Advanced Throwing Knives": { price: 540, tier: 3 },
+        "Advanced Focus Runes": { price: 560, tier: 3 },
+        "Vorpal Shard": { price: 580, tier: 3 },
+        "Advanced Rune Shield": { price: 600, tier: 3 },
+        "War Dart": { price: 600, tier: 3 },
+        "Soul Chain": { price: 620, tier: 3 },
+        "Tinker's Hammer": { price: 640, tier: 3 },
+        // Tier 4
+        "Legendary Fighting Cloak": { price: 1000, tier: 4 },
+        "Legendary Hatchet": { price: 1050, tier: 4 },
+        "Legendary Offhand Brass Knuckles": { price: 1050, tier: 4 },
+        "Legendary Throwing Knives": { price: 1080, tier: 4 },
+        "Legendary Focus Runes": { price: 1120, tier: 4 },
+        "Legendary Rune Shield": { price: 1200, tier: 4 },
+        "Void Needle": { price: 1250, tier: 4 },
+        "Möbius Orb": { price: 1280, tier: 4 },
+        "Blackblood Tendril": { price: 1300, tier: 4 },
+        "Echo Blade": { price: 1300, tier: 4 }
     },
     "Armors": {
         // Tier 1
@@ -255,7 +393,50 @@ export const PRICE_DATA = {
         "Emberwoven Armor": { price: 1700, tier: 4 },
         "Legendary Full Plate Armor": { price: 1800, tier: 4 },
         "Dunamis Silkchain": { price: 1900, tier: 4 },
-        "Savior Chainmail": { price: 2000, tier: 4 }
+        "Savior Chainmail": { price: 2000, tier: 4 },
+
+        // --- Hope & Fear (added to the system compendiums in daggerheart 2.8) ---
+        // Tier 1
+        "Scale Mail Armor": { price: 25, tier: 1 },
+        "Brigandine Armor": { price: 30, tier: 1 },
+        "Banded Armor": { price: 35, tier: 1 },
+        "Mage Robes": { price: 45, tier: 1 },
+        // Tier 2
+        "Improved Scale Mail Armor": { price: 110, tier: 2 },
+        "Improved Brigandine Armor": { price: 120, tier: 2 },
+        "Improved Banded Armor": { price: 130, tier: 2 },
+        "Improved Mage Robes": { price: 150, tier: 2 },
+        "Stormthread Habit": { price: 170, tier: 2 },
+        "Hawkguard's Mantle": { price: 175, tier: 2 },
+        "Enchanter's Robes": { price: 180, tier: 2 },
+        "Trollhide Cuirass": { price: 180, tier: 2 },
+        "Spidersilk Tunic": { price: 185, tier: 2 },
+        "Wyrdwood Splint Armor": { price: 190, tier: 2 },
+        "Gilded Sunplate": { price: 195, tier: 2 },
+        // Tier 3
+        "Advanced Scale Mail Armor": { price: 550, tier: 3 },
+        "Advanced Brigandine Armor": { price: 600, tier: 3 },
+        "Advanced Banded Armor": { price: 650, tier: 3 },
+        "Advanced Mage Robes": { price: 750, tier: 3 },
+        "Deep-Forged Coral Armor": { price: 820, tier: 3 },
+        "Astral Raiment": { price: 850, tier: 3 },
+        "Bloodstone Plate Armor": { price: 880, tier: 3 },
+        // Both spellings: the system compendium ships the name misspelled.
+        "Granminister's Finery": { price: 900, tier: 3 },
+        "Granminster's Finery": { price: 900, tier: 3 },
+        "Skywarden's Lamellar": { price: 900, tier: 3 },
+        "Cloverweave Cloak": { price: 950, tier: 3 },
+        // Tier 4
+        "Legendary Scale Mail Armor": { price: 1100, tier: 4 },
+        "Legendary Brigandine Armor": { price: 1200, tier: 4 },
+        "Legendary Banded Armor": { price: 1300, tier: 4 },
+        "Legendary Mage Robes": { price: 1500, tier: 4 },
+        "Darkweave Shroud": { price: 1700, tier: 4 },
+        "Circle-Forged Dreadplate": { price: 1750, tier: 4 },
+        "Godbound Laminar": { price: 1800, tier: 4 },
+        "Rune-Forged Exosuit": { price: 1850, tier: 4 },
+        "Hallowed Heroplate": { price: 1900, tier: 4 },
+        "Resonant Harness": { price: 1950, tier: 4 }
     },
     "Wheelchairs": {
         // Tier 1
@@ -318,7 +499,46 @@ export const PRICE_DATA = {
         "Blinding Orb": { price: 700, tier: 4 },
         "Knowledge Stone": { price: 800, tier: 4 },
         "Death Tea": { price: 900, tier: 4 },
-        "Stardrop": { price: 1000, tier: 4 }
+        "Stardrop": { price: 1000, tier: 4 },
+
+        // --- Hope & Fear (added to the system compendiums in daggerheart 2.8) ---
+        // Tier 1
+        "Cupbearer's Bezoar": { price: 20, tier: 1 },
+        "Mossmantle Potion": { price: 20, tier: 1 },
+        "Vial of Featherfall": { price: 20, tier: 1 },
+        "Vial of Moondrip": { price: 20, tier: 1 },  // no Hope & Fear price; judged here
+        "Lyrebird Lozenge": { price: 22, tier: 1 },
+        "Chimeric Saliva": { price: 25, tier: 1 },
+        "Pipeweed": { price: 25, tier: 1 },
+        "Salamander Salve": { price: 25, tier: 1 },
+        // Tier 2
+        "Bundle of Spiderlegs": { price: 45, tier: 2 },
+        "Nightmare Mead": { price: 45, tier: 2 },
+        "Mnemonic Potion": { price: 50, tier: 2 },
+        "Green Ooze Oil": { price: 55, tier: 2 },
+        "Red Ooze Oil": { price: 55, tier: 2 },
+        "Cacophonous Concoction": { price: 60, tier: 2 },
+        "Concoction": { price: 60, tier: 2 },  // no Hope & Fear price; Nightmare Mead without its drawback
+        "Yakamel Milk": { price: 60, tier: 2 },
+        "Phial of Deep Ink": { price: 65, tier: 2 },
+        "Sun Tree Sap": { price: 65, tier: 2 },  // no Hope & Fear price; judged here
+        "Displacement Token": { price: 70, tier: 2 },
+        "Potion of Vigilance": { price: 70, tier: 2 },
+        "Berserker's Brew": { price: 75, tier: 2 },
+        "Steelskin Salve": { price: 75, tier: 2 },
+        // Tier 3
+        "Mesmer's Tonic": { price: 160, tier: 3 },
+        "Formoid Serum": { price: 180, tier: 3 },
+        "Invisibility Potion": { price: 200, tier: 3 },
+        "Demiurge's Draught": { price: 250, tier: 3 },
+        "Cockerel Claw Tea": { price: 260, tier: 3 },
+        "Snakeskin Spirit": { price: 300, tier: 3 },
+        "Featherstep Potion": { price: 320, tier: 3 },
+        // Tier 4
+        "Lionheart Tonic": { price: 500, tier: 4 },
+        "Dripfang Poison": { price: 700, tier: 4 },  // no Hope & Fear price; 8d10 direct damage
+        "Godling's Pomelo": { price: 800, tier: 4 },
+        "Tears of the Undying Hero": { price: 900, tier: 4 }
     },
     "Consumables": {
         // Tier 1
@@ -343,7 +563,44 @@ export const PRICE_DATA = {
         "Bridge Seed": { price: 400, tier: 3 },
         // Tier 4
         "Mirror of Marigold": { price: 700, tier: 4 },
-        "Stardrop": { price: 1000, tier: 4 }
+        "Stardrop": { price: 1000, tier: 4 },
+
+        // --- Hope & Fear (added to the system compendiums in daggerheart 2.8) ---
+        // Tier 1
+        "Glowmoss Mushroom": { price: 10, tier: 1 },
+        "Iridian Dust": { price: 15, tier: 1 },
+        "Packet of Space Dust": { price: 15, tier: 1 },
+        "Verglasian Seed": { price: 18, tier: 1 },
+        "Warding Candle": { price: 20, tier: 1 },
+        "Instant Camp": { price: 25, tier: 1 },
+        // Tier 2
+        "Moonlight Orb": { price: 40, tier: 2 },
+        "Sunlight Orb": { price: 40, tier: 2 },
+        "Gossip Flower": { price: 45, tier: 2 },
+        "Slayer's Salt": { price: 45, tier: 2 },
+        "Deathseer's Powder": { price: 50, tier: 2 },
+        "Self-Sewing Thread": { price: 55, tier: 2 },
+        "Ciscan Fog Bottle": { price: 60, tier: 2 },
+        "Night Hag's Dust": { price: 60, tier: 2 },
+        "Stonemason's Fortune": { price: 60, tier: 2 },
+        "Snapthorn Seed": { price: 65, tier: 2 },
+        "Gravity Bomb": { price: 70, tier: 2 },
+        "Midas Flask": { price: 80, tier: 2 },
+        // Tier 3
+        "Stake of Abjuration": { price: 180, tier: 3 },
+        "Arcticite Shard": { price: 200, tier: 3 },
+        "Emberite Shard": { price: 200, tier: 3 },
+        "Fulgurite Shard": { price: 220, tier: 3 },
+        "Staff of Reversal": { price: 250, tier: 3 },
+        "Psychopomp's Shroud": { price: 280, tier: 3 },
+        "Necroprancer's Bell": { price: 300, tier: 3 },
+        "Sprite Bottle": { price: 300, tier: 3 },
+        "Magic-User's Malison": { price: 320, tier: 3 },
+        "Gambler's Fallacy": { price: 340, tier: 3 },
+        // Tier 4
+        "Mask of the Echoed Self": { price: 550, tier: 4 },
+        "Quintessential Severant": { price: 600, tier: 4 },
+        "Drakemantle": { price: 650, tier: 4 }
     },
     "Loot": {
         // Tier 1
@@ -409,7 +666,74 @@ export const PRICE_DATA = {
         "Gem of Audacity": { price: 1500, tier: 4 },
         "Gem of Sagacity": { price: 1500, tier: 4 },
         "Ring of Unbreakable Resolve": { price: 2000, tier: 4 },
-        "Belt of Unity": { price: 2000, tier: 4 }
+        "Belt of Unity": { price: 2000, tier: 4 },
+
+        // --- Hope & Fear (added to the system compendiums in daggerheart 2.8) ---
+        // Tier 1
+        "Ball Bearings": { price: 10, tier: 1 },
+        "Collapsible Pole": { price: 12, tier: 1 },
+        "Caltrops": { price: 15, tier: 1 },
+        "Gourmet Granules": { price: 15, tier: 1 },
+        "Windup Toy": { price: 15, tier: 1 },
+        "Box of Dragon Dust": { price: 20, tier: 1 },
+        "Grapnel": { price: 20, tier: 1 },
+        "Blackwing Quill": { price: 25, tier: 1 },
+        "Furball Bag": { price: 30, tier: 1 },
+        "Loaded Dice": { price: 30, tier: 1 },
+        "Self-Tying Rope": { price: 35, tier: 1 },
+        "Hollowbark Horn": { price: 40, tier: 1 },
+        "Kingfisher's Net": { price: 40, tier: 1 },
+        "Thief's Compass": { price: 40, tier: 1 },
+        "Elven Spyglass": { price: 45, tier: 1 },
+        "Mandragorian Torch": { price: 45, tier: 1 },
+        "Cheater's Coin": { price: 50, tier: 1 },
+        // Tier 2
+        "Boots of Supple Mystique": { price: 100, tier: 2 },
+        "Dagginae's Obsidian Slate": { price: 100, tier: 2 },
+        "Silee's Folding Knife": { price: 100, tier: 2 },
+        "Gravewarden's Bell": { price: 110, tier: 2 },
+        "Traveler's Bell": { price: 110, tier: 2 },
+        "Escher's Mirrorball": { price: 120, tier: 2 },
+        "Iron Veil": { price: 120, tier: 2 },
+        "Nighthawker's Ring": { price: 120, tier: 2 },
+        "Whisperstep Anklet": { price: 130, tier: 2 },
+        "Returning Ring": { price: 140, tier: 2 },
+        "Wildrider's Saddle": { price: 140, tier: 2 },
+        "Enchanter's Loupe": { price: 150, tier: 2 },
+        "Gloves of Alacrity": { price: 150, tier: 2 },
+        "Zephyr's Jar": { price: 160, tier: 2 },
+        "Reliquary of the Sightless Saint": { price: 170, tier: 2 },
+        "Gadiman's Backpack": { price: 180, tier: 2 },
+        "Namer's Oracle": { price: 190, tier: 2 },
+        "Titan's Girdle": { price: 190, tier: 2 },
+        // Tier 3
+        "Collar of Ascendancy": { price: 500, tier: 3 },
+        "Force Disc": { price: 500, tier: 3 },
+        "Brooch": { price: 550, tier: 3 },  // no Hope & Fear price; same text as Knockback Bracelets
+        "Eclipse Coin": { price: 550, tier: 3 },
+        "Knockback Bracelets": { price: 550, tier: 3 },
+        "Molepaw Mittens": { price: 550, tier: 3 },
+        "Map of Revelation": { price: 600, tier: 3 },
+        "Two-Faced Aegis Brooch": { price: 600, tier: 3 },
+        "Soul-Twin Circlets": { price: 650, tier: 3 },
+        "Ghoulskin Gloves": { price: 700, tier: 3 },
+        "Iron Dagger Pendant": { price: 700, tier: 3 },
+        "Insomniac's Periapt": { price: 750, tier: 3 },
+        "Sorcerer's Hat": { price: 800, tier: 3 },
+        "Timekeeper's Pendant": { price: 850, tier: 3 },
+        "Crucible Frames": { price: 900, tier: 3 },
+        "Temporal Sanctuary": { price: 950, tier: 3 },
+        // Tier 4
+        "Hero's Helm": { price: 1200, tier: 4 },
+        "Quillshawl": { price: 1200, tier: 4 },
+        "Rings of Camaraderie": { price: 1300, tier: 4 },
+        "Rings of Friendship": { price: 1300, tier: 4 },
+        "Phobophage's Circlet": { price: 1400, tier: 4 },
+        "Communion Relic": { price: 1500, tier: 4 },
+        "Rings of Alliance": { price: 1500, tier: 4 },
+        "Warp Pendant": { price: 1600, tier: 4 },
+        "Portal Frames": { price: 1800, tier: 4 },
+        "Augur's Relic": { price: 2000, tier: 4 }
     }
 };
 
