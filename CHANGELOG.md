@@ -4,6 +4,7 @@
 - [Added] `daggerheart-store.formatPrice` hook: other modules can change how prices and balances are displayed. See docs/API.md.
 - [Fixed] Selling an item from a stack (for example 3 potions) now sells one and keeps the rest. Before, the whole stack was removed for the price of one. The sell lists show the stack size.
 - [Fixed] Homebrew weapon and armor features showed "undefined" in the store tooltips. They now show their name and description, and built-in features show their proper name.
+- [Changed] Verified with Daggerheart 2.11.2.
 
 # 0.6.1
 
