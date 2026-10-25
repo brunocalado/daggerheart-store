@@ -172,7 +172,10 @@ export function extractWeaponStats(doc) {
         const burden = burdenMap[burdenRaw] || burdenRaw;
 
         const features = [];
-        const weaponFeatures = system.weaponFeatures || [];
+        // system.weaponFeatures is a getter the system marks for deprecation; itemFeatures is the stored
+        // field (an object keyed by id in 2.11, a getter returning the array in 2.8), and
+        // Object.values reads both shapes.
+        const weaponFeatures = Object.values(system.itemFeatures ?? {});
         // CONFIG.DH.ITEM.weaponFeatures holds only the built-in features; homebrew ones are
         // merged in by allWeaponFeatures(). Built-in label/description are i18n keys, homebrew
         // ones are plain text and GM-written HTML, and localize() passes the latter through.
@@ -202,7 +205,10 @@ export function extractArmorStats(doc) {
     try {
         const system = doc.system;
         const features = [];
-        const armorFeatures = system.armorFeatures || [];
+        // system.armorFeatures is a getter the system marks for deprecation; itemFeatures is the stored
+        // field (an object keyed by id in 2.11, a getter returning the array in 2.8), and
+        // Object.values reads both shapes.
+        const armorFeatures = Object.values(system.itemFeatures ?? {});
         // CONFIG.DH.ITEM.armorFeatures holds only the built-in features; homebrew ones are
         // merged in by allArmorFeatures(). Built-in label/description are i18n keys, homebrew
         // ones are plain text and GM-written HTML, and localize() passes the latter through.
