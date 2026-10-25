@@ -13,7 +13,7 @@
                  title="Click to view item" width="36" height="36">
             <span class="neg-item-name">{{itemName}}</span>
         </div>
-        <span class="neg-base-price">{{#if basePrice}}Listed: <strong>{{basePrice}} {{currency}}</strong>{{else}}Listed: <em>no fixed price</em>{{/if}}</span>
+        <span class="neg-base-price">{{#if basePrice}}Listed: <strong>{{storePrice basePrice}}</strong>{{else}}Listed: <em>no fixed price</em>{{/if}}</span>
     </div>
 
     {{! ── Stage: initial offer from player ───────────── }}
@@ -21,7 +21,7 @@
         <div class="neg-action-row">
             <div class="neg-action-left">
                 <span class="neg-label">Player's Offer</span>
-                <span class="neg-offer-display accent">{{playerOffer}} {{currency}}</span>
+                <span class="neg-offer-display accent">{{storePrice playerOffer}}</span>
             </div>
             <button type="button" class="neg-btn accept compact" data-action="accept">
                 <i class="fas fa-check"></i> Accept
@@ -52,14 +52,14 @@
         {{#if gmCounter}}
             <div class="neg-offer-row">
                 <span class="neg-label">Your Counter</span>
-                <span class="neg-offer-display dim">{{gmCounter}} {{currency}}</span>
+                <span class="neg-offer-display dim">{{storePrice gmCounter}}</span>
             </div>
             <div class="neg-divider"><i class="fas fa-arrows-alt-v"></i></div>
         {{/if}}
 
         <div class="neg-offer-row highlight">
             <span class="neg-label">Player's Final Offer</span>
-            <span class="neg-offer-display accent">{{playerOffer}} {{currency}}</span>
+            <span class="neg-offer-display accent">{{storePrice playerOffer}}</span>
         </div>
 
         <div class="neg-section-label">This is the player's final offer. Accept or reject.</div>

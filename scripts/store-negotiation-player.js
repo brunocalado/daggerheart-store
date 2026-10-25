@@ -6,7 +6,7 @@
  */
 
 import { MODULE_ID, NEGOTIATION_FLAG_KEY, NEGOTIATION_STAGES } from "./store-constants.js";
-import { getChatWhisperRecipients, buildChatCard, getSystemCurrency, createStoreChatMessage } from "./store-utils.js";
+import { getChatWhisperRecipients, buildChatCard, getSystemCurrency, formatPrice, createStoreChatMessage } from "./store-utils.js";
 import { queryCancelNegotiation, queryAcceptCounter, querySubmitFinalOffer } from "./socket.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api;
@@ -223,7 +223,6 @@ export class PlayerNegotiationApp extends HandlebarsApplicationMixin(Application
     async _postNegotiationChat(result, agreedPrice, flag) {
         if (!flag?.playerId || flag.playerId !== game.user.id) return;
 
-        const currency    = getSystemCurrency();
         const isBuy       = (flag?.type ?? this.options.type) === "buy";
         const itemName    = flag?.itemName ?? this.options.itemName;
         const playerName  = flag?.playerName ?? game.user.name;
@@ -236,8 +235,8 @@ export class PlayerNegotiationApp extends HandlebarsApplicationMixin(Application
             body        = `
                 <strong>${playerName}</strong> ${isBuy ? "bought" : "sold"}
                 <strong>${itemName}</strong> for
-                <strong>${agreedPrice} ${currency}</strong>
-                <span style="color:var(--color-text-secondary)"> (listed: ${flag?.basePrice ?? "?"})</span>`;
+                <strong>${formatPrice(agreedPrice)}</strong>
+                <span style="color:var(--color-text-secondary)"> (listed: ${flag?.basePrice != null ? formatPrice(flag.basePrice) : "?"})</span>`;
         } else {
             borderColor = "#C9A060";
             title       = "Negotiation Cancelled";

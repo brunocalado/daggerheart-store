@@ -93,14 +93,14 @@
 
                 <!-- PC Wealth -->
                 <label>PC Wealth:</label>
-                <span class="gold-display"><i class="fas fa-coins"></i> {{userGold}} {{currency}}</span>
+                <span class="gold-display"><i class="fas fa-coins"></i> {{storePrice userGold}}</span>
 
                 <!-- Separator -->
                 <span style="margin: 0 10px; opacity: 0.5;">|</span>
 
                 <!-- Party Wealth -->
                 <label>Party Wealth:</label>
-                <span class="gold-display"><i class="fas fa-users"></i> {{partyGold}} {{currency}}</span>
+                <span class="gold-display"><i class="fas fa-users"></i> {{storePrice partyGold}}</span>
             </div>
         {{else}}
             <!-- No Party Actor: Standard Display -->
@@ -127,7 +127,7 @@
             </div>
             <div class="header-right">
                 <label>PC Wealth:</label>
-                <span class="gold-display"><i class="fas fa-coins"></i> {{userGold}} {{currency}}</span>
+                <span class="gold-display"><i class="fas fa-coins"></i> {{storePrice userGold}}</span>
             </div>
         {{/if}}
     {{/if}}

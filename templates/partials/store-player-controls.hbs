@@ -12,13 +12,13 @@
         {{#if this.isSale}}
             <span class="item-price sale">
                 <i class="fas fa-coins price-coin-icon"></i>
-                <span class="original">{{this.originalPrice}}</span>
-                <span class="new">{{this.price}}</span>
+                <span class="original">{{storePrice this.originalPrice label=false}}</span>
+                <span class="new">{{storePrice this.price label=false}}</span>
             </span>
         {{else}}
             <span class="item-price">
             <i class="fas fa-coins price-coin-icon"></i>
-            {{this.price}}</span>
+            {{storePrice this.price label=false}}</span>
         {{/if}}
     </div>
 

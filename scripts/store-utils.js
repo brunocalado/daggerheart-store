@@ -105,6 +105,22 @@ export function getSystemCurrency() {
 }
 
 /**
+ * Builds the display text for an amount of currency. Every price and balance the store shows
+ * goes through here, so other modules can restyle money by listening to
+ * `daggerheart-store.formatPrice` and replacing `data.text`.
+ * @param {number} amount - Amount in the base unit (`system.gold.coins`)
+ * @param {object} [options]
+ * @param {boolean} [options.label=true] - Append the currency name. False where the UI already
+ *   shows a coin icon and only the number is printed (item cards).
+ * @returns {string} Plain text
+ */
+export function formatPrice(amount, { label = true } = {}) {
+    const data = { amount, label, text: label ? `${amount} ${getSystemCurrency()}` : String(amount) };
+    foundry.helpers.Hooks.callAll(`${MODULE_ID}.formatPrice`, data);
+    return data.text;
+}
+
+/**
  * Calculates total wealth in coins across all denomination slots.
  * Used by the "smart" currency mode.
  * @param {Actor} actor - The actor to calculate wealth for

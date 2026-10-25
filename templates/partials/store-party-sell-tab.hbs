@@ -19,7 +19,7 @@
             <div class="row-right">
                 <div class="price-display">
                     <span class="item-price">
-                        <i class="fas fa-coins price-coin-icon"></i> {{this.sellPrice}}
+                        <i class="fas fa-coins price-coin-icon"></i> {{storePrice this.sellPrice label=false}}
                     </span>
                 </div>
 
@@ -47,7 +47,7 @@
                         data-uuid="{{this.catalogUuid}}"
                         data-item-id="{{this.itemId}}"
                         data-price="{{this.sellPrice}}"
-                        title="{{#if this.canSell}}Sell for {{this.sellPrice}}{{else}}Sale blocked for this item{{/if}}"
+                        title="{{#if this.canSell}}Sell for {{storePrice this.sellPrice}}{{else}}Sale blocked for this item{{/if}}"
                         {{#unless this.canSell}}disabled{{/unless}}>
                     <i class="fas fa-hand-holding-dollar"></i> Sell
                 </button>

@@ -7,7 +7,7 @@ import { migrateTags } from "./store-migration.js";
 import { registerQueryHandlers, queryCancelNegotiation, querySellFromParty } from "./socket.js";
 import { MODULE_ID, NEGOTIATION_FLAG_KEY, NEGOTIATION_STAGES } from "./store-constants.js";
 import { GMNegotiationApp } from "./store-negotiation-gm.js";
-import { addGold, getActorWealth, createStoreChatMessage } from "./store-utils.js";
+import { addGold, getActorWealth, createStoreChatMessage, formatPrice } from "./store-utils.js";
 const { DialogV2 } = foundry.applications.api;
 
 Hooks.once("init", () => {
@@ -287,6 +287,9 @@ Hooks.once("init", () => {
     ]);
 
     // --- HANDLEBARS HELPERS FOR COMPARISON ---
+    Handlebars.registerHelper("storePrice", (amount, options) =>
+        formatPrice(amount, { label: options.hash.label ?? true }));
+
     Handlebars.registerHelper("compareClass", (direction) => {
         if (direction === "up") return "compare-better";
         if (direction === "down") return "compare-worse";

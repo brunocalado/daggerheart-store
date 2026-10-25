@@ -8,7 +8,7 @@ import {
 } from "./store-constants.js";
 import {
     getValidItemTypes, getItemTier, extractPriceFromDescription, getItemHeader,
-    getOriginalName, getSystemCurrency, getActorWealth, deductGold, addGold,
+    getOriginalName, getSystemCurrency, formatPrice, getActorWealth, deductGold, addGold,
     getChatWhisperRecipients, buildChatCard, createStoreChatMessage,
     getEpicTextColor, getEpicBgColor,
     showStoreDialog, getUnidentifiedDisplayData
@@ -595,7 +595,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const profileKeys = Object.keys(storeProfiles);
         if (!profileKeys.includes("Default")) profileKeys.unshift("Default");
 
-        const currencyName = getSystemCurrency();
 
         let bestTraits = [];
         if (hasActor && !isGM) {
@@ -616,7 +615,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const context = {
             isGM, hasActor,
             actorName: userActor ? userActor.name : "None",
-            currency: currencyName,
             hasPartyActor,
             userGold, partyGold,
             tabs: {},
@@ -1491,14 +1489,13 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
 
         await addGold(userActor, sellPrice);
 
-        const currency = getSystemCurrency();
         const borderColor = this._getBorderColor("sell");
         const body = `
             <span style="color: #ffffff; font-size: 1.1em; font-weight: bold; font-family: 'Lato', sans-serif;">
                 <strong>${userActor.name}</strong> sold <strong>${itemName}</strong>
             </span>
             <span style="color: #d4af37; font-size: 1.2em; font-weight: bold; margin-top: 10px;">
-                +${sellPrice} ${currency}
+                +${formatPrice(sellPrice)}
             </span>`;
 
         const chatData = {
@@ -1550,7 +1547,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const stockEnabled = game.settings.get(MODULE_ID, "stockEnabled") && !!partyActor;
         if (stockEnabled && itemUuid) await StockManager.incrementStock(itemUuid, 1);
 
-        const currency = getSystemCurrency();
         const borderColor = this._getBorderColor("sell");
         const sellerName = game.user.character?.name ?? game.user.name;
         const body = `
@@ -1558,7 +1554,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 <strong>${sellerName}</strong> sold <strong>${itemName}</strong> from the party inventory
             </span>
             <span style="color: #d4af37; font-size: 1.2em; font-weight: bold; margin-top: 10px;">
-                +${sellPrice} ${currency}
+                +${formatPrice(sellPrice)}
             </span>`;
 
         const chatData = {
@@ -1626,7 +1622,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             ? (isBuy ? Math.floor(basePrice * 0.8) : Math.ceil(basePrice * 1.2))
             : 1;
         const listedText = basePrice > 0
-            ? `Listed: ${basePrice} <i class="fas fa-coins"></i> ${currency}`
+            ? `Listed: <i class="fas fa-coins"></i> ${formatPrice(basePrice)}`
             : `Listed: <em>no fixed price</em>`;
 
         const content = `
@@ -1726,7 +1722,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             <p><strong>${game.user.name}</strong> is negotiating for
             <strong>${itemName}</strong>.</p>
             <p style="color:var(--color-text-secondary);font-size:0.9em;">
-                Listed: ${basePrice} ${currency} &mdash; Offer: ${playerOffer} ${currency}
+                Listed: ${formatPrice(basePrice)} &mdash; Offer: ${formatPrice(playerOffer)}
             </p>`;
         const chatData = {
             content: buildChatCard({ title: "Negotiation Started", borderColor, body }),
@@ -1787,11 +1783,11 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             <div class="transfer-wealth-display">
                 <div class="transfer-wealth-item">
                     <div class="transfer-wealth-label"><i class="fas fa-coins"></i> My Wealth</div>
-                    <div class="transfer-wealth-value">${userWealth} ${currency}</div>
+                    <div class="transfer-wealth-value">${formatPrice(userWealth)}</div>
                 </div>
                 <div class="transfer-wealth-item">
                     <div class="transfer-wealth-label"><i class="fas fa-users"></i> Party Resources</div>
-                    <div class="transfer-wealth-value">${partyWealth} ${currency}</div>
+                    <div class="transfer-wealth-value">${formatPrice(partyWealth)}</div>
                 </div>
             </div>
             <div class="transfer-direction-container">
@@ -1837,7 +1833,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                                 await addGold(userActor, amount);
                                 return ui.notifications.error("Failed to deposit funds. Your gold has been refunded.");
                             }
-                            storeApp._createTransferChatMessage(userActor, partyActor, amount, "deposit", currency);
+                            storeApp._createTransferChatMessage(userActor, partyActor, amount, "deposit");
                         } else {
                             // Balance check happens server-side in the GM handler against live data
                             const withdrawResult = await queryWithdrawFromParty(partyActor.id, amount);
@@ -1846,7 +1842,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                                 return ui.notifications.error("Failed to withdraw funds. Please try again.");
                             }
                             await addGold(userActor, amount);
-                            storeApp._createTransferChatMessage(userActor, partyActor, amount, "withdraw", currency);
+                            storeApp._createTransferChatMessage(userActor, partyActor, amount, "withdraw");
                         }
                         storeApp.render();
                     }
@@ -1874,7 +1870,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         dialog.render(true);
     }
 
-    async _createTransferChatMessage(userActor, partyActor, amount, type, currency) {
+    async _createTransferChatMessage(userActor, partyActor, amount, type) {
         const title = type === "deposit" ? "Funds Deposited" : "Funds Withdrawn";
         const message = type === "deposit"
             ? `<strong>${userActor.name}</strong> deposited funds to <strong>${partyActor.name}</strong>.`
@@ -1886,7 +1882,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 ${message}
             </span>
             <span style="color: #d4af37; font-size: 1.3em; font-weight: bold; margin-top: 10px;">
-                ${amount} ${currency}
+                ${formatPrice(amount)}
             </span>`;
 
         const chatData = {
@@ -1901,7 +1897,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
     }
 
     async _handleSplitPurchase(itemUuid, itemName, price, userActor, partyActor) {
-        const currency = getSystemCurrency();
         const userGold = getActorWealth(userActor);
         const partyGold = getActorWealth(partyActor);
 
@@ -1914,14 +1909,14 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 <div class="split-payment-header">
                     <span class="split-payment-action">Buying</span>
                     <span class="split-payment-item">${itemName}</span>
-                    <span class="split-payment-cost">Cost: ${price} <i class="fas fa-coins"></i> ${currency}</span>
+                    <span class="split-payment-cost">Cost: <i class="fas fa-coins"></i> ${formatPrice(price)}</span>
                 </div>
                 <div class="split-payment-separator"></div>
                 <div class="split-payment-source-group">
                     <div class="split-payment-row">
                         <div class="split-payment-label-group">
                             <span class="split-payment-label">${userActor.name}</span>
-                            <span class="split-payment-wealth">(${userGold} ${currency})</span>
+                            <span class="split-payment-wealth">(${formatPrice(userGold)})</span>
                         </div>
                         <div class="split-payment-input-wrapper">
                             <i class="fas fa-coins"></i>
@@ -1933,7 +1928,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     <div class="split-payment-row">
                         <div class="split-payment-label-group">
                             <span class="split-payment-label">Party</span>
-                            <span class="split-payment-wealth">(${partyGold} ${currency})</span>
+                            <span class="split-payment-wealth">(${formatPrice(partyGold)})</span>
                         </div>
                         <div class="split-payment-input-wrapper">
                             <i class="fas fa-coins"></i>
@@ -1990,7 +1985,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const itemFromPack = await fromUuid(itemUuid);
         if (!itemFromPack) return ui.notifications.error("Item data not found.");
 
-        const currency = getSystemCurrency();
 
         const partyId = game.settings.get(MODULE_ID, "partyActorId");
         for (const payer of payers) {
@@ -2017,7 +2011,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             if (!success) ui.notifications.warn("Stock depleted during purchase. Item added but stock was not updated.");
         }
 
-        const payerText = payers.filter(p => p.amount > 0).map(p => `<strong>${p.name}</strong> (${p.amount})`).join(" & ");
+        const payerText = payers.filter(p => p.amount > 0).map(p => `<strong>${p.name}</strong> (${formatPrice(p.amount, { label: false })})`).join(" & ");
         const itemLink = itemFromPack.link;
         const usedPartyFunds = payers.some(p => p.name === "Party Funds");
         const borderColor = this._getBorderColor(usedPartyFunds ? "party" : "buy");
@@ -2030,7 +2024,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 Paid by: ${payerText}
             </span>
             <span style="color: #d4af37; font-size: 1.2em; font-weight: bold; margin-top: 5px;">
-                -${price} ${currency}
+                -${formatPrice(price)}
             </span>`;
 
         const chatData = {

@@ -1,3 +1,7 @@
+# Unreleased
+
+- [Added] `daggerheart-store.formatPrice` hook: other modules can change how prices and balances are displayed. See docs/API.md.
+
 # 0.6.1
 
 - [Added] Prices and tiers for the 280 Hope & Fear items that Daggerheart 2.8 merged into the system compendiums (`daggerheart.weapons`, `armors`, `consumables`, `loot`). Without them the store simply skipped every new item: for default compendiums `store-app.js` only lists a document whose name is a key in the matching `PRICE_DATA` category. Added to `price-data.js` as a marked block at the end of each category — 85 Primary Weapons, 37 Secondary Weapons, 36 Armors, 33 Potions, 31 Consumables, 61 Loot. Prices come from the pricing tables of the `dh-hope-fear` module, which follow the system's equipment bands (tier 1: 10–50 | tier 2: 100–200 | tier 3: 500–1000 | tier 4: 1000–2000), with consumables at roughly a third of the band since they're spent on use. Weapon and armor tiers are taken from the system's own `system.tier`; loot and consumable tiers are judged per item, as the system stores no tier for those two types. Every one of the 635 items across the four system packs now resolves to a price.

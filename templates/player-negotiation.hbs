@@ -4,7 +4,7 @@
     <div class="neg-item-header">
         <span class="neg-item-name">{{itemName}}</span>
         <span class="neg-base-price">
-            {{#if basePrice}}Listed: <strong>{{basePrice}} {{currency}}</strong>{{else}}Listed: <em>no fixed price</em>{{/if}}
+            {{#if basePrice}}Listed: <strong>{{storePrice basePrice}}</strong>{{else}}Listed: <em>no fixed price</em>{{/if}}
             {{#if (eq type "sell")}}
                 <span class="neg-type-badge sell">Selling</span>
             {{else}}
@@ -17,7 +17,7 @@
     {{#if isPendingGm}}
         <div class="neg-offer-row">
             <span class="neg-label">Your Offer</span>
-            <span class="neg-offer-display">{{playerOffer}} {{currency}}</span>
+            <span class="neg-offer-display">{{storePrice playerOffer}}</span>
         </div>
         <div class="neg-waiting">
             <i class="fas fa-hourglass-half neg-waiting-icon"></i>
@@ -29,14 +29,14 @@
     {{#if isPendingPlayer}}
         <div class="neg-offer-row">
             <span class="neg-label">Your Offer</span>
-            <span class="neg-offer-display dim">{{playerOffer}} {{currency}}</span>
+            <span class="neg-offer-display dim">{{storePrice playerOffer}}</span>
         </div>
 
         <div class="neg-divider"><i class="fas fa-arrows-alt-v"></i></div>
 
         <div class="neg-offer-row highlight">
             <span class="neg-label">GM Counter</span>
-            <span class="neg-offer-display accent">{{gmCounter}} {{currency}}</span>
+            <span class="neg-offer-display accent">{{storePrice gmCounter}}</span>
         </div>
 
         <div class="neg-actions">
@@ -65,11 +65,11 @@
     {{#if isPendingGmFinal}}
         <div class="neg-offer-row">
             <span class="neg-label">GM Counter</span>
-            <span class="neg-offer-display dim">{{gmCounter}} {{currency}}</span>
+            <span class="neg-offer-display dim">{{storePrice gmCounter}}</span>
         </div>
         <div class="neg-offer-row highlight">
             <span class="neg-label">Your Final Offer</span>
-            <span class="neg-offer-display accent">{{playerOffer}} {{currency}}</span>
+            <span class="neg-offer-display accent">{{storePrice playerOffer}}</span>
         </div>
         <div class="neg-waiting">
             <i class="fas fa-hourglass-half neg-waiting-icon"></i>
