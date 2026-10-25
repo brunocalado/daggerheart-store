@@ -74,7 +74,8 @@ export const EXCLUDED_SYSTEM_PACKS = [
     "daggerheart.armors",
     "daggerheart.consumables",
     "daggerheart.loot",
-    "daggerheart.beastforms"
+    "daggerheart.beastforms",
+    "daggerheart.transformations"
 ];
 
 /** Icon mapping for category cards in config UI */
