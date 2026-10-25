@@ -27,7 +27,7 @@ await Store.Show({ username: "Player2" });
 
 ## Hook: `daggerheart-store.formatPrice`
 
-Fires every time the store builds the text for a price or a balance: the store window, item cards, dialogs, negotiation windows and chat cards. Listeners are called in registration order, and a `false` return does not stop the chain.
+Fires every time the store builds the text for a price or a balance: the store window, item cards, dialogs, negotiation windows and chat cards. Listeners are called in registration order, and a `false` return does not stop the chain. Set `text` before your listener returns: the store reads it right away and does not wait for a returned Promise, so anything assigned after an `await` is lost.
 
 The hook receives one mutable object:
 
