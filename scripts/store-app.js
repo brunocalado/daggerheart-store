@@ -2014,6 +2014,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             }
         }
 
+        // Always a new document, even when the recipient already holds an identical stack:
+        // merging into it would mean copying the system's own item-identity rules.
         const itemData = itemFromPack.toObject();
         await recipient.createEmbeddedDocuments("Item", [itemData]);
 
