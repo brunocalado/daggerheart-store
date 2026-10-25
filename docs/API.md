@@ -1,4 +1,4 @@
-# 🧩 Daggerheart: Store — Developer API
+# 🧩 Daggerheart: Store developer API
 
 What macros and other modules can use from the store: the global `Store` object to open it from a macro, and a hook to change how prices and balances are displayed. For setup and day-to-day use, see the [README](../README.md) and the [full guide](WIKI.md).
 
@@ -8,14 +8,14 @@ What macros and other modules can use from the store: the global `Store` object 
 
 | Call | Who | What it does |
 |---|---|---|
-| `Store.Open()` | Any user | Opens the store for the caller. Players need a linked character, otherwise the GM gets a chat notice. |
+| `Store.Open()` | Any user | Opens the store for the caller. A player without a linked character sees the store but cannot buy, and a chat notice is whispered to the GMs and to that player. |
 | `Store.Show({ username, store })` | GM only | Opens the store on other clients. Both options are optional. |
 | `Store.EditTags()` | GM only | Opens the Item Tag Editor. |
 
 `Store.Show` options:
 
-- `username` (string) — open it only for that player. Omit to open it for every connected client.
-- `store` (string) — name of a store profile to load before opening. Omit to keep the active profile.
+- `username` (string): open it only for that player. Omit to open it for every connected client.
+- `store` (string): name of a store profile to load before opening. Omit to keep the active profile.
 
 ```js
 // Open the store for everyone, using the "Blacksmith" profile

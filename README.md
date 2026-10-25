@@ -13,9 +13,9 @@ Daggerheart: Store opens a shop inside Foundry. The player picks an item and cli
 * Browse the categories (Weapons, Armor, Potions and the others) in tabs, and search by typing part of an item's name. Clicking an item's image opens its compendium sheet.
 * Buy an item. The cost is taken from the character sheet and the item is added to the inventory. Coin sounds and a styled chat message confirm the transaction.
 * Split the cost of a purchase between the character and the Party Actor's funds, and see the party's wealth in the store header.
-* Sell items from the character's inventory. They are listed under "Store Items" (priced by the catalog or by the GM) and "Other Items, Negotiation Only" (unpriced items, which can only be sold by proposing your own offer). The GM sets the sell value.
+* Sell items from the character's inventory. Selling from a stack, such as three potions, sells one and keeps the rest. Items are listed under "Store Items" (priced by the catalog or by the GM) and "Other Items, Negotiation Only" (unpriced items, which can only be sold by proposing your own offer). The GM sets the sell value.
 * Sell from the party's shared inventory in a second tab. It appears for players with Owner permission on the configured Party Actor, and the money goes to the party's wealth instead of the character's.
-* Click Bargain on an item to negotiate with the GM: propose an offer, receive counter-offers and accept when you agree. An accepted deal is blocked if it would leave your funds negative.
+* Click the handshake button on an item to negotiate with the GM: propose an offer, receive counter-offers and accept when you agree. An accepted deal is blocked if it would leave your funds negative.
 * See which items are on sale by their tag and reduced price.
 * Read the main stats in the list: Damage, Range and Trait for weapons, Score and Thresholds for armor. A gold crown marks the weapons that match the character's highest Trait.
 * Compare a store item with the one currently equipped before buying.
@@ -37,10 +37,10 @@ With the **Update All** currency mode (the default), Handfuls, Bags and Chests o
 * Lock items so the Randomizer never replaces them, and use the Randomizer to generate the inventory of each category with the parameters you choose. A shortcut restores the maximum item counts.
 * Turn player bargaining on or off in the Store Config. When a player negotiates, a window opens for the GM to counter, accept or reject the offer. The deal cannot be finalized if the player can no longer afford the price.
 * Set the merchant's name, portrait and description in the Vendor tab, and set each player character's relationship level, from Hostile to Allied. Each level applies a price modifier after all other pricing rules.
-* Edit an item's price, tier and header in the Item Tag Editor, which writes to the item's flags, so the description does not have to be edited by hand.
+* Edit an item's price, tier and header in the **Item Tagger**, which writes to the item's flags, so the description does not have to be edited by hand.
 * Link a Party Actor to allow group purchases.
 * Add homebrew compendiums to the store, or turn off the system's default compendiums to use only your own. A Custom Tab can be dedicated to one or more compendiums for special merchant inventories.
-* Export and import a store profile to share it between worlds or with other GMs.
+* Export the store configuration and all its profiles to a file from **Import / Export** in the module settings, and import it in another world or share it with other GMs. An import can replace the current settings, be merged with them, or bring in a single profile.
 
 The currency name is read from the Daggerheart system settings.
 
@@ -96,7 +96,7 @@ Install it from the Foundry VTT module browser, or use this manifest link:
 https://github.com/brunocalado/daggerheart-store/releases/latest/download/module.json
 ```
 
-It needs Foundry VTT 14 and the Daggerheart system 2.8.1 or newer.
+It needs Foundry VTT 14 and the Daggerheart system 2.8.1 or newer, and was verified with Daggerheart 2.11.2.
 
 ## ⚖️ Credits and License
 
