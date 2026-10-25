@@ -96,6 +96,18 @@ export function getUnidentifiedDisplayData(doc) {
     };
 }
 
+/**
+ * Removes one unit of an owned item. Daggerheart stacks identical loot and consumables on a
+ * character, and every inventory type on a party, in `system.quantity`; deleting the document
+ * would throw away the whole stack for the price of one.
+ * @param {Item} item
+ */
+export async function removeOneUnit(item) {
+    const quantity = item.system.quantity ?? 1;
+    if (quantity > 1) return item.update({ "system.quantity": quantity - 1 });
+    return item.delete();
+}
+
 // --- Currency Helpers ---
 
 /**

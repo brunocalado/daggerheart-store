@@ -19,7 +19,7 @@ import {
     getOriginalName, getSystemCurrency, formatPrice, getActorWealth, deductGold, addGold,
     getChatWhisperRecipients, buildChatCard, createStoreChatMessage,
     getEpicTextColor, getEpicBgColor,
-    showStoreDialog, getUnidentifiedDisplayData
+    showStoreDialog, getUnidentifiedDisplayData, removeOneUnit
 } from "./store-utils.js";
 import { queryDepositToParty, queryWithdrawFromParty, querySellFromParty, queryStartNegotiation, queryCancelNegotiation } from "./socket.js";
 import { PlayerNegotiationApp } from "./store-negotiation-player.js";
@@ -376,7 +376,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         isSaleBlocked,
                         catalogUuid: null,
                         description: sellMaskedDesc ?? "",
-                        itemId: playerItem.id
+                        itemId: playerItem.id,
+                        quantity: playerItem.system.quantity ?? 1
                     });
                     continue;
                 }
@@ -395,7 +396,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     // null UUID → _onSellItem's `stockEnabled && itemUuid` guard skips stock increment
                     catalogUuid: null,
                     description: sellMaskedDesc ?? "",
-                    itemId: playerItem.id
+                    itemId: playerItem.id,
+                    quantity: playerItem.system.quantity ?? 1
                 });
                 continue;
             }
@@ -415,7 +417,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 // Catalog UUID used by _setupItemImages (click to view) and stock management in _onSellItem
                 catalogUuid: entry.uuid,
                 description: sellMaskedDesc ?? (entry.description || ""),
-                itemId: playerItem.id
+                itemId: playerItem.id,
+                quantity: playerItem.system.quantity ?? 1
             });
         }
 
@@ -466,7 +469,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         isSaleBlocked,
                         catalogUuid: null,
                         description: sellMaskedDesc ?? "",
-                        itemId: partyItem.id
+                        itemId: partyItem.id,
+                        quantity: partyItem.system.quantity ?? 1
                     });
                     continue;
                 }
@@ -482,7 +486,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     isSaleBlocked,
                     catalogUuid: null,
                     description: sellMaskedDesc ?? "",
-                    itemId: partyItem.id
+                    itemId: partyItem.id,
+                    quantity: partyItem.system.quantity ?? 1
                 });
                 continue;
             }
@@ -499,7 +504,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                 isSaleBlocked,
                 catalogUuid: entry.uuid,
                 description: sellMaskedDesc ?? (entry.description || ""),
-                itemId: partyItem.id
+                itemId: partyItem.id,
+                quantity: partyItem.system.quantity ?? 1
             });
         }
 
@@ -1488,7 +1494,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             : userActor.items.find(i => i.name === itemName);
         if (!itemToDelete) return ui.notifications.warn(`You do not have a "${itemName}" to sell.`);
 
-        await itemToDelete.delete();
+        await removeOneUnit(itemToDelete);
 
         const partyActorId = game.settings.get(MODULE_ID, "partyActorId");
         const hasPartyActor = !!(partyActorId && game.actors.get(partyActorId));

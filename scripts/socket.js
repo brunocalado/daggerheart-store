@@ -17,7 +17,7 @@
  */
 
 import { StockManager } from "./stock-manager.js";
-import { deductGold, addGold, getActorWealth } from "./store-utils.js";
+import { deductGold, addGold, getActorWealth, removeOneUnit } from "./store-utils.js";
 import { MODULE_ID, NEGOTIATION_FLAG_KEY, NEGOTIATION_STAGES } from "./store-constants.js";
 
 // ---------------------------------------------------------------
@@ -154,7 +154,7 @@ export function registerQueryHandlers() {
     };
 
     // --- Party Inventory: Sell ---
-    // Deletes an item from the Party Actor and credits the sale price to the
+    // Removes one unit of an item from the Party Actor and credits the sale price to the
     // party's own wealth (not the selling player's). Delegated to the GM
     // because players only hold Observer access on the Party Actor.
     CONFIG.queries[Q.sellFromParty] = async ({ partyActorId, itemId, amount }) => {
@@ -167,7 +167,7 @@ export function registerQueryHandlers() {
         if (!item) return { ok: false, reason: "item_not_found" };
 
         try {
-            await item.delete();
+            await removeOneUnit(item);
             await addGold(partyActor, amount);
             return { ok: true };
         } catch (err) {
@@ -425,10 +425,10 @@ export async function queryWithdrawFromParty(partyActorId, amount) {
 }
 
 /**
- * Requests the GM to delete an item from the Party Actor and credit the
+ * Requests the GM to remove one unit of an item from the Party Actor and credit the
  * sale price to the party's wealth.
  * @param {string} partyActorId - Party Actor ID
- * @param {string} itemId - ID of the item to delete from the Party Actor
+ * @param {string} itemId - ID of the item to sell from the Party Actor
  * @param {number} amount - Sale price to credit to the party
  * @returns {Promise<{ok: boolean, reason?: string}>}
  */

@@ -15,7 +15,7 @@ import { migrateTags } from "./store-migration.js";
 import { registerQueryHandlers, queryCancelNegotiation, querySellFromParty } from "./socket.js";
 import { MODULE_ID, NEGOTIATION_FLAG_KEY, NEGOTIATION_STAGES } from "./store-constants.js";
 import { GMNegotiationApp } from "./store-negotiation-gm.js";
-import { addGold, getActorWealth, createStoreChatMessage, formatPrice } from "./store-utils.js";
+import { addGold, getActorWealth, createStoreChatMessage, formatPrice, removeOneUnit } from "./store-utils.js";
 const { DialogV2 } = foundry.applications.api;
 
 Hooks.once("init", () => {
@@ -560,11 +560,11 @@ Hooks.on("updateActor", async (actor, changes, options, userId) => {
                     }
                 }
             } else {
-                // Sell: delete the owned item and credit the agreed price.
+                // Sell: remove one unit of the owned item and credit the agreed price.
                 const itemToDelete = fullFlag.itemId
                     ? userActor.items.get(fullFlag.itemId)
                     : userActor.items.find(i => i.name === fullFlag.itemName);
-                if (itemToDelete) await itemToDelete.delete();
+                if (itemToDelete) await removeOneUnit(itemToDelete);
 
                 const stockEnabled = game.settings.get(MODULE_ID, "stockEnabled");
                 if (stockEnabled && fullFlag.itemUuid) {

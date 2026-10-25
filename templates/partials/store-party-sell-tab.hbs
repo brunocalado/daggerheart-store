@@ -13,7 +13,7 @@
                          width="36" height="36" />
                 </div>
 
-                <span class="store-item-name" {{#if this.description}}data-item-desc="{{this.description}}"{{/if}}>{{this.name}}</span>
+                <span class="store-item-name" {{#if this.description}}data-item-desc="{{this.description}}"{{/if}}>{{this.name}}{{#if (gt this.quantity 1)}} ×{{this.quantity}}{{/if}}</span>
             </div>
 
             <div class="row-right">
@@ -72,7 +72,7 @@
                          width="36" height="36" />
                 </div>
 
-                <span class="store-item-name" {{#if this.description}}data-item-desc="{{this.description}}"{{/if}}>{{this.name}}</span>
+                <span class="store-item-name" {{#if this.description}}data-item-desc="{{this.description}}"{{/if}}>{{this.name}}{{#if (gt this.quantity 1)}} ×{{this.quantity}}{{/if}}</span>
             </div>
 
             <div class="row-right">
