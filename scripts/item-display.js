@@ -1,3 +1,11 @@
+/*!
+ * Daggerheart: Store
+ * 2025 https://github.com/brunocalado
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3.
+ */
+
 /**
  * Pure helpers for sanitizing item descriptions and parsing damage strings.
  * Extracted from `store-app.js` to keep the main class focused on rendering

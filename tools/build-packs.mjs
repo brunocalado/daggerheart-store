@@ -1,3 +1,11 @@
+/*!
+ * Daggerheart: Store
+ * 2025 https://github.com/brunocalado
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3.
+ */
+
 import { compilePack, extractPack } from "@foundryvtt/foundryvtt-cli";
 import { readFileSync, rmSync } from "node:fs";
 import { join, dirname } from "node:path";

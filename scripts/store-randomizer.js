@@ -1,3 +1,11 @@
+/*!
+ * Daggerheart: Store
+ * 2025 https://github.com/brunocalado
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3.
+ */
+
 import { PRICE_DATA, PACK_MAPPING } from "./price-data.js";
 import { StockManager } from "./stock-manager.js";
 import { MODULE_ID, STANDARD_CATEGORIES, CATEGORY_ITEM_TYPE } from "./store-constants.js";

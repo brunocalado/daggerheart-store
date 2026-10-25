@@ -1,3 +1,11 @@
+/*!
+ * Daggerheart: Store
+ * 2025 https://github.com/brunocalado
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3.
+ */
+
 /**
  * Pure helpers for extracting weapon and armor stats from item documents and
  * formatting them for display. Extracted from `store-app.js` so the main class

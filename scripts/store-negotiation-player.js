@@ -1,3 +1,11 @@
+/*!
+ * Daggerheart: Store
+ * 2025 https://github.com/brunocalado
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3.
+ */
+
 /**
  * Player-side negotiation window for the Daggerheart Store.
  * Opens when a player initiates a price bargain. Reacts to Party Actor flag
