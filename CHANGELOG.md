@@ -3,6 +3,7 @@
 - [Changed] Releases are now published as GitHub releases and registered on foundryvtt.com automatically. The manifest URL is now `https://github.com/brunocalado/daggerheart-store/releases/latest/download/module.json`; existing installs pick it up on their next update.
 - [Added] `daggerheart-store.formatPrice` hook: other modules can change how prices and balances are displayed. See docs/API.md.
 - [Fixed] Selling an item from a stack (for example 3 potions) now sells one and keeps the rest. Before, the whole stack was removed for the price of one. The sell lists show the stack size.
+- [Fixed] Homebrew weapon and armor features showed "undefined" in the store tooltips. They now show their name and description, and built-in features show their proper name.
 
 # 0.6.1
 

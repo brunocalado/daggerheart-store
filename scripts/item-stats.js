@@ -18,7 +18,7 @@
 
 import { MODULE_ID } from "./store-constants.js";
 import { getItemTier } from "./store-utils.js";
-import { cleanDescription, parseDamageTypes } from "./item-display.js";
+import { cleanDescription, cleanDescriptionString, parseDamageTypes } from "./item-display.js";
 
 /**
  * Resolves the primary (hit points) damage part of an action.
@@ -173,15 +173,17 @@ export function extractWeaponStats(doc) {
 
         const features = [];
         const weaponFeatures = system.weaponFeatures || [];
+        // CONFIG.DH.ITEM.weaponFeatures holds only the built-in features; homebrew ones are
+        // merged in by allWeaponFeatures(). Built-in label/description are i18n keys, homebrew
+        // ones are plain text and GM-written HTML, and localize() passes the latter through.
+        const allFeatures = CONFIG.DH.ITEM.allWeaponFeatures();
         for (const feature of weaponFeatures) {
-            const featureValue = feature.value;
-            if (featureValue) {
-                try {
-                    const featureName = featureValue.charAt(0).toUpperCase() + featureValue.slice(1);
-                    const featureDesc = game.i18n.localize(`${CONFIG.DH.ITEM.weaponFeatures[featureValue]?.description}`) || "";
-                    if (featureDesc) features.push({ name: featureName, description: featureDesc });
-                } catch (e) { /* Feature not found in config, skip */ }
-            }
+            const config = allFeatures[feature.value];
+            // Unknown id (e.g. a homebrew feature deleted after use): skip rather than show "undefined".
+            if (!config?.description) continue;
+            const featureName = game.i18n.localize(config.label ?? feature.value);
+            const featureDesc = cleanDescriptionString(game.i18n.localize(config.description));
+            if (featureDesc) features.push({ name: featureName, description: featureDesc });
         }
 
         return { trait, range, damageDisplay, damageType, isDirect, burden, features };
@@ -201,15 +203,17 @@ export function extractArmorStats(doc) {
         const system = doc.system;
         const features = [];
         const armorFeatures = system.armorFeatures || [];
+        // CONFIG.DH.ITEM.armorFeatures holds only the built-in features; homebrew ones are
+        // merged in by allArmorFeatures(). Built-in label/description are i18n keys, homebrew
+        // ones are plain text and GM-written HTML, and localize() passes the latter through.
+        const allFeatures = CONFIG.DH.ITEM.allArmorFeatures();
         for (const feature of armorFeatures) {
-            const featureValue = feature.value;
-            if (featureValue) {
-                try {
-                    const featureName = featureValue.charAt(0).toUpperCase() + featureValue.slice(1);
-                    const featureDesc = game.i18n.localize(`${CONFIG.DH.ITEM.armorFeatures[featureValue]?.description}`) || "";
-                    if (featureDesc) features.push({ name: featureName, description: featureDesc });
-                } catch (e) { /* Feature not found in config, skip */ }
-            }
+            const config = allFeatures[feature.value];
+            // Unknown id (e.g. a homebrew feature deleted after use): skip rather than show "undefined".
+            if (!config?.description) continue;
+            const featureName = game.i18n.localize(config.label ?? feature.value);
+            const featureDesc = cleanDescriptionString(game.i18n.localize(config.description));
+            if (featureDesc) features.push({ name: featureName, description: featureDesc });
         }
         return {
             baseScore: system.armor?.max ?? 0,
