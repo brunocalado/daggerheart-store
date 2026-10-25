@@ -1,4 +1,4 @@
-# Unreleased
+# 0.7.0
 
 - [Changed] Releases are now published as GitHub releases and registered on foundryvtt.com automatically. The manifest URL is now `https://github.com/brunocalado/daggerheart-store/releases/latest/download/module.json`; existing installs pick it up on their next update.
 - [Added] `daggerheart-store.formatPrice` hook: other modules can change how prices and balances are displayed. See docs/API.md.
