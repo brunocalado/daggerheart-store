@@ -108,6 +108,17 @@ export function getSystemCurrency() {
  * Builds the display text for an amount of currency. Every price and balance the store shows
  * goes through here, so other modules can restyle money by listening to
  * `daggerheart-store.formatPrice` and replacing `data.text`.
+ *
+ * Design notes:
+ * - A hook, not a `registerPriceFormatter(fn)` on `Store`: a registry would make the store own
+ *   ordering and unregistering, which `Hooks.on`/`Hooks.off` already handle.
+ * - `callAll`, not `call`: `call` stops at the first listener returning `false`, which means
+ *   nothing for a "rewrite this text" event and would let one module silently disable another's.
+ * - Only displayed text goes through here. Inputs (offers, transfer amounts, split payments) keep
+ *   taking plain base-unit integers, so their labels name the base unit via `getSystemCurrency()`
+ *   and nothing parses formatted text back into numbers.
+ * - `text` is plain text. Templates escape it, but chat cards and dialogs are built as HTML
+ *   strings and insert it as written.
  * @param {number} amount - Amount in the base unit (`system.gold.coins`)
  * @param {object} [options]
  * @param {boolean} [options.label=true] - Append the currency name. False where the UI already
