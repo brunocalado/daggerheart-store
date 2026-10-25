@@ -1,0 +1,43 @@
+{
+  "folder": "vLt3ege2XxuoOvzq",
+  "name": "Riverboat Transport",
+  "type": "consumable",
+  "img": "icons/tools/nautical/steering-wheel.webp",
+  "system": {
+    "attribution": {
+      "source": "Daggerheart Store",
+      "page": null,
+      "artist": ""
+    },
+    "description": "<p>Passenger travel along major rivers, slower but safer than roads.  </p>",
+    "quantity": 1,
+    "actions": {},
+    "consumeOnUse": true,
+    "destroyOnEmpty": true
+  },
+  "effects": [],
+  "flags": {
+    "daggerheart-store": {
+      "price": 40,
+      "header": "Transportation Services"
+    }
+  },
+  "_stats": {
+    "compendiumSource": "Compendium.daggerheart-store.general-items.Item.Ul2qrgi3xXTStsmj",
+    "duplicateSource": "Item.qzkICUNH2P5owsIu",
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "daggerheart",
+    "systemVersion": "1.9.1",
+    "createdTime": 1769801959421,
+    "modifiedTime": 1773425865139,
+    "lastModifiedBy": "1XySCPpaFX8RnFhs"
+  },
+  "ownership": {
+    "default": 2,
+    "zWDd1mciIe4rp82O": 3
+  },
+  "sort": 100000,
+  "_id": "xFxOWUUaaBCzsqNk",
+  "_key": "!items!xFxOWUUaaBCzsqNk"
+}

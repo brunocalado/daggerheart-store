@@ -1,0 +1,42 @@
+{
+  "folder": "ru4lw1ikqZ7Lh2vz",
+  "name": "Luxury Meal (Individual)",
+  "type": "consumable",
+  "img": "icons/consumables/food/plate-fish-grilled-brown.webp",
+  "system": {
+    "attribution": {
+      "source": "Daggerheart Store",
+      "page": null,
+      "artist": ""
+    },
+    "description": "<p>Fine roasted meats, wine, and dessert.  </p>",
+    "quantity": 1,
+    "actions": {},
+    "consumeOnUse": true,
+    "destroyOnEmpty": true
+  },
+  "effects": [],
+  "flags": {
+    "daggerheart-store": {
+      "price": 10,
+      "header": "Lodging &amp; Sustenance"
+    }
+  },
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "daggerheart",
+    "systemVersion": "1.9.1",
+    "createdTime": 1765582660691,
+    "modifiedTime": 1773425864984,
+    "lastModifiedBy": "1XySCPpaFX8RnFhs"
+  },
+  "_id": "Ucx76Xza00mjIELy",
+  "ownership": {
+    "default": 0
+  },
+  "sort": 0,
+  "_key": "!items!Ucx76Xza00mjIELy"
+}

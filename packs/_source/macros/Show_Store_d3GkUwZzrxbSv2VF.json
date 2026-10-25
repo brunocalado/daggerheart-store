@@ -1,0 +1,28 @@
+{
+  "name": "Show Store",
+  "type": "script",
+  "_id": "d3GkUwZzrxbSv2VF",
+  "author": "zWDd1mciIe4rp82O",
+  "img": "icons/magic/perception/eye-ringed-green.webp",
+  "scope": "global",
+  "command": "Store.Show();                // GM: Send store to all players\n\n// Store.Show({ username: \"PlayerName\" });  // GM: Send current store to specific player\n\n// Store.Show({ store: \"ProfileName\" }); // GM: Send selected store to all players\n\n// Store.Show({ store: \"ProfileName\", username: \"PlayerName\" }); // GM: Send selected store to specific players",
+  "folder": null,
+  "sort": 100000,
+  "ownership": {
+    "default": 0,
+    "zWDd1mciIe4rp82O": 3
+  },
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "14.363",
+    "systemId": "daggerheart",
+    "systemVersion": "1.6.1",
+    "createdTime": 1769793844523,
+    "modifiedTime": 1779583946852,
+    "lastModifiedBy": "1XySCPpaFX8RnFhs"
+  },
+  "_key": "!macros!d3GkUwZzrxbSv2VF"
+}

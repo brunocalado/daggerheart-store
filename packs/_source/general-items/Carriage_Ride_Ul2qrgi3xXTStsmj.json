@@ -1,0 +1,42 @@
+{
+  "folder": "vLt3ege2XxuoOvzq",
+  "name": "Carriage Ride",
+  "type": "consumable",
+  "img": "icons/environment/settlement/wagon-black.webp",
+  "system": {
+    "attribution": {
+      "source": "Daggerheart Store",
+      "page": null,
+      "artist": ""
+    },
+    "description": "<p>Travel between districts or towns.  </p>",
+    "quantity": 1,
+    "actions": {},
+    "consumeOnUse": true,
+    "destroyOnEmpty": true
+  },
+  "effects": [],
+  "flags": {
+    "daggerheart-store": {
+      "price": 20,
+      "header": "Transportation Services"
+    }
+  },
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "daggerheart",
+    "systemVersion": "1.9.1",
+    "createdTime": 1765582660691,
+    "modifiedTime": 1773425864996,
+    "lastModifiedBy": "1XySCPpaFX8RnFhs"
+  },
+  "_id": "Ul2qrgi3xXTStsmj",
+  "ownership": {
+    "default": 0
+  },
+  "sort": 200000,
+  "_key": "!items!Ul2qrgi3xXTStsmj"
+}

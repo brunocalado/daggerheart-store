@@ -1,0 +1,43 @@
+{
+  "folder": "vLt3ege2XxuoOvzq",
+  "name": "Guild Caravan Slot",
+  "type": "consumable",
+  "img": "icons/environment/settlement/wagon.webp",
+  "system": {
+    "attribution": {
+      "source": "Daggerheart Store",
+      "page": null,
+      "artist": ""
+    },
+    "description": "<p>Secure passage with a merchant caravan. Safety in numbers, slower pace.</p>",
+    "quantity": 1,
+    "actions": {},
+    "consumeOnUse": true,
+    "destroyOnEmpty": true
+  },
+  "effects": [],
+  "flags": {
+    "daggerheart-store": {
+      "price": 45,
+      "header": "Transportation Services"
+    }
+  },
+  "_stats": {
+    "compendiumSource": "Compendium.daggerheart-store.general-items.Item.Ul2qrgi3xXTStsmj",
+    "duplicateSource": "Item.xFxOWUUaaBCzsqNk",
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "daggerheart",
+    "systemVersion": "1.9.1",
+    "createdTime": 1769801959421,
+    "modifiedTime": 1773425865008,
+    "lastModifiedBy": "1XySCPpaFX8RnFhs"
+  },
+  "ownership": {
+    "default": 2,
+    "zWDd1mciIe4rp82O": 3
+  },
+  "sort": 100000,
+  "_id": "V1a8Ce4oOc2Awn3U",
+  "_key": "!items!V1a8Ce4oOc2Awn3U"
+}

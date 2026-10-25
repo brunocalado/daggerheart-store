@@ -1,0 +1,43 @@
+{
+  "folder": "vLt3ege2XxuoOvzq",
+  "name": "River Ferry Passage",
+  "type": "consumable",
+  "img": "icons/magic/water/wave-water-blue.webp",
+  "system": {
+    "attribution": {
+      "source": "Daggerheart Store",
+      "page": null,
+      "artist": ""
+    },
+    "description": "<p>Crossing rivers or canals using local ferries. Delays common during bad weather.  </p>",
+    "quantity": 1,
+    "actions": {},
+    "consumeOnUse": true,
+    "destroyOnEmpty": true
+  },
+  "effects": [],
+  "flags": {
+    "daggerheart-store": {
+      "price": 15,
+      "header": "Transportation Services"
+    }
+  },
+  "_stats": {
+    "compendiumSource": "Compendium.daggerheart-store.general-items.Item.Ul2qrgi3xXTStsmj",
+    "duplicateSource": "Item.MTIQMFKmS3XAnCfG",
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "daggerheart",
+    "systemVersion": "1.9.1",
+    "createdTime": 1769801959421,
+    "modifiedTime": 1773425865117,
+    "lastModifiedBy": "1XySCPpaFX8RnFhs"
+  },
+  "ownership": {
+    "default": 2,
+    "zWDd1mciIe4rp82O": 3
+  },
+  "sort": 100000,
+  "_id": "qzkICUNH2P5owsIu",
+  "_key": "!items!qzkICUNH2P5owsIu"
+}

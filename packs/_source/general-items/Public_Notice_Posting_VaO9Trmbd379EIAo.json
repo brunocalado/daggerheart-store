@@ -1,0 +1,43 @@
+{
+  "folder": "dpWURbhadOWAKN9g",
+  "name": "Public Notice Posting",
+  "type": "consumable",
+  "img": "icons/sundries/documents/document-sealed-beige-red.webp",
+  "system": {
+    "attribution": {
+      "source": "Daggerheart Store",
+      "page": null,
+      "artist": ""
+    },
+    "description": "<p>Official placement of announcements on guild boards or city squares.</p>",
+    "quantity": 1,
+    "actions": {},
+    "consumeOnUse": true,
+    "destroyOnEmpty": true
+  },
+  "effects": [],
+  "flags": {
+    "daggerheart-store": {
+      "price": 10,
+      "header": "Communications &amp; Services"
+    }
+  },
+  "_stats": {
+    "compendiumSource": "Compendium.daggerheart-store.general-items.Item.Ul2qrgi3xXTStsmj",
+    "duplicateSource": "Item.GZDZMCcmNUwwMdNQ",
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "daggerheart",
+    "systemVersion": "1.9.1",
+    "createdTime": 1769800576720,
+    "modifiedTime": 1773425865020,
+    "lastModifiedBy": "1XySCPpaFX8RnFhs"
+  },
+  "ownership": {
+    "default": 2,
+    "zWDd1mciIe4rp82O": 3
+  },
+  "sort": 0,
+  "_id": "VaO9Trmbd379EIAo",
+  "_key": "!items!VaO9Trmbd379EIAo"
+}

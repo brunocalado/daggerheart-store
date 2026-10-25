@@ -1,0 +1,40 @@
+{
+  "folder": "l1KLWEgbu42eayLz",
+  "name": "Riding Horse",
+  "type": "loot",
+  "img": "icons/environment/creatures/horse-white.webp",
+  "system": {
+    "attribution": {
+      "source": "Daggerheart Store",
+      "page": null,
+      "artist": ""
+    },
+    "description": "<p>Standard mount for travel speed.  </p>",
+    "quantity": 1,
+    "actions": {}
+  },
+  "effects": [],
+  "flags": {
+    "daggerheart-store": {
+      "price": 300,
+      "header": "Mounts"
+    }
+  },
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "daggerheart",
+    "systemVersion": "1.9.1",
+    "createdTime": 1765582660691,
+    "modifiedTime": 1773425865149,
+    "lastModifiedBy": "1XySCPpaFX8RnFhs"
+  },
+  "_id": "zleEYOAwnJCAoTek",
+  "ownership": {
+    "default": 0
+  },
+  "sort": 0,
+  "_key": "!items!zleEYOAwnJCAoTek"
+}

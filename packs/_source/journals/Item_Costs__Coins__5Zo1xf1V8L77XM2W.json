@@ -1,0 +1,494 @@
+{
+  "name": "Item Costs (Coins)",
+  "pages": [
+    {
+      "sort": 100000,
+      "name": "Weapons - Tier 1",
+      "type": "text",
+      "_id": "V21niXFV8KfpYtzo",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<h2>Tier 1 Physical Primary Weapons</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Weapon Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.iStO0BbeMTTR0rQi]{Dagger}</strong></td><td>10 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.1cwWNt4sqlgA8gCT]{Broadsword}</strong></td><td>20 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.cKQCDyM2UopDL9zF]{Mace}</strong></td><td>20 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.CWrbnethuILXrEpA]{Cutlass}</strong></td><td>20 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.zkAgEW6zMkRZalEm]{Rapier}</strong></td><td>20 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.cw7HG1Z7hp7OOLD0]{Crossbow}</strong></td><td>20 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.p9tdjQr2AZP19RYm]{Shortbow}</strong></td><td>30 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.Iv8BZM1R24QMT72M]{Longsword}</strong></td><td>30 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.fbDYUja3ll9vCtrB]{Battleaxe}</strong></td><td>30 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.mlIj88p1wcQNjEDG]{Quarterstaff}</strong></td><td>30 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.TF85tKJetUjLwh54]{Spear}</strong></td><td>30 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.70ysaFJDREwTgvZa]{Greatsword}</strong></td><td>40 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.ZXh1GQahBiODfSTC]{Warhammer}</strong></td><td>40 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.qT7FfmauAumOjJoq]{Halberd}</strong></td><td>40 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.YfVs6Se903az4Yet]{Longbow}</strong></td><td>40 Coins</td></tr></tbody></table><p></p><h2>Tier 1 Magic Primary Weapons</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Weapon Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.3whiedn0jBMNRdIb]{Hand Runes}</strong></td><td>30 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.Vayg7CnRTFBrunjM]{Hallowed Axe}</strong></td><td>40 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.4fQpVfQ3NVwTHStA]{Returning Blade}</strong></td><td>40 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.vHDHG3STcxTEfYAM]{Shortstaff}</strong></td><td>40 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.ItWisJFNGMNWeaCV]{Wand}</strong></td><td>40 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.PC5EyEIq7NWBV0n5]{Arcane Gauntlets}</strong></td><td>50 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.wG9f5NpCwSbaLy8t]{Glowing Rings}</strong></td><td>50 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.j8cdNeIUYxxzFVji]{Dualstaff}</strong></td><td>50 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.GZh345N8fmuS4Jeh]{Scepter}</strong></td><td>50 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.Yk8pTEmyLLi4095S]{Greatstaff}</strong></td><td>50 Coins</td></tr></tbody></table><p></p><h2>Tier 1 Secondary Weapons</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Weapon Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.wKklDxs5nkzILNp4]{Small Dagger}</strong></td><td>10 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.CmtWqw6DwoePnX7W]{Whip}</strong></td><td>20 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.cjGZpXCoshEqi1FI]{Shortsword}</strong></td><td>20 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.mxwWKDujgsRcZWPT]{Round Shield}</strong></td><td>20 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.zxKt6qXe7uZB6ljm]{Hand Crossbow}</strong></td><td>20 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.iEzPscUc18GuFoB6]{Grappler}</strong></td><td>30 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.C9aWpK1shVMWP4m5]{Tower Shield}</strong></td><td>40 Coins</td></tr></tbody></table>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "daggerheart",
+        "systemVersion": "1.3.1",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": -1
+      },
+      "_key": "!journal.pages!5Zo1xf1V8L77XM2W.V21niXFV8KfpYtzo"
+    },
+    {
+      "sort": 200000,
+      "name": "Weapons - Tier 2",
+      "type": "text",
+      "_id": "WfGUAcLnFq54fd41",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<h2>Tier 2 Physical Primary Weapons</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Weapon Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.zSLx52U4Yltqx8F1]{Improved Mace}</strong></td><td>110 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.ScjTkb9qrndhlk9S]{Improved Dagger}</strong></td><td>120 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.OcKeLJxvmdT81VBc]{Improved Broadsword}</strong></td><td>120 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.6ZWl6ARfvYBaAMwY]{Improved Shortbow}</strong></td><td>120 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.55NwHIIZHUeKSE3M]{Improved Crossbow}</strong></td><td>120 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.5faflfNz20cFW1EM]{Bladed Whip}</strong></td><td>120 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.F9PETfCQGwczBPif]{Improved Halberd}</strong></td><td>120 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.QyBZ5NxM8F9nCL9s]{Improved Longsword}</strong></td><td>130 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.nxGUpuHLmuKdKsDC]{Improved Battleaxe}</strong></td><td>130 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.ddRjXnp2vbohu7rJ]{Improved Cutlass}</strong></td><td>130 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.j5Pt1thLfcvopBij]{Improved Spear}</strong></td><td>130 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.pxaN4ZK4eqKrjtWj]{Improved Warhammer}</strong></td><td>130 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.NacNonjbzyoVMNhI]{Improved Longbow}</strong></td><td>130 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.6bkbw4Ap644KZGvJ]{Steelforged Halberd}</strong></td><td>130 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.BEmAR60PM3ZaiNXa]{Improved Quarterstaff}</strong></td><td>140 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.LFPH8nD2f4Blv3AM]{Improved Rapier}</strong></td><td>140 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.VwcOgqnzjf9LBj2S]{Gilded Falchion}</strong></td><td>140 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.zGm6Wa1fGF6cECY5]{Urok Broadsword}</strong></td><td>140 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.z6yEdFYQJ5IzgTX3]{War Scythe}</strong></td><td>140 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.SLFrK0WmldPo0shz]{Blunderbuss}</strong></td><td>140 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.MXBpbqQsZFln4rZk]{Greatbow}</strong></td><td>140 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.ykF3jouxHZ6YR8Bg]{Finehair Bow}</strong></td><td>140 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.FPX4ouDrxXiQ5MDf]{Improved Greatsword}</strong></td><td>150 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.U8gfyvxoHm024inM]{Knuckle Blades}</strong></td><td>150 Coins</td></tr></tbody></table><p></p><h2>Tier 2 Magic Primary Weapons</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Weapon Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.wFOXMN2uiX4j6Gd9]{Improved Hallowed Axe}</strong></td><td>120 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.jMEukC3VpNDz5AOD]{Improved Hand Runes}</strong></td><td>130 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.Mn8ja5Oi1sXvvPSk]{Improved Shortstaff}</strong></td><td>130 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.6d9B2b5X2d2U56jt]{Improved Wand}</strong></td><td>130 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.f7hhHlZ5nL3AhYEM]{Improved Dualstaff}</strong></td><td>130 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.kENTDpa1hr5LDhIT]{Improved Arcane Gauntlets}</strong></td><td>140 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.N5amhkxR1xn3B7r2]{Improved Glowing Rings}</strong></td><td>140 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.G7rH31KQ5eEZXcv0]{Ego Blade}</strong></td><td>140 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.C5wSGglR8e0euQnY]{Devouring Dagger}</strong></td><td>140 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.SKNwkW23eVQjN4Zy]{Improved Returning Blade}</strong></td><td>150 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.tj26lbNkwy8bORF4]{Improved Scepter}</strong></td><td>150 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.2Fbf2cxLfbdGkU4I]{Casting Sword}</strong></td><td>150 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.0XpSBYXxtywvBFQi]{Yutari Bloodbow}</strong></td><td>150 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.JdWcn9W1edhAEInL]{Elder Bow}</strong></td><td>150 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.acPGwIaUhx3R0mTq]{Scepter of Elias}</strong></td><td>150 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.tP6vmnrmTq2h5sj7]{Wand of Enthrallment}</strong></td><td>150 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.q382JqMkqLaaFLIr]{Keeper's Staff}</strong></td><td>150 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.0lAkBEUvbM9Osmqb]{Hammer of Exota}</strong></td><td>160 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.LCuTrYXi4lhg6LqW]{Improved Greatstaff}</strong></td><td>170 Coins</td></tr></tbody></table><p></p><h2>Tier 2 Secondary Weapons</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Weapon Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.rSyBNRwemBVuTo3H]{Improved Shortsword}</strong></td><td>120 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.DlinEBGZfIlvreO3]{Improved Round Shield}</strong></td><td>120 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.XEDRkuw3BhMoVBn9]{Improved Hand Crossbow}</strong></td><td>120 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.vzyzFwLUniWZV1rt]{Spiked Shield}</strong></td><td>120 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.bxt3NsbMqTSdI5ab]{Improved Tower Shield}</strong></td><td>120 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.nMuF8ZDZ2aXZVTg6]{Improved Small Dagger}</strong></td><td>130 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.taAZDkDCpeNgxhnn]{Parrying Dagger}</strong></td><td>130 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.ftTp8VlsBQ1r4LFD]{Improved Whip}</strong></td><td>130 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.FtsQGwOg3r8uUCST]{Returning Axe}</strong></td><td>130 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.3T3o9zfe61t22L1H]{Improved Grappler}</strong></td><td>140 Coins</td></tr></tbody></table>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "daggerheart",
+        "systemVersion": "1.3.1",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": -1
+      },
+      "_key": "!journal.pages!5Zo1xf1V8L77XM2W.WfGUAcLnFq54fd41"
+    },
+    {
+      "sort": 300000,
+      "name": "Weapons - Tier 3",
+      "type": "text",
+      "_id": "pQ3qHszANd4A8k8k",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<h2>Tier 3 Physical Primary Weapons</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Weapon Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.mrioysDjNQEIE8hN]{Advanced Dagger}</strong></td><td>500 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.WreMYiH5uhVDaoVw]{Advanced Mace}</strong></td><td>550 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.JpSlJvDR0X8VFDns]{Advanced Shortbow}</strong></td><td>550 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.WtQAGz0TUgz8Xg70]{Advanced Broadsword}</strong></td><td>600 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.bw9WO9lxkM9bWZxQ]{Advanced Cutlass}</strong></td><td>600 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.3HGs0AgVrdIBTaKG]{Advanced Crossbow}</strong></td><td>600 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.KxFne76d7cak15dO]{Advanced Rapier}</strong></td><td>650 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.pK6dsNABKKp1CIGN]{Advanced Spear}</strong></td><td>650 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.FcbvY1ydbNVMjKvk]{Advanced Battleaxe}</strong></td><td>700 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.9xkB3MWXahrsVP4N]{Advanced Longsword}</strong></td><td>700 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.zJtm2f9ZFKZRtCRg]{Advanced Quarterstaff}</strong></td><td>700 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.C8gQn7onAc9wsrCs]{Advanced Halberd}</strong></td><td>750 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.M5CywMAyPKGgebsJ]{Advanced Longbow}</strong></td><td>750 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.AokqTusPzn0hghkE]{Black Powder Revolver}</strong></td><td>800 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.MAC6YWTo4lzSotQc]{Advanced Greatsword}</strong></td><td>800 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.ijWppQzSOqVCb3rE]{Labrys Axe}</strong></td><td>800 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.8Lipw3RRKDgBVP0p]{Advanced Warhammer}</strong></td><td>850 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.i8CqVTzqoRoCewNe]{Retractable Saber}</strong></td><td>850 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.QZrWAkprA2tL2MOI]{Bravesword}</strong></td><td>850 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.O1w8KPYH85ZS8X64]{Spiked Bow}</strong></td><td>900 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.jlLtgK468rO5IssR]{Talon Blades}</strong></td><td>900 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.Gi26Zk9VqlAAgx3E]{Meridian Cutlass}</strong></td><td>900 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.xLJ5RRpUoTRmAC3G]{Flickerfly Blade}</strong></td><td>950 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.xm1yU7k58fMgXxRR]{Double Flail}</strong></td><td>950 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.1R4uzOpWD8bkYRUm]{Hammer of Wrath}</strong></td><td>1000 Coins</td></tr></tbody></table><p></p><h2>Tier 3 Magic Primary Weapons</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Weapon Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.jU9jWIardjtdAQcs]{Advanced Wand}</strong></td><td>550 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.PQACczSghZIVTdgZ]{Advanced Hand Runes}</strong></td><td>600 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.T5exRCqOXhrjSYnI]{Advanced Shortstaff}</strong></td><td>650 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.sIGXA4KMeYBUjcEO]{Advanced Returning Blade}</strong></td><td>650 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.BiyXKX2Mo1TQbKgk]{Advanced Hallowed Axe}</strong></td><td>700 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.X5x3sC7v2f3L9sjL]{Advanced Dualstaff}</strong></td><td>700 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.2Khzuj768yoWN9QK]{Advanced Scepter}</strong></td><td>750 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.hXR56fTKwZ6s1obs]{Advanced Arcane Gauntlets}</strong></td><td>800 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.EG6mZhr3ib56r974]{Runes of Ruination}</strong></td><td>800 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.InQoh8mZPnwarQkX]{Advanced Glowing Rings}</strong></td><td>850 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.XKBmBUEoGLdLcuqQ]{Mage Orb}</strong></td><td>850 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.BtCm2RhWEfs00g38]{Firestaff}</strong></td><td>850 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.4UzxqfkwF8gDSdu7]{Advanced Greatstaff}</strong></td><td>850 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.TMrUzVC3KvcHmdt8]{Ilmari's Rifle}</strong></td><td>900 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.ctTgFfMbM3YtmsYU]{Gilded Bow}</strong></td><td>900 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.6gFvOFTE97QZ74Zr]{Ghostblade}</strong></td><td>900 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.YcS1rHgfnSlla8Xf]{Axe of Fortunis}</strong></td><td>950 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.8Z5QrThfwkYPXNco]{Widogast Pendant}</strong></td><td>950 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.n1oPTk5czTIGTkVj]{Blessed Anlace}</strong></td><td>1000 Coins</td></tr></tbody></table><p></p><h2>Tier 3 Secondary Weapons</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Weapon Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.0thN0BpN05KT8Avx]{Advanced Small Dagger}</strong></td><td>500 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.hiEOGF2reabGLUoi]{Advanced Round Shield}</strong></td><td>550 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.01izMUSJcAUo79IX]{Advanced Whip}</strong></td><td>550 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.p3nz5CaGUoyuGVg0]{Advanced Shortsword}</strong></td><td>600 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.Lsvocst8aGqkBj7g]{Advanced Hand Crossbow}</strong></td><td>650 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.7vvhVl4TDJHtjpFK]{Advanced Grappler}</strong></td><td>650 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.OfOzQbs4hg6QbfTG]{Advanced Tower Shield}</strong></td><td>700 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.RAIaoMi6iO1PKIlK]{Hand Sling}</strong></td><td>750 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.EmFTp9wzT6MHSaNz]{Buckler}</strong></td><td>800 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.bW3xw5S9DbaLCN3E]{Powered Gauntlet}</strong></td><td>850 Coins</td></tr></tbody></table>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "daggerheart",
+        "systemVersion": "1.3.1",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": -1
+      },
+      "_key": "!journal.pages!5Zo1xf1V8L77XM2W.pQ3qHszANd4A8k8k"
+    },
+    {
+      "sort": 400000,
+      "name": "Weapons - Tier 4",
+      "type": "text",
+      "_id": "sxmNfhfEQDfhqYwy",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<h2>Tier 4 Physical Primary Weapons</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Weapon Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.GmTg3Fdne1UPNs8t]{Legendary Dagger}</strong></td><td>1000 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.RsDsy7tIhrhaAQQc]{Legendary Mace}</strong></td><td>1100 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.j7kp36jaetfn5jb3]{Legendary Shortbow}</strong></td><td>1100 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.1G6xX2QL9O0Rsgz7]{Legendary Crossbow}</strong></td><td>1200 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.y3hfTPfZhMognyaJ]{Legendary Broadsword}</strong></td><td>1200 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.Rpyz0jbFJ1SwqfyD]{Legendary Cutlass}</strong></td><td>1200 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.Fk69R40svV0kanZD]{Curved Dagger}</strong></td><td>1300 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.BakN97v4jTePcXiZ]{Legendary Rapier}</strong></td><td>1300 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.4e5pWxi2qohuGsWh]{Legendary Spear}</strong></td><td>1300 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.1nztpLzoHGfbKf5x]{Legendary Battleaxe}</strong></td><td>1400 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.14abPqQcROJfDChR]{Legendary Longsword}</strong></td><td>1400 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.MyGz8nd5sieRQ7zl]{Hand Cannon}</strong></td><td>1400 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.1ZciqG7vIKLYpKsP]{Legendary Quarterstaff}</strong></td><td>1500 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.1AuMNiJz96Ez9fur]{Legendary Halberd}</strong></td><td>1500 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.Utt1GpoH1fhaTOtN]{Legendary Longbow}</strong></td><td>1500 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.fJHKMxZokVP34MCi]{Extended Polearm}</strong></td><td>1500 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.nXjuBa215H1sTUK3]{Dual-Ended Sword}</strong></td><td>1600 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.zMZ46F9VR7zdTxb9]{Legendary Greatsword}</strong></td><td>1600 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.W9ymfEDck2icfvla]{Legendary Warhammer}</strong></td><td>1600 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.Zg6IutksQVOqAg8K]{Impact Gauntlet}</strong></td><td>1700 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.E9QDh5o9eQ1Qx0kH]{Ricochet Axes}</strong></td><td>1700 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.1jOJHHKdtk3s2jaY]{Swinging Ropeblade}</strong></td><td>1800 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.ijodu5yNBoMxpkHV]{Aantari Bow}</strong></td><td>1800 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.OxsEmffWriiQmqJK]{Sledge Axe}</strong></td><td>2000 Coins</td></tr></tbody></table><p></p><h2>Tier 4 Magic Primary Weapons</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Weapon Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.DWLkswhluXuMy3bB]{Legendary Hand Runes}</strong></td><td>1200 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.D3SbNvNJZAFuzfhg]{Legendary Shortstaff}</strong></td><td>1200 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.wPjg0LufJH9vUfVM]{Legendary Wand}</strong></td><td>1200 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.0HmhnZnv1I6uX69c]{Legendary Hallowed Axe}</strong></td><td>1300 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.mcj3CPkcSSDdAcBB]{Legendary Returning Blade}</strong></td><td>1300 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.o3rsLvImcLAx5TvD]{Legendary Dualstaff}</strong></td><td>1400 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.umADDPYCaykXDc1v]{Legendary Arcane Gauntlets}</strong></td><td>1500 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.PReWrfuPjoNQuieo]{Legendary Glowing Rings}</strong></td><td>1500 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.IZ4CWNxfuM46JeCN]{Legendary Scepter}</strong></td><td>1500 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.3vti3xfo0wJND7ew]{Floating Bladeshards}</strong></td><td>1500 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.jDtvEabkHY1GFgfc]{Legendary Greatstaff}</strong></td><td>1600 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.ZrRGNjGCgZTTfgDG]{Wand of Essek}</strong></td><td>1600 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.jGykNGQiKm63tCiE]{Magus Revolver}</strong></td><td>1600 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.I1nDGpulg29GpWOW]{Thistlebow}</strong></td><td>1700 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.1N1jggda5DfdzdMj]{Siphoning Gauntlets}</strong></td><td>1800 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.BdLfy5i488VZgkjP]{Midas Scythe}</strong></td><td>1800 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.IoMVDz92WVvfGGdc]{Bloodstaff}</strong></td><td>1900 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.uK1RhtYAsDeoPNGx]{Fusion Gloves}</strong></td><td>1900 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.TVPCWnSELOVBv6G1]{Sword of Light &amp; Flame}</strong></td><td>2000 Coins</td></tr></tbody></table><p></p><h2>Tier 4 Secondary Weapons</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Weapon Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.Px3Rh3kIvAqyISxJ]{Legendary Small Dagger}</strong></td><td>1000 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.A28WL9E2lJ3iLZHW]{Legendary Round Shield}</strong></td><td>1200 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.Wcdbf6yS3LEt7nsg]{Legendary Whip}</strong></td><td>1200 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.dEumq3BIZBk5xYTk]{Legendary Shortsword}</strong></td><td>1300 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.32nYyMaeDWaakSxz]{Legendary Hand Crossbow}</strong></td><td>1300 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.SFqganS8Du4aEKjQ]{Knuckle Claws}</strong></td><td>1400 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.SxcblanBvqaest3A]{Primer Shard}</strong></td><td>1400 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.IrtUj0UntBMNn49G]{Legendary Grappler}</strong></td><td>1500 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.MaJIROht7A9LxIZx]{Legendary Tower Shield}</strong></td><td>1600 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.QEvgVoz9xKBSKsGi]{Braveshield}</strong></td><td>1700 Coins</td></tr></tbody></table>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "daggerheart",
+        "systemVersion": "1.3.1",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": -1
+      },
+      "_key": "!journal.pages!5Zo1xf1V8L77XM2W.sxmNfhfEQDfhqYwy"
+    },
+    {
+      "sort": 500000,
+      "name": "Armors - Tier 1",
+      "type": "text",
+      "_id": "jHdwcrRjWWVZP3nm",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<h2>Tier 1 Armor</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Armor Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.yJFp1bfpecDcStVK]{Gambeson Armor}</strong></td><td>20 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.nibfdNtp2PtxvbVz]{Leather Armor}</strong></td><td>30 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.haULhuEg37zUUvhb]{Chainmail Armor}</strong></td><td>40 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.UdUJNa31WxFW2noa]{Full Plate Armor}</strong></td><td>50 Coins</td></tr></tbody></table>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "daggerheart",
+        "systemVersion": "1.3.1",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": -1
+      },
+      "_key": "!journal.pages!5Zo1xf1V8L77XM2W.jHdwcrRjWWVZP3nm"
+    },
+    {
+      "sort": 500000,
+      "name": "Armors - Tier 2",
+      "type": "text",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<h2>Tier 2 Armor</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Armor Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.jphnMZjnS2FkOH3s]{Improved Gambeson Armor}</strong></td><td>120 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.t91M61pSCMKStTNt]{Improved Leather Armor}</strong></td><td>130 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.PSW3BxCGmtLeWOxM]{Tyris Soft Armor}</strong></td><td>150 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.K5WkjS0NGqHYmhU3]{Improved Chainmail Armor}</strong></td><td>160 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.tzZntboNtHL5C6VM]{Irontree Breastplate Armor}</strong></td><td>170 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.tHlBUDQC24YMZqd6]{Runetan Floating Armor}</strong></td><td>180 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.dvyQeUVRLc9y6rnt]{Harrowbone Armor}</strong></td><td>180 Coins</td></tr><tr><td><strong>Elundrian Chain Armor</strong></td><td>190 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.tN8kAeBvNKM3EBFo]{Rosewild Armor}</strong></td><td>200 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.9f7RozpPTqrzJS1m]{Improved Full Plate Armor}</strong></td><td>200 Coins</td></tr></tbody></table>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "daggerheart",
+        "systemVersion": "1.3.1",
+        "lastModifiedBy": null
+      },
+      "_id": "NtqmQ8OIxie5YqAg",
+      "ownership": {
+        "default": -1
+      },
+      "_key": "!journal.pages!5Zo1xf1V8L77XM2W.NtqmQ8OIxie5YqAg"
+    },
+    {
+      "sort": 500000,
+      "name": "Armors - Tier 3",
+      "type": "text",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<h2>Tier 3 Armor</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Armor Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.epkAmlZVk7HOfUUT]{Advanced Gambeson Armor}</strong></td><td>500 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.QjwsIhXKqnlvRBMv]{Spiked Plate Armor}</strong></td><td>580 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.itSOp2GCyem0f7oM]{Advanced Leather Armor}</strong></td><td>600 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.WuoVwZA53XRAIt6d]{Bellamoi Fine Armor}</strong></td><td>650 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.LzLOJ9EVaHWAjoq9]{Advanced Chainmail Armor}</strong></td><td>700 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.crIbCb9NZ4K0VpoU]{Advanced Full Plate Armor}</strong></td><td>750 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.mdQ69eFHyAQUDmE7]{Dragonscale Armor}</strong></td><td>820 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.mNN6pvcsS10ChrWF]{Bladefare Armor}</strong></td><td>880 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.AQzU2RsqS5V5bd1v]{Monett's Cloak}</strong></td><td>880 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.P4qAEDJUoNLgVRsA]{Runes of Fortification}</strong></td><td>950 Coins</td></tr></tbody></table>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "daggerheart",
+        "systemVersion": "1.3.1",
+        "lastModifiedBy": null
+      },
+      "_id": "gUsniaQf5jXtKoEo",
+      "ownership": {
+        "default": -1
+      },
+      "_key": "!journal.pages!5Zo1xf1V8L77XM2W.gUsniaQf5jXtKoEo"
+    },
+    {
+      "sort": 500000,
+      "name": "Armors - Tier 4",
+      "type": "text",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<h2>Tier 4 Armor</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Armor Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.c6tMXz4rPf9ioQrf]{Legendary Gambeson Armor}</strong></td><td>1000 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.Tptgl5WOj76TyFn7]{Legendary Leather Armor}</strong></td><td>1200 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.vMJxEWz1srfwMsoj]{Channeling Armor}</strong></td><td>1400 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.OvzgUTYy2RCN85vV]{Veritas Opal Armor}</strong></td><td>1500 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.EsIN5OLKe9ZYFNXZ]{Legendary Chainmail Armor}</strong></td><td>1500 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.7emTSt6nhZuTlvt5]{Full Fortified Armor}</strong></td><td>1600 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.bcQUh4QG3qFX0Vx6]{Emberwoven Armor}</strong></td><td>1700 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.SXWjUR2aUR6bYvdl]{Legendary Full Plate Armor}</strong></td><td>1800 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.hAY6UgdGT7dj22Pr]{Dunamis Silkchain}</strong></td><td>1900 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.armors.Item.8X16lJQ3xltTwynm]{Savior Chainmail}</strong></td><td>2000 Coins</td></tr></tbody></table>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "daggerheart",
+        "systemVersion": "1.3.1",
+        "lastModifiedBy": null
+      },
+      "_id": "R4jDgjxuBdHdneT2",
+      "ownership": {
+        "default": -1
+      },
+      "_key": "!journal.pages!5Zo1xf1V8L77XM2W.R4jDgjxuBdHdneT2"
+    },
+    {
+      "sort": 600000,
+      "name": "Combat Wheelchairs",
+      "type": "text",
+      "_id": "0VfUZ2UnDUOlvcoV",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<h2>Tier 1 Combat Wheelchairs</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Weapon Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.iaGnlUkShBgdeMo0]{Light-Frame Wheelchair}</strong></td><td>20 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.XjPQjhRCH08VUIbr]{Heavy-Frame Wheelchair}</strong></td><td>30 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.XRChepscgr75Uug7]{Arcane-Frame Wheelchair}</strong></td><td>40 Coins</td></tr></tbody></table><p></p><h2>Tier 2 Combat Wheelchairs</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Weapon Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.ZJsetdHKV77ygtCE]{Improved Light-Frame Wheelchair}</strong></td><td>120 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.L5KeCtrs768PmYWW]{Improved Heavy-Frame Wheelchair}</strong></td><td>150 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.N9P695V5KKlJbAY5]{Improved Arcane-Frame Wheelchair}</strong></td><td>180 Coins</td></tr></tbody></table><p></p><h2>Tier 3 Combat Wheelchairs</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Weapon Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.BuMfupnCzHbziQ8o]{Advanced Light-Frame Wheelchair}</strong></td><td>550 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.eT2Qwb0RdrLX2hH1]{Advanced Heavy-Frame Wheelchair}</strong></td><td>700 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.la3sAWgnvadc4NvP]{Advanced Arcane-Frame Wheelchair}</strong></td><td>850 Coins</td></tr></tbody></table><p></p><h2>Tier 4 Combat Wheelchairs</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Weapon Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.Xt8tVSn5Fu6ly6LF]{Legendary Light-Frame Wheelchair}</strong></td><td>1200 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.S6nB0CNlzdU05o5U]{Legendary Heavy-Frame Wheelchair}</strong></td><td>1500 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.weapons.Item.gA2tiET9VHGhwMoO]{Legendary Arcane-Frame Wheelchair}</strong></td><td>1800 Coins</td></tr></tbody></table>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "daggerheart",
+        "systemVersion": "1.3.1",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": -1
+      },
+      "_key": "!journal.pages!5Zo1xf1V8L77XM2W.0VfUZ2UnDUOlvcoV"
+    },
+    {
+      "sort": 700000,
+      "name": "Potions",
+      "type": "text",
+      "_id": "wt1X2cPo74LEdWav",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<h2>Tier 1 (Common)</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Item Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.tPfKtKRRjv8qdSqy]{Minor Health Potion}</strong></td><td>20 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.b6vGSPFWOlzZZDLO]{Minor Stamina Potion}</strong></td><td>20 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.lNtcrkgFGOJNaroE]{Stride Potion}</strong> </td><td>10 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.FOPQNqXbiVO0ilYL]{Bolster Potion}</strong></td><td>10 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.eeBhZSGLjuNZuJuI]{Control Potion}</strong></td><td>10 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.JGD3M9hBHtVAA8XP]{Attune Potion}</strong></td><td>10 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.CVBbFfOY75YwyQsp]{Charm Potion}</strong></td><td>10 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.aWHSO2AqDufi7nL4]{Enlighten Potion}</strong></td><td>10 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.8WkhvSzeOmLdnoLJ]{Grindletooth Venom}</strong></td><td>30 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.dvL8oaxpEF6jKvYN]{Potion of Stability}</strong></td><td>30 Coins</td></tr></tbody></table><p></p><h2>Tier 2 (Uncommon)</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Item Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.Aruc2NLutWuVIjP1]{Health Potion}</strong></td><td>50 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.hf3k1POoVSooJyN2]{Stamina Potion}</strong></td><td>50 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.BqBWXXe9T07AMV4u]{Improved Grindletooth Venom}</strong></td><td>60 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.Nwv5ydGf0MWnzq1n]{Vial of Darksmoke}</strong></td><td>60 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.yK6eEDUrsPbZA8G0]{Major Stride Potion}</strong></td><td>80 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.mnyQDRtngWWQeRXF]{Major Bolster Potion}</strong></td><td>80 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.80s1FLmTLtohZ5GH]{Major Control Potion}</strong></td><td>80 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.CCPFm5iXXwvyYYwR]{Major Attune Potion}</strong></td><td>80 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.IJLAUlQymbSjzsri]{Major Charm Potion}</strong></td><td>80 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.SDdv1G2veMLKrxcJ]{Major Enlighten Potion}</strong></td><td>80 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.pDGzmczoTlKGmKgd]{Blood of the Yorgi}</strong></td><td>90 Coins</td></tr><tr><td><strong>Homet's Secret Potion</strong></td><td>90 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.s2Exl2XFuoOhtIov]{Redthorn Saliva}</strong></td><td>90 Coins</td></tr></tbody></table><p></p><h2>Tier 3 (Rare)</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Item Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.cM7pHe8bBAxSZ2xR]{Major Health Potion}</strong></td><td>200 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.I4cQ03xbxnc81EGa]{Major Stamina Potion}</strong></td><td>200 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.qr1bosjFcUfuwq4B]{Ogre Musk}</strong></td><td>250 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.n10vozlmosVR6lo4]{Wingsprout}</strong></td><td>300 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.yUol6M5b8jsbk9za]{Jar of Lost Voices}</strong></td><td>300 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.wM18PWWW2Ami4fBG]{Dragonbloom Tea}</strong></td><td>350 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.XZavUVlHEvE2srEt]{Sleeping Sap}</strong></td><td>350 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.aX6NyxkNzu0LcJpt]{Feast of Xuria}</strong></td><td>400 Coins</td></tr></tbody></table><p></p><h2>Tier 4 (Legendary)</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Item Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.PfQvqopXgvroBklL]{Bonding Honey}</strong></td><td>500 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.GrDrRqWgv7gvl9vn]{Sweet Moss}</strong></td><td>500 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.HGixKenQwhyRAYNk]{Shrinking Potion}</strong></td><td>600 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.fl2f3ees8RFMze9t]{Growing Potion}</strong></td><td>600 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.eAXHdzA5qNPldOpn]{Blinding Orb}</strong></td><td>700 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.nL9IALzm9BNi5oSt]{Knowledge Stone}</strong></td><td>800 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.xDnJeF1grkmKck8Q]{Death Tea}</strong></td><td>900 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.y4c1jrlHrf0wBWOq]{Stardrop}</strong></td><td>1000 Coins</td></tr></tbody></table>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "daggerheart",
+        "systemVersion": "1.3.1",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": -1
+      },
+      "_key": "!journal.pages!5Zo1xf1V8L77XM2W.wt1X2cPo74LEdWav"
+    },
+    {
+      "sort": 800000,
+      "name": "Non-Potion Consumables",
+      "type": "text",
+      "_id": "2W3IMXeJqRo3UrUG",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<h2>Tier 1 Non-Potion Consumables</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Item Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.hvy5BkG3F6iOIXTx]{Varik Leaves}</strong></td><td>20 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.mUepnLbkvFk0ha4Z]{Unstable Arcane Shard}</strong></td><td>30 Coins</td></tr></tbody></table><p></p><h2>Tier 2 Non-Potion Consumables</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Item Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.f1NHVSIHJJCIOaBl]{Morphing Clay}</strong></td><td>60 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.c2putn9apuurJhWX]{Jumping Root}</strong></td><td>60 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.cg6VtQ0eVZjDdcK0]{Snap Powder}</strong></td><td>70 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.VlbsCjvvLNfTzNXb]{Armor Stitcher}</strong></td><td>80 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.Nvbb9mze6o5D0AEg]{Gill Salve}</strong></td><td>80 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.yJkwz4AP6yhGo8Vj]{Replication Parchment}</strong></td><td>90 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.nQTo6mNoPTEVBtkm]{Improved Arcane Shard}</strong></td><td>90 Coins</td></tr></tbody></table><p></p><h2>Tier 3 Non-Potion Consumables</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Item Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.IKMVQ6VwtapwoUim]{Channelstone}</strong></td><td>200 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.Zsh2AvZr8EkGtLyw]{Mythic Dust}</strong></td><td>250 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.cfVFmS8vT9dbq9s1]{Acidpaste}</strong></td><td>250 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.EhaQCPJ8oiqpRIwB]{Hopehold Flare}</strong></td><td>300 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.AA7bmiwv00lshPrC]{Major Arcane Shard}</strong></td><td>300 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.DpxEMpwfasEBpORU]{Featherbone}</strong></td><td>350 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.elsyP6VhHw1JjGSl]{Circle of the Void}</strong></td><td>350 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.RrIasiMCt6mqVTps]{Bridge Seed}</strong></td><td>400 Coins</td></tr></tbody></table><p></p><h2>Tier 4 Non-Potion Consumables</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Item Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.UFQVwgYOUZ88UxcH]{Mirror of Marigold}</strong></td><td>700 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.consumables.Item.y4c1jrlHrf0wBWOq]{Stardrop}</strong></td><td>1000 Coins</td></tr></tbody></table>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "daggerheart",
+        "systemVersion": "1.3.1",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": -1
+      },
+      "_key": "!journal.pages!5Zo1xf1V8L77XM2W.2W3IMXeJqRo3UrUG"
+    },
+    {
+      "sort": 900000,
+      "name": "Loot",
+      "type": "text",
+      "_id": "OmHBeD7G1Fc85JGi",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<h2>Tier 1 Items (Common)</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Item Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.QGYPNBIufpBguwjC]{Premium Bedroll}</strong></td><td>20 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.v4PIoCCEjeE3acys]{Piper Whistle}</strong></td><td>20 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.GkmATIuemyFtQX1D]{Manacles}</strong></td><td>20 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.gsUDP90d4SRtLEUn]{Charging Quiver}</strong></td><td>30 Coins</td></tr><tr><td><strong>Alistair's Torch</strong></td><td>40 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.X6RMkIt89wf7qX2E]{Fire Jar}</strong></td><td>40 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.ARuv48PWUGJGBC4n]{Woven Net}</strong></td><td>40 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.LZrG6CFiSjpLA2F1]{Speaking Orbs}</strong></td><td>50 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.4STt98biZwjFoKOe]{Arcane Cloak}</strong></td><td>50 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.nnj12RiFanq7s5zv]{Suspended Rod}</strong></td><td>50 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.Pj17cvdJ1XG1jv6I]{Glamour Stone}</strong></td><td>50 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.p2yy61uKsyIsl8cU]{Empty Chest}</strong></td><td>50 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.V25uXkAQvK3hUta4]{Companion Case}</strong></td><td>50 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.I63LTFD6GXHgyGpR]{Piercing Arrows}</strong></td><td>50 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.7yywua9TmQ4WP5WH]{Valorstone}</strong></td><td>50 Coins</td></tr></tbody></table><p></p><h2>Tier 2 Items (Uncommon)</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Item Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.1TLpFsp3PLDsqoTw]{Minor Stamina Potion Recipe}</strong></td><td>80 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.PQxvxAVBbkt0TleC]{Minor Health Potion Recipe}</strong></td><td>80 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.edkNgwy4xghZreBa]{Skeleton Key}</strong></td><td>90 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.yrAGYlDyoe4OYl7d]{Homing Compasses}</strong></td><td>90 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.Mn1eo2Mdtu1kzyxB]{Arcane Prism}</strong></td><td>100 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.G0RktbmtnuAlKCRH]{Corrector Sprite}</strong></td><td>100 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.CGzjBpHJRG8KSt5Y]{Gecko Gloves}</strong></td><td>100 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.JsPYzrqpITqGj23I]{Lorekeeper}</strong></td><td>120 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.MhCo8i0cRXzdnXbA]{Vial of Darksmoke Recipe}</strong></td><td>120 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.CiXwelozmBDcPY48]{Glider}</strong></td><td>150 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.K1ysGnTpNyxPu5Au]{Ring of Silence}</strong></td><td>150 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.tgFFMxpuRSiRrrEB]{Calming Pendant}</strong></td><td>150 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.HCvcAu3sdHCspGMP]{Dual Flask}</strong></td><td>150 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.oMd78vhL2x2NO8Mg]{Bloodstone}</strong></td><td>200 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.y7zABzR0Q2fRskTw]{Greatstone}</strong></td><td>200 Coins</td></tr></tbody></table><p></p><h2>Tier 3 Items (Rare)</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Item Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.v758j4FwNVAurhYK]{Bag of Ficklesand}</strong></td><td>300 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.bZyT7Qw7iafswlTY]{Box of Many Goods}</strong></td><td>300 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.aUqRifqR5JXXa1dN]{Ring of Resistance}</strong></td><td>400 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.QNtzJSVENww63THa]{Phoenix Feather}</strong></td><td>400 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.cTYvyaSKBxosM9Y9]{Airblade Charm}</strong></td><td>500 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.eRd5Gk7J7hPCqp11]{Portal Seed}</strong></td><td>600 Coins</td></tr><tr><td><strong>Paragon's Chain</strong></td><td>600 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.PkmTZXRMZL022O75]{Elusive Amulet}</strong></td><td>700 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.9DcFR75tsnBYIp6Z]{Hopekeeper Locket}</strong></td><td>700 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.Iedjw1LVWEozVh0J]{Infinite Bag}</strong></td><td>800 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.FfJISMzYATaPQPLc]{Stride Relic}</strong></td><td>1000 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.m3EpxlDgxn2tCDDR]{Bolster Relic}</strong></td><td>1000 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.QPGBDItjrRhXU6iJ]{Control Relic}</strong></td><td>1000 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.vK6bKyQTT3m8WvMh]{Attune Relic}</strong></td><td>1000 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.9P9jqGSlxVCbTdLe]{Charm Relic}</strong></td><td>1000 Coins</td></tr></tbody></table><p></p><h2>Tier 4 Items (Legendary)</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Item Name</th><th style=\"text-align:left\">Cost</th></tr></thead><tbody><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.vSGx1f9SYUiA29L3]{Enlighten Relic}</strong></td><td>1000 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.SAAnEAeXDnhBbLjB]{Honing Relic}</strong></td><td>1000 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.9VKYSBQxN9XFWlAm]{Flickerfly Pendant}</strong></td><td>1200 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.NgvmrJYKpA2PrRSo]{Lakestrider Boots}</strong></td><td>1200 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.lGIk9vBNz0jvskXD]{Clay Companion}</strong></td><td>1300 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.5YZls8XH3MB7twNa]{Mythic Dust Recipe}</strong></td><td>1400 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.2ULPgNyqCrxea0v0]{Shard of Memory}</strong></td><td>1500 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.zecFwBUSWtB3HW8X]{Gem of Alacrity}</strong></td><td>1500 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.rtSInNPc4B3ChBUZ]{Gem of Might}</strong></td><td>1500 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.CrvJ7vb4s40YgEcy]{Gem of Precision}</strong></td><td>1500 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.TbgeT9ZxKHqFqJSN]{Gem of Insight}</strong></td><td>1500 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.hMu9It3ThCLCXuCA]{Gem of Audacity}</strong></td><td>1500 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.ua351S7CsH22X1x2]{Gem of Sagacity}</strong></td><td>1500 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.kn71qCQY0DnjmQBJ]{Ring of Unbreakable Resolve}</strong></td><td>2000 Coins</td></tr><tr><td><strong>@UUID[Compendium.daggerheart.loot.Item.gFzkUGCjkRJtyoe9]{Belt of Unity}</strong></td><td>2000 Coins</td></tr></tbody></table>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "daggerheart",
+        "systemVersion": "1.3.1",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": -1
+      },
+      "_key": "!journal.pages!5Zo1xf1V8L77XM2W.OmHBeD7G1Fc85JGi"
+    },
+    {
+      "sort": 1000000,
+      "name": "General Expenses",
+      "type": "text",
+      "_id": "lOphdQDWU2D3hVPE",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<h2>Lodging &amp; Sustenance</h2><p></p><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Item / Service</th><th style=\"text-align:left\">Cost</th><th style=\"text-align:left\">Notes</th></tr></thead><tbody><tr><td><strong>Standard Meal (Individual)</strong></td><td>2 Coins</td><td>Simple stew, bread, and ale.</td></tr><tr><td><strong>Luxury Meal (Individual)</strong></td><td>10 Coins</td><td>Fine roasted meats, wine, and dessert.</td></tr><tr><td><strong>Standard Inn Room (Night)</strong></td><td>10 Coins</td><td>A private room with a clean bed.</td></tr><tr><td><strong>Luxury Inn Room (Night)</strong></td><td>100 Coins</td><td>A suite with a bath, fine linens, and service.</td></tr></tbody></table><p></p><h2>Travel &amp; Gear</h2><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Item / Service</th><th style=\"text-align:left\">Cost</th><th style=\"text-align:left\">Notes</th></tr></thead><tbody><tr><td><strong>Carriage Ride</strong></td><td>20 Coins</td><td>Travel between districts or towns.</td></tr><tr><td><strong>Fine Clothing</strong></td><td>30 Coins</td><td>Respectable attire for nobles or meetings.</td></tr><tr><td><strong>Luxury Clothing</strong></td><td>100 Coins</td><td>Silks, velvets, and embroidery.</td></tr><tr><td><strong>Disguise Kit</strong></td><td>30 Coins</td><td>Makeup, wigs, and props.</td></tr><tr><td><strong>Thieves' Tools</strong></td><td>30 Coins</td><td>Picks and tension wrenches.</td></tr><tr><td><strong>Climber's Kit</strong></td><td>30 Coins</td><td>Pitons, spiked boots, and gloves.</td></tr><tr><td><strong>Cartographer's Tools</strong></td><td>30 Coins</td><td>Parchment, ink, and compasses.</td></tr><tr><td><strong>Healer's Kit</strong></td><td>30 Coins</td><td>Bandages, salves, and splints.</td></tr></tbody></table><p></p><h2>Mounts</h2><p></p><table border=\"1\" style=\"width:100%;border-collapse:collapse\"><thead><tr style=\"background-color:#000000;color:#ffffff\"><th style=\"text-align:left\">Mount Type</th><th style=\"text-align:left\">Cost</th><th style=\"text-align:left\">Notes</th></tr></thead><tbody><tr><td><strong>Mule</strong></td><td>120 Coins</td><td>Slow and stubborn, but sturdy.</td></tr><tr><td><strong>Pony</strong></td><td>150 Coins</td><td>Good for small adventurers.</td></tr><tr><td><strong>Riding Horse</strong></td><td>300 Coins</td><td>Standard mount for travel speed.</td></tr><tr><td><strong>Camel</strong></td><td>350 Coins</td><td>Essential for desert travel; high stamina.</td></tr><tr><td><strong>Draft Horse</strong></td><td>450 Coins</td><td>Very strong; best for pulling wagons.</td></tr><tr><td><strong>Giant Lizard</strong></td><td>550 Coins</td><td>Can climb vertical surfaces.</td></tr><tr><td><strong>Warhorse</strong></td><td>1000 Coins</td><td>Trained for combat; brave.</td></tr><tr><td><strong>Griffon</strong></td><td>2500 Coins</td><td>Rare flying mount.</td></tr></tbody></table>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "daggerheart",
+        "systemVersion": "1.3.1",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": -1
+      },
+      "_key": "!journal.pages!5Zo1xf1V8L77XM2W.lOphdQDWU2D3hVPE"
+    }
+  ],
+  "folder": null,
+  "categories": [],
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "daggerheart",
+    "systemVersion": "1.3.1",
+    "createdTime": 1765582681782,
+    "modifiedTime": 1765972383645,
+    "lastModifiedBy": "zWDd1mciIe4rp82O"
+  },
+  "_id": "5Zo1xf1V8L77XM2W",
+  "ownership": {
+    "default": 0,
+    "zWDd1mciIe4rp82O": 3
+  },
+  "sort": 100000,
+  "_key": "!journal!5Zo1xf1V8L77XM2W"
+}

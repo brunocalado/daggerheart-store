@@ -1,0 +1,40 @@
+{
+  "folder": "l1KLWEgbu42eayLz",
+  "name": "Mule",
+  "type": "loot",
+  "img": "icons/creatures/mammals/ox-buffalo-horned-green.webp",
+  "system": {
+    "attribution": {
+      "source": "Daggerheart Store",
+      "page": null,
+      "artist": ""
+    },
+    "description": "<p>Slow and stubborn, but sturdy.  </p>",
+    "quantity": 1,
+    "actions": {}
+  },
+  "effects": [],
+  "flags": {
+    "daggerheart-store": {
+      "price": 120,
+      "header": "Mounts"
+    }
+  },
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "daggerheart",
+    "systemVersion": "1.9.1",
+    "createdTime": 1765582660691,
+    "modifiedTime": 1773425864847,
+    "lastModifiedBy": "1XySCPpaFX8RnFhs"
+  },
+  "_id": "6pfBxfn5I3zW8Y9u",
+  "ownership": {
+    "default": 0
+  },
+  "sort": 0,
+  "_key": "!items!6pfBxfn5I3zW8Y9u"
+}

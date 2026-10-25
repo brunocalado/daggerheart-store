@@ -1,0 +1,377 @@
+{
+  "name": "⚠️ READ ME! ⚠️",
+  "pages": [
+    {
+      "sort": 100000,
+      "name": "⚠️ START HERE!",
+      "type": "text",
+      "_id": "Ycc2hQd2ieYcu1ES",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<h2>Player Setup: Linking Characters</h2><p>Each user must have a linked Actor (type: <em>character</em>) assigned to them in Foundry's User Configuration. This enables store purchases, sales, gold transfers, and currency display in the store interface.</p><p></p><h3>Configuration Steps</h3><ol><li><p>Right-click the player's name in the <strong>Player List</strong> (bottom left corner).</p></li><li><p>Select <strong>User Configuration</strong>.</p></li><li><p>In the configuration window, locate the <strong>Player Character</strong> field.</p></li><li><p>Select the desired Actor from the dropdown menu.</p></li></ol><img src=\"modules/daggerheart-store/docs/config-user.webp\" /><p></p><h3>Verification</h3><p>If the setup is correct, the <strong>Player List</strong> will display the Username followed by the Character Name in brackets.</p><ul><li><p><em>Example:</em> <strong>Player2 [Elara]</strong></p></li></ul><img src=\"modules/daggerheart-store/docs/player-list.webp\" /><p></p><h3>Troubleshooting</h3><p>If a player opens the store without a linked Actor, a <strong>red alert</strong> will appear indicating they cannot make purchases. If you see the error below, please repeat the configuration steps above.</p><img src=\"modules/daggerheart-store/docs/user-without-actor.webp\" /><p></p><p>To use the <strong>Store Randomizer</strong>, <strong>Inventory Stock</strong>, and <strong>Gold Transfer</strong> features, you must set a Party Actor in the module configurations. Read more:</p><p>@UUID[Compendium.daggerheart-store.journals.JournalEntry.fIXCeXWeDbAu3uFg.JournalEntryPage.acPvDUbb85GK4BiU]{👥 Party Actor}</p><p></p>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "ownership": {
+        "default": -1,
+        "zWDd1mciIe4rp82O": 3
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "daggerheart",
+        "systemVersion": "1.3.2",
+        "lastModifiedBy": "1XySCPpaFX8RnFhs",
+        "modifiedTime": 1773595708951,
+        "createdTime": null
+      },
+      "_key": "!journal.pages!fIXCeXWeDbAu3uFg.Ycc2hQd2ieYcu1ES"
+    },
+    {
+      "sort": 200000,
+      "name": "🔓 Opening the Store",
+      "type": "text",
+      "_id": "2eJth0FsHPcibDu7",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<h3 data-path-to-node=\"3\">GM Access</h3><p data-path-to-node=\"4\">As the Game Master, you can access the store interface using either of the following methods:</p><ul data-path-to-node=\"5\"><li><p data-path-to-node=\"5,0,0\"><strong>Menu Button:</strong> Click the <strong>Open Store</strong> button located in the Daggerheart sidebar menu.</p></li></ul><img src=\"modules/daggerheart-store/docs/system-button.webp\" /><ul data-path-to-node=\"5\"><li><p data-path-to-node=\"5,1,0\"><strong>Macro:</strong> Execute the script macro <code>Store.Open();</code></p></li></ul><p data-path-to-node=\"5,1,0\">You can drag this macro to your world: @UUID[Compendium.daggerheart-store.macros.Macro.lWDmGeMZEFxKcsPa]{Store}.</p><pre><code>Tip: The GM can create a macro with this command and assign it to players, allowing them to open the store on their own.</code></pre><p></p><h3 data-path-to-node=\"6\">Sharing with Players</h3><p data-path-to-node=\"7\">Once the store window is open, use the window header buttons (top right) to control player visibility:</p><ul data-path-to-node=\"8\"><li><p data-path-to-node=\"8,0,0\">🌍 <strong>Show to Everyone:</strong> Forces the store interface to open for all connected players.</p></li><li><p data-path-to-node=\"8,1,0\">👤 <strong>Show to Player:</strong> Opens the store interface only for a specific, selected player.</p></li></ul><p>You can also use</p><p data-path-to-node=\"5,1,0\"><code>Store.Show(); // To send the store to all players </code></p><p><code>Store.Show(\"PlayerUserName\"); // To send store to a specific player</code> </p><p></p><p>You can drag this macro to your world: @UUID[Compendium.daggerheart-store.macros.Macro.d3GkUwZzrxbSv2VF]{Show Store to All Players}</p>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "ownership": {
+        "default": -1,
+        "zWDd1mciIe4rp82O": 3
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "daggerheart",
+        "systemVersion": "1.3.2",
+        "lastModifiedBy": "zWDd1mciIe4rp82O",
+        "modifiedTime": 1769959251848,
+        "createdTime": null
+      },
+      "_key": "!journal.pages!fIXCeXWeDbAu3uFg.2eJth0FsHPcibDu7"
+    },
+    {
+      "sort": 300000,
+      "name": "🛠️ Configuration (GM)",
+      "type": "text",
+      "_id": "bbQY9zgHxE3hTplw",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<p>To access advanced settings, click the gear button (<strong>⚙️</strong>) located in the top-right corner of the store interface.</p><p>How to Enable Stock, Randomizer and Shared Wealth: @UUID[Compendium.daggerheart-store.journals.JournalEntry.fIXCeXWeDbAu3uFg.JournalEntryPage.acPvDUbb85GK4BiU]{👥 Party Actor}</p><hr /><h4><strong>1. General</strong></h4><ul><li><p><strong>Store Window Name:</strong> Sets the title displayed at the top of the main store interface.</p></li><li><p><strong>Party Actor:</strong> Designates a specific actor to handle shared funds, stock tracking, and access to the randomizer. No specific ownership level is required — the actor just needs to exist and be selected.</p></li><li><p><strong>Price Modifiers:</strong></p><ul><li><p><strong>Global Price Multiplier:</strong> Adjusts base prices for all items (50%–300%).</p></li><li><p><strong>Sale Discount:</strong> Percentage deducted from items marked as \"On Sale.\"</p></li><li><p><strong>Sell Ratio:</strong> Percentage of value players receive when selling items to the store.</p></li></ul></li></ul><p></p><h4><strong>2. Categories</strong></h4><ul><li><p><strong>Visibility:</strong> Toggle specific item categories (e.g., hide \"Wheelchairs\" or \"Potions\") to remove them from the store interface entirely.</p></li></ul><p></p><h4><strong>3. Tiers</strong></h4><ul><li><p><strong>Tier Restrictions:</strong> Restrict which Tiers (1–4) appear within each standard category. Useful for limiting shop inventory based on campaign level (e.g., a starter village selling only Tier 1 items).</p></li></ul><p></p><h4><strong>4. Custom Compendiums</strong></h4><ul><li><p><strong>Custom Tab Configuration:</strong> Creates a dedicated, separate tab in the store (e.g., \"Merchant\") that pulls items exclusively from one or more specific compendiums.</p></li><li><p><strong>Merged Compendiums:</strong> Injects items from external compendiums into the <em>standard</em> store categories (Loot, Weapons, etc.) alongside default items.</p></li></ul><p></p><h4><strong>5. Stock Management</strong></h4><ul><li><p><strong>Enable Limited Stock:</strong> Activates the inventory tracking system.</p><ul><li><p><em>Note:</em> Requires a configured <strong>Party Actor</strong>. Read: @UUID[Compendium.daggerheart-store.journals.JournalEntry.fIXCeXWeDbAu3uFg.JournalEntryPage.acPvDUbb85GK4BiU]{👥 Party Actor}</p></li></ul></li><li><p><strong>Quick Stock Configuration:</strong> Defines default stock quantities per Category and Tier (e.g., Tier 1 Potions = 10, Tier 4 Armor = 1).</p></li><li><p><strong>Actions:</strong></p><ul><li><p><strong>Apply Defaults:</strong> Overwrites current stock for <em>all</em> items based on the configuration table above.</p></li><li><p><strong>Restock All:</strong> Resets every item to its default stock value.</p></li></ul></li></ul><p></p><h4><strong>6. Vendor</strong></h4><ul><li><p><strong>Vendor Name &amp; Portrait:</strong> Sets the merchant's name and image, displayed in the store header.</p></li><li><p><strong>Vendor Description:</strong> A text shown as a tooltip when players hover over the vendor's info icon.</p></li><li><p><strong>Relationships:</strong> Set a relationship level (Hostile → Allied) per player character. Each level applies a configurable price modifier — hostile characters pay more, allied characters pay less.</p></li></ul>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "ownership": {
+        "default": -1,
+        "zWDd1mciIe4rp82O": 3
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "daggerheart",
+        "systemVersion": "1.3.2",
+        "lastModifiedBy": "1XySCPpaFX8RnFhs",
+        "modifiedTime": 1773595836086,
+        "createdTime": null
+      },
+      "_key": "!journal.pages!fIXCeXWeDbAu3uFg.bbQY9zgHxE3hTplw"
+    },
+    {
+      "sort": 400000,
+      "name": "📁 Profiles (Presets)",
+      "type": "text",
+      "_id": "U1XszfBud9mpigev",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<p>Use the dropdown menu and header buttons to manage different store configurations:</p><ul><li><strong>Save:</strong> Stores the current configuration as a new named profile or overwrites an existing one. Each profile captures all store settings: prices, sale items, hidden items, tiers, stock settings, randomizer options, vendor identity, relationships, and compendium configuration.</li><li><strong>Load:</strong> Instantly applies a saved profile to the store (e.g., \"Expensive City\", \"Goblin Merchant\").</li><li><strong>Delete:</strong> Removes a profile that is no longer needed. The <em>Default</em> profile cannot be deleted.</li></ul><blockquote><p><strong>Note:</strong> Epic item states and Randomizer options are saved per profile — switching profiles will change them accordingly.</p></blockquote><img src=\"modules/daggerheart-store/docs/profiles.webp\" />"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "ownership": {
+        "default": -1,
+        "zWDd1mciIe4rp82O": 3
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "daggerheart",
+        "systemVersion": "1.3.2",
+        "lastModifiedBy": "1XySCPpaFX8RnFhs",
+        "modifiedTime": 1773595980832,
+        "createdTime": null
+      },
+      "_key": "!journal.pages!fIXCeXWeDbAu3uFg.U1XszfBud9mpigev"
+    },
+    {
+      "sort": 500000,
+      "name": "🧪 Homebrew & Custom Content",
+      "type": "text",
+      "_id": "YtpfXzhS0iaT2BOp",
+      "system": {},
+      "title": {
+        "show": false,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<h2>➕ Adding Homebrew to the Store</h2><hr /><h3>🗂️ Custom Shop Tab</h3><p>You can create a dedicated tab with specific content. This is ideal for special merchants or unique item categories.</p><ol><li>Create an <strong>Item Compendium</strong> in your world and populate it with the items you wish to sell.</li><li>Open the <strong>Store Configuration</strong> (⚙️) menu.</li><li>Navigate to the <strong>Custom Compendiums</strong> section.</li><li>Find the <strong>Custom Tab Compendiums</strong> setting and select your compendium from the list. You can add multiple compendiums to the same tab.</li></ol><p>The items will now appear in a new dedicated tab within the store interface.</p><blockquote><p><strong>Note:</strong> For items to display prices and tiers correctly, configure them using the <strong>Item Tag Editor</strong> (right-click an item in the store as GM). This sets price, tier, and header via item flags — no manual description editing required.</p></blockquote><hr /><h3>🧩 Extending Default Tabs</h3><p>You can inject new content into the existing standard tabs (e.g., adding a homebrew sword to the \"Weapons\" tab) without replacing core content.</p><ol><li>Create an <strong>Item Compendium</strong> and populate it with your custom items.</li><li>Open the <strong>Store Configuration</strong> (⚙️) menu and go to <strong>Custom Compendiums</strong>.</li><li>Add one or more compendiums to the <strong>Merged Compendiums</strong> list.</li><li>For each compendium, select the <strong>Target Tab</strong> where its items should appear.</li></ol><blockquote><p><strong>Note:</strong> Items injected into standard tabs must match the expected item type for that category (e.g., <em>weapon</em> type for the Weapons tab). Items that do not match will be ignored.</p></blockquote><hr /><h3>📸 Screenshots</h3><img src=\"modules/daggerheart-store/docs/homebrew.webp\" />"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "ownership": {
+        "default": -1,
+        "zWDd1mciIe4rp82O": 3
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "daggerheart",
+        "systemVersion": "1.3.2",
+        "lastModifiedBy": "1XySCPpaFX8RnFhs",
+        "modifiedTime": 1773596033076,
+        "createdTime": null
+      },
+      "_key": "!journal.pages!fIXCeXWeDbAu3uFg.YtpfXzhS0iaT2BOp"
+    },
+    {
+      "sort": 600000,
+      "name": "🎲 Store Randomizer",
+      "type": "text",
+      "_id": "SqoXdZ1yaCPsXA9v",
+      "system": {},
+      "title": {
+        "show": false,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<h3><strong>Store Randomizer Guide</strong></h3><p>The <strong>Store Randomizer</strong> allows the GM to dynamically generate the store's inventory. Instead of manually hiding items or setting prices one by one, you set parameters for each category and let the module roll the inventory for you.</p><blockquote><p><strong>Note:</strong> Items marked with the <strong>Lock</strong> flag in the store are excluded from randomization — their visibility, stock, and price are never touched by the randomizer.</p></blockquote><p></p><h4><strong>Interface Overview</strong></h4><p>For each category (e.g., Primary Weapons, Armor), you configure four distinct parameters:</p><h4><strong>1. Item Selection (Visibility)</strong></h4><p>Controls the <strong>variety</strong> of items displayed in the store.</p><ul><li><p><strong>Items Min:</strong> The minimum number of unique items to reveal.</p></li><li><p><strong>Items Max:</strong> The maximum number of unique items to reveal.</p><ul><li><p><em>Logic:</em> The system shuffles all unlocked items in the category, reveals a random number between Min and Max, and hides the rest.</p></li></ul></li></ul><p></p><h4><strong>2. Stock Quantity</strong></h4><p>Controls the <strong>quantity</strong> (inventory count) available for each visible item.</p><ul><li><p><strong>Qty Min:</strong> Minimum units available per item.</p></li><li><p><strong>Qty Max:</strong> Maximum units available per item.</p><ul><li><p><em>Logic:</em> For every visible item, the system generates a random stock count between Min and Max.</p></li><li><p><em>Note:</em> Stock randomization only runs if <strong>Limited Stock</strong> is enabled in the Configuration and <strong>Qty Max</strong> is greater than <code>0</code>. Setting Qty Max to <code>0</code> skips stock changes entirely for that category.</p></li></ul></li></ul><p></p><h4><strong>3. Sale Events</strong></h4><p>Controls how many of the visible items are marked \"On Sale\" (applying the global sale discount).</p><ul><li><p><strong>Sale Min:</strong> Minimum number of items to put on sale.</p></li><li><p><strong>Sale Max:</strong> Maximum number of items to put on sale.</p></li></ul><p></p><h4><strong>4. Market Volatility (Price Variation)</strong></h4><p>Controls random price fluctuations to simulate market scarcity or surplus.</p><ul><li><p><strong>Price -%:</strong> Maximum percentage a price can <strong>decrease</strong> (e.g., <code>10</code> = prices can drop by up to 10%).</p></li><li><p><strong>Price +%:</strong> Maximum percentage a price can <strong>increase</strong> (e.g., <code>15</code> = prices can rise by up to 15%).</p><ul><li><p><em>Logic:</em> Every visible item gets a unique price modifier rolled within this range.</p></li></ul></li></ul><hr /><p></p><h4><strong>Controls</strong></h4><ul><li><p><strong>Default:</strong> Resets the input fields for that category to the values saved in the current profile (or factory defaults if using the Default profile).</p></li><li><p><strong>Roll:</strong> Applies the randomization logic to <strong>only</strong> this specific category.</p></li><li><p><strong>Randomize All Categories:</strong> Triggers the \"Roll\" logic for every visible category. Requires confirmation.</p></li><li><p><strong>Reset All:</strong> <strong>DANGER.</strong> Clears all randomization data — all items become visible, sales are removed, prices return to base values, and all locks are cleared. Requires confirmation.</p></li></ul><hr /><p></p><h4><strong>Usage Example</strong></h4><p>You want a <strong>Primary Weapons</strong> shop that has a decent selection, limited stock (to encourage buying now), and volatile prices.</p><p><strong>Configuration:</strong></p><ul><li><p><strong>Items Min:</strong> <code>10</code> | <strong>Items Max:</strong> <code>25</code></p></li><li><p><strong>Qty Min:</strong> <code>1</code> | <strong>Qty Max:</strong> <code>3</code></p></li><li><p><strong>Sale Min:</strong> <code>1</code> | <strong>Sale Max:</strong> <code>3</code></p></li><li><p><strong>Price -%:</strong> <code>5</code> | <strong>Price +%:</strong> <code>15</code></p></li></ul><p></p><p><strong>Result (After clicking \"Roll\"):</strong></p><ol><li><p><strong>Selection:</strong> The system reveals <strong>18</strong> random weapons (rolled between 10–25). All others are hidden.</p></li><li><p><strong>Stock:</strong> Each of those 18 weapons is assigned a stock quantity between <strong>1 and 3</strong> (e.g., only 1 <em>Longsword</em> available, but 3 <em>Daggers</em>).</p></li><li><p><strong>Sales:</strong> <strong>2</strong> of those weapons are marked \"On Sale\" (rolled between 1–3).</p></li><li><p><strong>Pricing:</strong> Each weapon gets a unique price shift between <strong>-5%</strong> and <strong>+15%</strong>.</p><ul><li><p><em>Weapon A</em> costs +12% (Scarcity).</p></li><li><p><em>Weapon B</em> costs -3% (Surplus).</p></li></ul></li></ol>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "ownership": {
+        "default": -1,
+        "zWDd1mciIe4rp82O": 3
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "daggerheart",
+        "systemVersion": "1.6.1",
+        "createdTime": 1769786674364,
+        "modifiedTime": 1773596106044,
+        "lastModifiedBy": "1XySCPpaFX8RnFhs"
+      },
+      "_key": "!journal.pages!fIXCeXWeDbAu3uFg.SqoXdZ1yaCPsXA9v"
+    },
+    {
+      "sort": 900000,
+      "name": "👥 Party Actor",
+      "type": "text",
+      "_id": "acPvDUbb85GK4BiU",
+      "system": {},
+      "title": {
+        "show": false,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<h2>Party Actor</h2><p>The Party Actor is a shared actor used by the module to store Stock data and Randomizer state. It also enables players to access Party Sheet features (shared wealth, gold transfer) directly from the store interface.</p><p></p><h3>Configuration</h3><ol><li><p>Create a new Actor with the type <strong>Party</strong>.</p></li><li><p>Open <strong>Store Configuration</strong> (⚙️) → <strong>General</strong> tab and select this actor in the <strong>Party Actor</strong> field.</p></li></ol><p></p><h3>⚠️ Warnings</h3><ul><li><p>Deleting this actor will result in <strong>permanent loss</strong> of all Stock and Randomizer data.</p></li><li><p>You must remove the Party Actor from the store settings before deleting it — it cannot be deleted while active.</p></li></ul>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "ownership": {
+        "default": -1,
+        "3eQnOSvnfoYbqF31": 3
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "daggerheart",
+        "systemVersion": "1.6.1",
+        "createdTime": 1769905130142,
+        "modifiedTime": 1773597629544,
+        "lastModifiedBy": "1XySCPpaFX8RnFhs"
+      },
+      "_key": "!journal.pages!fIXCeXWeDbAu3uFg.acPvDUbb85GK4BiU"
+    },
+    {
+      "sort": 1000000,
+      "name": "🏷️ Tags",
+      "type": "text",
+      "_id": "aKnIG3sfTpMKvYdf",
+      "system": {},
+      "title": {
+        "show": false,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<h1>Item Tagger 🏷️</h1><p>The <strong>Item Tagger</strong> lets you configure store metadata (price, tier, and header) for any item using a dedicated interface. Data is stored as item flags — the item's description is never modified.</p><p></p><h2>How to Open</h2><ul><li><p>Via the <strong>Daggerheart Menu</strong> → <strong>Item Tagger</strong> button.</p></li><li><p>Via the macro: <code>Store.EditTags()</code></p></li></ul><p></p><h2>How to Use</h2><ol><li><p>Drag any item from the <strong>Items Directory</strong> or a <strong>Compendium</strong> into the drop zone.</p></li><li><p>Fill in the desired fields: <strong>Price</strong>, <strong>Tier</strong>, and/or <strong>Header</strong>.</p></li><li><p>Click <strong>Save</strong>. The values are written to the item's flags immediately.</p></li></ol><p></p><h2>Fields</h2><ul><li><p><strong>Price:</strong> Sets a fixed price for the item in the store. Overrides the default value from the price table.</p></li><li><p><strong>Tier:</strong> Assigns a Tier (1–4) to items that don't have one natively (e.g., Loot, Consumables). Used for tier filtering and stock defaults.</p><ul><li><p><em>Note:</em> For <strong>weapons</strong> and <strong>armor</strong>, tier is written to <code>system.tier</code> directly — not as a flag.</p></li></ul></li><li><p><strong>Header:</strong> Groups the item under a named section within the store tab (e.g., \"Blacksmith\", \"Relics\").</p></li></ul><p></p><hr /><p></p><h2>📝 Examples</h2><p><strong>Item 1:</strong> <em>Ancient Golden Idol</em></p><p><strong>Tags configured:</strong> Price = <code>500</code> | Tier = <code>4</code> | Header = <code>Relics</code></p><p><strong>Result in the store:</strong></p><ol><li><p><strong>Price:</strong> Costs <strong>500 Coins</strong>.</p></li><li><p><strong>Location:</strong> Appears under the <strong>\"Tier 4 / Legendary — Relics\"</strong> header.</p></li></ol><p></p><p><strong>Item 2:</strong> <em>Potion of Flight</em></p><p><strong>Tags configured:</strong> Price = <code>97</code> | Tier = <code>2</code></p><p><strong>Result in the store:</strong></p><ol><li><p><strong>Price:</strong> Costs <strong>97 Coins</strong>.</p></li><li><p><strong>Location:</strong> Appears under the <strong>\"Tier 2 / Uncommon\"</strong> header.</p></li></ol><p>Working examples:</p><p>@UUID[Compendium.daggerheart-store.general-items.Item.pFgpjOHQJH7Hb1G1]{Camel}<br />@UUID[Compendium.daggerheart-store.general-items.Item.pMpRp5mHb0ciEGgo]{Climber's Kit}<br />@UUID[Compendium.daggerheart-store.general-items.Item.jteolML5GNTbw4S7]{Griffon}</p>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "ownership": {
+        "default": -1,
+        "zWDd1mciIe4rp82O": 3
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "daggerheart",
+        "systemVersion": "1.6.4",
+        "createdTime": 1770482032731,
+        "modifiedTime": 1773598221965,
+        "lastModifiedBy": "1XySCPpaFX8RnFhs"
+      },
+      "_key": "!journal.pages!fIXCeXWeDbAu3uFg.aKnIG3sfTpMKvYdf"
+    },
+    {
+      "sort": 1100000,
+      "name": "Macros",
+      "type": "text",
+      "_id": "7DChhhcJXuUQV6nP",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<h1>Store Macros Guide</h1><p>The <code>Store.Open()</code> and <code>Store.Show()</code> APIs allow Game Masters to programmatically interact with the store. <code>Store.Open()</code> opens the store for your own view, while <code>Store.Show()</code> broadcasts it to players.</p><h2>Basic Usage</h2><h3>Open the store for yourself (GM only)</h3><pre><code>Store.Open();</code></pre><h3>Show the current store to all players</h3><pre><code>Store.Show();</code></pre><h3>Show the current store to a specific player</h3><pre><code>Store.Show({ username: \"PlayerName\" });</code></pre><h3>Load a profile and show to all players</h3><pre><code>Store.Show({ store: \"ProfileName\" });</code></pre><h3>Load a profile and show to a specific player</h3><pre><code>Store.Show({ store: \"ProfileName\", username: \"PlayerName\" });</code></pre><h2>Examples</h2><h3>Example 1: Quick access to your \"Blacksmith\" store</h3><pre><code>Store.Show({ store: \"Blacksmith\" });</code></pre><p>This loads your \"Blacksmith\" profile and opens it for all connected players.</p><h3>Example 2: Send the \"Tavern\" store to only Alice</h3><pre><code>Store.Show({ store: \"Tavern\", username: \"Alice\" });</code></pre><p>This loads the \"Tavern\" profile and shows it only to the player named \"Alice\".</p><h3>Example 3: Show current store to a specific player</h3><pre><code>Store.Show({ username: \"Bob\" });</code></pre><p>Opens the currently active store profile for the player named \"Bob\".</p><h3>Example 4: Open your store for editing</h3><pre><code>Store.Open();</code></pre><p>Opens the store interface so you can configure it.</p><h2>Important Notes</h2><ul><li><p><strong>Profile Names:</strong> Profile names are case-sensitive. Use the exact name you assigned when creating the profile in the Store Configuration.</p></li><li><p><strong>Player Names:</strong> Use the player's display name (as shown in the Players list) when targeting a specific player.</p></li><li><p><strong>GM Only:</strong> Only Game Masters can execute <code>Store.Open()</code> and <code>Store.Show()</code>. Players attempting to use it will receive a warning.</p></li><li><p><strong>Error Handling:</strong> If a profile doesn't exist, an error notification appears and the store does not open. If a player name is invalid, an error appears.</p></li><li><p><strong>Offline Players:</strong> If you target a player who is offline, the store will not open for them, but a warning notification is displayed.</p></li></ul><h2>Creating Macros in Foundry VTT</h2><ol><li><p>Open the <strong>Macro</strong> sidebar tab</p></li><li><p>Click <strong>Create Macro</strong></p></li><li><p>Set the <strong>Type</strong> to <code>Script</code></p></li><li><p>Paste one of the code examples above into the <strong>Command</strong> field</p></li><li><p>Click <strong>Save Macro</strong></p></li><li><p>To use the macro, click it from the macro bar or drag it to your hotbar</p></li></ol><h3>Example Macro Names</h3><ul><li><p>\"Open Store\"</p></li><li><p>\"Show Blacksmith\"</p></li><li><p>\"Send Tavern to Alice\"</p></li><li><p>\"Show Current Store\"</p></li><li><p>\"Market - All Players\"</p></li></ul>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "ownership": {
+        "default": -1,
+        "1XySCPpaFX8RnFhs": 3
+      },
+      "flags": {},
+      "_stats": {
+        "coreVersion": "14.363",
+        "systemId": "daggerheart",
+        "systemVersion": "2.2.6",
+        "createdTime": 1779583479822,
+        "modifiedTime": 1779583699901,
+        "lastModifiedBy": "1XySCPpaFX8RnFhs",
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null
+      },
+      "_key": "!journal.pages!fIXCeXWeDbAu3uFg.7DChhhcJXuUQV6nP"
+    }
+  ],
+  "folder": null,
+  "categories": [],
+  "ownership": {
+    "default": 0,
+    "zWDd1mciIe4rp82O": 3
+  },
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "daggerheart",
+    "systemVersion": "1.3.2",
+    "createdTime": 1765972383612,
+    "modifiedTime": 1765972383645,
+    "lastModifiedBy": "zWDd1mciIe4rp82O"
+  },
+  "_id": "fIXCeXWeDbAu3uFg",
+  "sort": 200000,
+  "_key": "!journal!fIXCeXWeDbAu3uFg"
+}

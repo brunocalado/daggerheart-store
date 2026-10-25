@@ -1,0 +1,40 @@
+{
+  "folder": "l1KLWEgbu42eayLz",
+  "name": "Griffon",
+  "type": "loot",
+  "img": "icons/creatures/reptiles/dragon-winged-blue.webp",
+  "system": {
+    "attribution": {
+      "source": "Daggerheart Store",
+      "page": null,
+      "artist": ""
+    },
+    "description": "<p>Rare flying mount.  </p>",
+    "quantity": 1,
+    "actions": {}
+  },
+  "effects": [],
+  "flags": {
+    "daggerheart-store": {
+      "price": 2500,
+      "header": "Mounts"
+    }
+  },
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "daggerheart",
+    "systemVersion": "1.9.1",
+    "createdTime": 1765582660691,
+    "modifiedTime": 1773425865063,
+    "lastModifiedBy": "1XySCPpaFX8RnFhs"
+  },
+  "_id": "jteolML5GNTbw4S7",
+  "ownership": {
+    "default": 0
+  },
+  "sort": 0,
+  "_key": "!items!jteolML5GNTbw4S7"
+}

@@ -1,0 +1,40 @@
+{
+  "folder": "l1KLWEgbu42eayLz",
+  "name": "Warhorse",
+  "type": "loot",
+  "img": "icons/environment/creatures/horse-brown.webp",
+  "system": {
+    "attribution": {
+      "source": "Daggerheart Store",
+      "page": null,
+      "artist": ""
+    },
+    "description": "<p>Trained for combat; brave.  </p>",
+    "quantity": 1,
+    "actions": {}
+  },
+  "effects": [],
+  "flags": {
+    "daggerheart-store": {
+      "price": 1000,
+      "header": "Mounts"
+    }
+  },
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "daggerheart",
+    "systemVersion": "1.9.1",
+    "createdTime": 1765582660691,
+    "modifiedTime": 1773425865052,
+    "lastModifiedBy": "1XySCPpaFX8RnFhs"
+  },
+  "_id": "dOO0MiljFRQ4R6uq",
+  "ownership": {
+    "default": 0
+  },
+  "sort": 0,
+  "_key": "!items!dOO0MiljFRQ4R6uq"
+}

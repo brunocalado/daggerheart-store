@@ -1,0 +1,28 @@
+{
+  "name": "Item Tagger",
+  "type": "script",
+  "author": "1XySCPpaFX8RnFhs",
+  "img": "icons/sundries/misc/admission-ticket-blue.webp",
+  "scope": "global",
+  "command": "Store.EditTags();",
+  "folder": null,
+  "ownership": {
+    "default": 0,
+    "1XySCPpaFX8RnFhs": 3
+  },
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "daggerheart",
+    "systemVersion": "1.9.2",
+    "createdTime": 1773598110469,
+    "modifiedTime": 1773598110482,
+    "lastModifiedBy": "1XySCPpaFX8RnFhs"
+  },
+  "_id": "nstAc1jbO2ktwjPB",
+  "sort": 200000,
+  "_key": "!macros!nstAc1jbO2ktwjPB"
+}

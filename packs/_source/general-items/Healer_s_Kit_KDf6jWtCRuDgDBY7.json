@@ -1,0 +1,40 @@
+{
+  "folder": "kcYGhKOzjMgba2aR",
+  "name": "Healer's Kit",
+  "type": "loot",
+  "img": "icons/tools/medical/bandages-gauze.webp",
+  "system": {
+    "attribution": {
+      "source": "Daggerheart Store",
+      "page": null,
+      "artist": ""
+    },
+    "description": "<p>Bandages, salves, and splints.  </p>",
+    "quantity": 1,
+    "actions": {}
+  },
+  "effects": [],
+  "flags": {
+    "daggerheart-store": {
+      "price": 30,
+      "header": "Gear"
+    }
+  },
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "daggerheart",
+    "systemVersion": "1.9.1",
+    "createdTime": 1765582660691,
+    "modifiedTime": 1773425864917,
+    "lastModifiedBy": "1XySCPpaFX8RnFhs"
+  },
+  "_id": "KDf6jWtCRuDgDBY7",
+  "ownership": {
+    "default": 0
+  },
+  "sort": 0,
+  "_key": "!items!KDf6jWtCRuDgDBY7"
+}

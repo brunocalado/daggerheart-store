@@ -93,7 +93,7 @@ Homebrew compendiums can be added to the store, or given a Custom Tab of their o
 Install it from the Foundry VTT module browser, or use this manifest link:
 
 ```
-https://raw.githubusercontent.com/brunocalado/daggerheart-store/main/module.json
+https://github.com/brunocalado/daggerheart-store/releases/latest/download/module.json
 ```
 
 It needs Foundry VTT 14 and the Daggerheart system 2.8.1 or newer.

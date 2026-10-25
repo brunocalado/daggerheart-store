@@ -1,0 +1,42 @@
+{
+  "folder": "ru4lw1ikqZ7Lh2vz",
+  "name": "Standard Inn Room (Night)",
+  "type": "consumable",
+  "img": "icons/environment/settlement/house-farmland-small.webp",
+  "system": {
+    "attribution": {
+      "source": "Daggerheart Store",
+      "page": null,
+      "artist": ""
+    },
+    "description": "<p>A private room with a clean bed.  </p>",
+    "quantity": 1,
+    "actions": {},
+    "consumeOnUse": true,
+    "destroyOnEmpty": true
+  },
+  "effects": [],
+  "flags": {
+    "daggerheart-store": {
+      "price": 10,
+      "header": "Lodging &amp; Sustenance"
+    }
+  },
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "daggerheart",
+    "systemVersion": "1.9.1",
+    "createdTime": 1765582660691,
+    "modifiedTime": 1773425864836,
+    "lastModifiedBy": "1XySCPpaFX8RnFhs"
+  },
+  "_id": "2hblPS6kI8KWiHqn",
+  "ownership": {
+    "default": 0
+  },
+  "sort": 0,
+  "_key": "!items!2hblPS6kI8KWiHqn"
+}

@@ -1,0 +1,30 @@
+{
+  "name": "Store",
+  "type": "script",
+  "scope": "global",
+  "author": "zWDd1mciIe4rp82O",
+  "img": "icons/commodities/currency/coins-plain-stack-gold-yellow.webp",
+  "command": "Store.Open();",
+  "flags": {
+    "core": {}
+  },
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "daggerheart",
+    "systemVersion": "1.3.2",
+    "createdTime": 1765907792255,
+    "modifiedTime": 1773598110482,
+    "lastModifiedBy": "1XySCPpaFX8RnFhs"
+  },
+  "folder": null,
+  "ownership": {
+    "default": 2,
+    "zWDd1mciIe4rp82O": 3
+  },
+  "_id": "lWDmGeMZEFxKcsPa",
+  "sort": 300000,
+  "_key": "!macros!lWDmGeMZEFxKcsPa"
+}

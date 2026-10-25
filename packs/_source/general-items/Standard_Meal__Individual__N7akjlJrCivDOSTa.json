@@ -1,0 +1,42 @@
+{
+  "folder": "ru4lw1ikqZ7Lh2vz",
+  "name": "Standard Meal (Individual)",
+  "type": "consumable",
+  "img": "icons/consumables/food/bowl-ribs-meat-rice-mash-brown-white.webp",
+  "system": {
+    "attribution": {
+      "source": "Daggerheart Store",
+      "page": null,
+      "artist": ""
+    },
+    "description": "<p>Simple stew, bread, and ale.  </p>",
+    "quantity": 1,
+    "actions": {},
+    "consumeOnUse": true,
+    "destroyOnEmpty": true
+  },
+  "effects": [],
+  "flags": {
+    "daggerheart-store": {
+      "price": 2,
+      "header": "Lodging &amp; Sustenance"
+    }
+  },
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "daggerheart",
+    "systemVersion": "1.9.1",
+    "createdTime": 1765582660691,
+    "modifiedTime": 1773425864948,
+    "lastModifiedBy": "1XySCPpaFX8RnFhs"
+  },
+  "_id": "N7akjlJrCivDOSTa",
+  "ownership": {
+    "default": 0
+  },
+  "sort": 0,
+  "_key": "!items!N7akjlJrCivDOSTa"
+}

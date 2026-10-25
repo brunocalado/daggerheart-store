@@ -1,0 +1,40 @@
+{
+  "folder": "l1KLWEgbu42eayLz",
+  "name": "Draft Horse",
+  "type": "loot",
+  "img": "icons/environment/creatures/horse-tan.webp",
+  "system": {
+    "attribution": {
+      "source": "Daggerheart Store",
+      "page": null,
+      "artist": ""
+    },
+    "description": "<p>Very strong; best for pulling wagons.  </p>",
+    "quantity": 1,
+    "actions": {}
+  },
+  "effects": [],
+  "flags": {
+    "daggerheart-store": {
+      "price": 450,
+      "header": "Mounts"
+    }
+  },
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "daggerheart",
+    "systemVersion": "1.9.1",
+    "createdTime": 1765582660691,
+    "modifiedTime": 1773425865073,
+    "lastModifiedBy": "1XySCPpaFX8RnFhs"
+  },
+  "_id": "kHzMNenhB3rX55Ux",
+  "ownership": {
+    "default": 0
+  },
+  "sort": 0,
+  "_key": "!items!kHzMNenhB3rX55Ux"
+}

@@ -1,0 +1,43 @@
+{
+  "folder": "vLt3ege2XxuoOvzq",
+  "name": "Mount Rental (Day)",
+  "type": "consumable",
+  "img": "icons/environment/people/cavalry.webp",
+  "system": {
+    "attribution": {
+      "source": "Daggerheart Store",
+      "page": null,
+      "artist": ""
+    },
+    "description": "<p>Temporary use of a riding mount within controlled areas.  </p>",
+    "quantity": 1,
+    "actions": {},
+    "consumeOnUse": true,
+    "destroyOnEmpty": true
+  },
+  "effects": [],
+  "flags": {
+    "daggerheart-store": {
+      "price": 15,
+      "header": "Transportation Services"
+    }
+  },
+  "_stats": {
+    "compendiumSource": "Compendium.daggerheart-store.general-items.Item.Ul2qrgi3xXTStsmj",
+    "duplicateSource": "Item.V1a8Ce4oOc2Awn3U",
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "daggerheart",
+    "systemVersion": "1.9.1",
+    "createdTime": 1769801959421,
+    "modifiedTime": 1773425864905,
+    "lastModifiedBy": "1XySCPpaFX8RnFhs"
+  },
+  "ownership": {
+    "default": 2,
+    "zWDd1mciIe4rp82O": 3
+  },
+  "sort": 100000,
+  "_id": "IdDRgCvBwBKnJ3fq",
+  "_key": "!items!IdDRgCvBwBKnJ3fq"
+}

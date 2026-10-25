@@ -1,0 +1,40 @@
+{
+  "folder": "l1KLWEgbu42eayLz",
+  "name": "Camel",
+  "type": "loot",
+  "img": "icons/commodities/treasure/figurine-camel.webp",
+  "system": {
+    "attribution": {
+      "source": "Daggerheart Store",
+      "page": null,
+      "artist": ""
+    },
+    "description": "<p>Essential for desert travel; high stamina.  </p>",
+    "quantity": 1,
+    "actions": {}
+  },
+  "effects": [],
+  "flags": {
+    "daggerheart-store": {
+      "price": 350,
+      "header": "Mounts"
+    }
+  },
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "daggerheart",
+    "systemVersion": "1.9.1",
+    "createdTime": 1765582660691,
+    "modifiedTime": 1773425865084,
+    "lastModifiedBy": "1XySCPpaFX8RnFhs"
+  },
+  "_id": "pFgpjOHQJH7Hb1G1",
+  "ownership": {
+    "default": 0
+  },
+  "sort": 0,
+  "_key": "!items!pFgpjOHQJH7Hb1G1"
+}

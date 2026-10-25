@@ -1,0 +1,43 @@
+{
+  "folder": "dpWURbhadOWAKN9g",
+  "name": "Courier Service (Local)",
+  "type": "consumable",
+  "img": "icons/environment/people/cavalry.webp",
+  "system": {
+    "attribution": {
+      "source": "Daggerheart Store",
+      "page": null,
+      "artist": ""
+    },
+    "description": "<p>A reliable messenger to deliver letters within a city.  </p>",
+    "quantity": 1,
+    "actions": {},
+    "consumeOnUse": true,
+    "destroyOnEmpty": true
+  },
+  "effects": [],
+  "flags": {
+    "daggerheart-store": {
+      "price": 10,
+      "header": "Communications &amp; Services"
+    }
+  },
+  "_stats": {
+    "compendiumSource": "Compendium.daggerheart-store.general-items.Item.Ul2qrgi3xXTStsmj",
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "daggerheart",
+    "systemVersion": "1.9.1",
+    "createdTime": 1769800576720,
+    "modifiedTime": 1773425864937,
+    "lastModifiedBy": "1XySCPpaFX8RnFhs"
+  },
+  "ownership": {
+    "default": 2,
+    "zWDd1mciIe4rp82O": 3
+  },
+  "_id": "MTIQMFKmS3XAnCfG",
+  "sort": 0,
+  "_key": "!items!MTIQMFKmS3XAnCfG"
+}

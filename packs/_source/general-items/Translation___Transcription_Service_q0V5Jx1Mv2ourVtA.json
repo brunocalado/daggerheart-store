@@ -1,0 +1,43 @@
+{
+  "folder": "dpWURbhadOWAKN9g",
+  "name": "Translation & Transcription Service",
+  "type": "consumable",
+  "img": "icons/sundries/books/book-embossed-gold-red.webp",
+  "system": {
+    "attribution": {
+      "source": "Daggerheart Store",
+      "page": null,
+      "artist": ""
+    },
+    "description": "<p>Translation of foreign texts or transcription of coded or damaged documents.</p>",
+    "quantity": 1,
+    "actions": {},
+    "consumeOnUse": true,
+    "destroyOnEmpty": true
+  },
+  "effects": [],
+  "flags": {
+    "daggerheart-store": {
+      "price": 50,
+      "header": "Communications &amp; Services"
+    }
+  },
+  "_stats": {
+    "compendiumSource": "Compendium.daggerheart-store.general-items.Item.Ul2qrgi3xXTStsmj",
+    "duplicateSource": "Item.VaO9Trmbd379EIAo",
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "daggerheart",
+    "systemVersion": "1.9.1",
+    "createdTime": 1769800576720,
+    "modifiedTime": 1773425865106,
+    "lastModifiedBy": "1XySCPpaFX8RnFhs"
+  },
+  "ownership": {
+    "default": 2,
+    "zWDd1mciIe4rp82O": 3
+  },
+  "sort": 0,
+  "_id": "q0V5Jx1Mv2ourVtA",
+  "_key": "!items!q0V5Jx1Mv2ourVtA"
+}
