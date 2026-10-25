@@ -5,6 +5,7 @@
 - [Fixed] Selling an item from a stack (for example 3 potions) now sells one and keeps the rest. Before, the whole stack was removed for the price of one. The sell lists show the stack size.
 - [Fixed] Homebrew weapon and armor features showed "undefined" in the store tooltips. They now show their name and description, and built-in features show their proper name.
 - [Changed] Verified with Daggerheart 2.11.2.
+- [Fixed] In the Split Payment dialog, changing your share or the party's share now adjusts the other one. Before, the other field stayed as it was, so the total no longer matched the price and the purchase was refused.
 
 # 0.6.1
 

@@ -1953,7 +1953,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             </div>
         `;
 
-        new DialogV2({
+        const dialog = new DialogV2({
             window: { title: "Split Payment", icon: "fas fa-coins", resizable: false },
             content,
             classes: ["dhs-dialog", "split-payment-dialog"],
@@ -1977,22 +1977,26 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     }
                 },
                 { action: "cancel", label: "Cancel", icon: "fas fa-times" }
-            ],
-            render: (event, html) => {
-                const userIn = html.querySelector("#user-share");
-                const partyIn = html.querySelector("#party-share");
-                userIn.addEventListener("input", () => {
-                    let val = parseInt(userIn.value) || 0;
-                    if (val > userGold) val = userGold;
-                    partyIn.value = Math.max(0, price - val);
-                });
-                partyIn.addEventListener("input", () => {
-                    let val = parseInt(partyIn.value) || 0;
-                    if (val > partyGold) val = partyGold;
-                    userIn.value = Math.max(0, price - val);
-                });
-            }
-        }).render(true);
+            ]
+        });
+
+        // DialogV2 honors a `render` option only through DialogV2.wait(); a dialog built with
+        // `new` ignores it, so listen for the dialog's own render event, as wait() does.
+        dialog.addEventListener("render", () => {
+            const userIn = dialog.element.querySelector("#user-share");
+            const partyIn = dialog.element.querySelector("#party-share");
+            userIn.addEventListener("input", () => {
+                let val = parseInt(userIn.value) || 0;
+                if (val > userGold) val = userGold;
+                partyIn.value = Math.max(0, price - val);
+            });
+            partyIn.addEventListener("input", () => {
+                let val = parseInt(partyIn.value) || 0;
+                if (val > partyGold) val = partyGold;
+                userIn.value = Math.max(0, price - val);
+            });
+        }, { once: true });
+        dialog.render(true);
     }
 
     async _executePurchase({ itemUuid, itemName, price, recipient, payers }) {
