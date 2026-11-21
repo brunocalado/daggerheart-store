@@ -49,21 +49,35 @@ export function cleanDescriptionString(descString) {
 }
 
 /**
+ * Localized text of a Daggerheart config entry (`CONFIG.DH.*`), e.g. a trait or range label.
+ * Built-in entries hold i18n keys; homebrew ones (damage type names) hold plain text, which
+ * localize() returns unchanged. An id the config does not know comes back as-is.
+ *
+ * @param {Object} config - The config table, keyed by id
+ * @param {string|null|undefined} id - The stored id
+ * @param {string} [key="label"] - Which text of the entry to use ("label", "short", "abbreviation")
+ * @returns {string} The text, or "" when there is no id
+ */
+export function configLabel(config, id, key = "label") {
+    if (!id) return "";
+    const text = config[id]?.[key];
+    return text ? game.i18n.localize(text) : String(id);
+}
+
+/**
  * Formats the damage types of a damage part (a Set of type ids such as
- * `physical` / `magical`).
+ * `physical` / `magical`) with the system's names, which homebrew settings can rename.
  *
  * @param {Set<string>} typeSet - The damage part's `type`
- * @param {boolean} [abbreviated=false] - If true, returns 3-char uppercase abbreviations
+ * @param {boolean} [abbreviated=false] - If true, returns uppercase abbreviations
  * @returns {string} Joined damage type string (slash-separated)
  */
 export function parseDamageTypes(typeSet, abbreviated = false) {
-    const fullNameMap = { "physical": "Physical", "magical": "Magical" };
-
+    const types = CONFIG.DH.GENERAL.damageTypes;
     return Array.from(typeSet ?? [])
-        .map(id => {
-            if (abbreviated) return id.substring(0, 3).toUpperCase();
-            return fullNameMap[id] || (id.charAt(0).toUpperCase() + id.slice(1));
-        })
+        .map(id => abbreviated
+            ? configLabel(types, id, "abbreviation").toUpperCase()
+            : configLabel(types, id))
         .filter(t => t)
         .join("/");
 }

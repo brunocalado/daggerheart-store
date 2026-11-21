@@ -18,7 +18,7 @@
 
 import { MODULE_ID } from "./store-constants.js";
 import { getItemTier } from "./store-utils.js";
-import { cleanDescription, cleanDescriptionString, parseDamageTypes } from "./item-display.js";
+import { cleanDescription, cleanDescriptionString, parseDamageTypes, configLabel } from "./item-display.js";
 
 /**
  * Resolves the primary (hit points) damage part of an action. `damage.main` is
@@ -42,15 +42,8 @@ export function getWeaponSummary(doc) {
         const system = doc.system;
         if (!system.attack) return "";
 
-        const traitRaw = String(system.attack.roll?.trait || "");
-        const weaponTrait = traitRaw.length >= 3 ? traitRaw.substring(0, 3).toUpperCase() : traitRaw.toUpperCase();
-
-        const rangeRaw = system.attack.range || "";
-        const rangeMap = {
-            "melee": "Melee", "veryClose": "Very Close", "close": "Close",
-            "far": "Far", "veryFar": "Very Far"
-        };
-        const weaponRange = rangeMap[rangeRaw] || (rangeRaw ? String(rangeRaw).charAt(0).toUpperCase() + String(rangeRaw).slice(1) : "");
+        const weaponTrait = configLabel(CONFIG.DH.ACTIONS.rollTypeTraits, system.attack.roll?.trait, "short");
+        const weaponRange = configLabel(CONFIG.DH.GENERAL.range, system.attack.range);
 
         const part0 = getPrimaryDamagePart(system.attack);
         const val = part0.value || {};
@@ -73,9 +66,7 @@ export function getWeaponSummary(doc) {
             if (damageType) damageSection += `(${damageType})`;
         }
 
-        const burdenRaw = String(system.burden || "");
-        const burdenMap = { "oneHanded": "One-Handed", "twoHanded": "Two-Handed" };
-        const weaponBurden = burdenMap[burdenRaw] || burdenRaw;
+        const weaponBurden = configLabel(CONFIG.DH.GENERAL.burden, system.burden);
 
         const parts = [weaponTrait, weaponRange, damageSection, weaponBurden];
         return parts.filter(p => p && String(p).trim() !== "").join(" - ");
@@ -114,19 +105,11 @@ export function extractWeaponStats(doc) {
         const system = doc.system;
         if (!system.attack) return {};
 
-        const traitMap = {
-            "agility": "Agility", "strength": "Strength", "finesse": "Finesse",
-            "instinct": "Instinct", "presence": "Presence", "knowledge": "Knowledge"
-        };
-        const traitRaw = String(system.attack.roll?.trait || "").toLowerCase();
-        const trait = traitMap[traitRaw] || (traitRaw ? traitRaw.charAt(0).toUpperCase() + traitRaw.slice(1) : "");
-
-        const rangeRaw = system.attack.range || "";
-        const rangeMap = {
-            "melee": "Melee", "veryClose": "Very Close", "close": "Close",
-            "far": "Far", "veryFar": "Very Far"
-        };
-        const range = rangeMap[rangeRaw] || (rangeRaw ? String(rangeRaw).charAt(0).toUpperCase() + String(rangeRaw).slice(1) : "");
+        const trait = configLabel(CONFIG.DH.ACTIONS.rollTypeTraits, system.attack.roll?.trait);
+        // The id travels with the label: the comparison orders ranges by id, since the label
+        // follows the client language.
+        const rangeId = system.attack.range;
+        const range = configLabel(CONFIG.DH.GENERAL.range, rangeId);
 
         const part0 = getPrimaryDamagePart(system.attack);
         const val = part0.value || {};
@@ -150,9 +133,7 @@ export function extractWeaponStats(doc) {
         }
 
         const isDirect = part0.direct === true;
-        const burdenRaw = String(system.burden || "");
-        const burdenMap = { "oneHanded": "One-Handed", "twoHanded": "Two-Handed" };
-        const burden = burdenMap[burdenRaw] || burdenRaw;
+        const burden = configLabel(CONFIG.DH.GENERAL.burden, system.burden);
 
         const features = [];
         // system.weaponFeatures is a getter the system marks for deprecation, so read the stored
@@ -171,7 +152,7 @@ export function extractWeaponStats(doc) {
             if (featureDesc) features.push({ name: featureName, description: featureDesc });
         }
 
-        return { trait, range, damageDisplay, damageType, isDirect, burden, features };
+        return { trait, range, rangeId, damageDisplay, damageType, isDirect, burden, features };
     } catch (err) {
         console.error(`${MODULE_ID} | Error extracting weapon stats:`, err);
         return {};

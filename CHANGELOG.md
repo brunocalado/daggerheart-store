@@ -2,6 +2,7 @@
 
 - [Breaking][Changed] Requires Daggerheart 2.13.0 or later. Verified with Daggerheart 2.13.0.
 - [Breaking][Removed] `game.daggerheartStore.migrateTags()` and the automatic upgrade of data from very old store versions (the single custom-tab compendium setting, the pre-profile stock flag, and price/tier/header tags written in item descriptions). Worlds that never ran those upgrades lose that data.
+- [Changed] Weapon trait, range, burden and damage type in the store rows and comparison tooltip now use the Daggerheart system's own names, so they follow the game language and homebrew damage type names. "Best Trait" and "Spellcast Trait" weapons show those names instead of "HIG"/"SPE".
 
 # 0.7.0
 

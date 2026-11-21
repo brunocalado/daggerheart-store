@@ -79,11 +79,11 @@ export function compareFeatures(equipped, storeItem) {
  * @param {Object} storeItem - Store item descriptor from formatItemForComparison
  */
 export function addComparisonIndicators(equipped, storeItem) {
-    const rangeOrder = ["Melee", "Very Close", "Close", "Far", "Very Far"];
+    const rangeOrder = ["melee", "veryClose", "close", "far", "veryFar"];
 
     if (storeItem.isWeapon && equipped.isWeapon) {
-        const equippedRangeIdx = rangeOrder.indexOf(equipped.range);
-        const storeRangeIdx = rangeOrder.indexOf(storeItem.range);
+        const equippedRangeIdx = rangeOrder.indexOf(equipped.rangeId);
+        const storeRangeIdx = rangeOrder.indexOf(storeItem.rangeId);
         if (equippedRangeIdx !== -1 && storeRangeIdx !== -1) {
             if (storeRangeIdx > equippedRangeIdx) storeItem.rangeCompare = "up";
             else if (storeRangeIdx < equippedRangeIdx) storeItem.rangeCompare = "down";
