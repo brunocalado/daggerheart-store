@@ -80,6 +80,8 @@ export async function buildStoreCatalogIndex({ priceMod, priceOverrides, useDefa
             let basePrice = extractPriceFromDescription(doc);
             if (priceOverrides.hasOwnProperty(doc.name)) basePrice = priceOverrides[doc.name];
 
+            // Custom packs are not type-filtered and may hold other modules' item types, whose
+            // description can be a { value } object rather than Daggerheart's HTML string.
             const rawDescCustom = String(foundry.utils.getProperty(doc, "system.description.value") ||
                                         foundry.utils.getProperty(doc, "system.description") || "");
             catalog.set(doc.name, { basePrice, img: doc.img, uuid: doc.uuid, description: cleanDescriptionString(rawDescCustom) });

@@ -856,6 +856,8 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                         if (customTabMaskedDesc !== null) {
                             itemData.description = cleanDescriptionString(customTabMaskedDesc);
                         } else {
+                            // extraItemTypes come from other modules, whose description can be a
+                            // { value } object rather than Daggerheart's HTML string.
                             const rawDesc = String(foundry.utils.getProperty(doc, "system.description.value") ||
                                                    foundry.utils.getProperty(doc, "system.description") || "");
                             itemData.description = buildTooltipContent(doc, cleanDescriptionString(rawDesc));
