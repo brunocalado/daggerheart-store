@@ -226,9 +226,7 @@ export const PRICE_DATA = {
         "Advanced Rope Dart": { price: 570, tier: 3 },
         "Advanced Twisted Dagger": { price: 600, tier: 3 },
         "Advanced Whipsword": { price: 620, tier: 3 },
-        // Both spellings: Daggerheart fixed the typo in 2.9.0, but worlds may still hold copies imported before it.
         "Soldier's Pike": { price: 650, tier: 3 },
-        "Solider's Pike": { price: 650, tier: 3 },
         "Singing Sword": { price: 660, tier: 3 },
         // Priced and listed as tier 3: the system marks it tier 1, but its d8+7 damage
         // matches the tier 3 weapons. Drop to tier 1 here if the system ever confirms tier 1.
@@ -340,9 +338,7 @@ export const PRICE_DATA = {
         // Tier 3
         "Advanced Fighting Cloak": { price: 500, tier: 3 },
         "Advanced Hatchet": { price: 520, tier: 3 },
-        // Both spellings: Daggerheart fixed the typo in 2.9.0, but worlds may still hold copies imported before it.
         "Advanced Offhand Brass Knuckles": { price: 520, tier: 3 },
-        "Advanced Offhand Brass Knucles": { price: 520, tier: 3 },
         "Advanced Throwing Knives": { price: 540, tier: 3 },
         "Advanced Focus Runes": { price: 560, tier: 3 },
         "Vorpal Shard": { price: 580, tier: 3 },
@@ -377,8 +373,6 @@ export const PRICE_DATA = {
         "Runetan Floating Armor": { price: 180, tier: 2 },
         "Harrowbone Armor": { price: 180, tier: 2 },
         "Elundrian Chain Armor": { price: 190, tier: 2 },
-        // Pre-2.9.0 name of Elundrian Chain Armor, kept for copies imported before the rename.
-        "Elundrian Chain Mail": { price: 190, tier: 2 },
         "Rosewild Armor": { price: 200, tier: 2 },
         "Improved Full Plate Armor": { price: 200, tier: 2 },
         // Tier 3
@@ -430,8 +424,6 @@ export const PRICE_DATA = {
         "Deep-Forged Coral Armor": { price: 820, tier: 3 },
         "Astral Raiment": { price: 850, tier: 3 },
         "Bloodstone Plate Armor": { price: 880, tier: 3 },
-        // Both spellings: Daggerheart fixed the typo in 2.9.0, but worlds may still hold copies imported before it.
-        "Granminister's Finery": { price: 900, tier: 3 },
         "Granminster's Finery": { price: 900, tier: 3 },
         "Skywarden's Lamellar": { price: 900, tier: 3 },
         "Cloverweave Cloak": { price: 950, tier: 3 },
