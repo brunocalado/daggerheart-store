@@ -313,60 +313,6 @@ export function getItemHeader(item) {
     return item.getFlag?.(MODULE_ID, STORE_FLAGS.header) ?? null;
 }
 
-// --- Migration-Only Helpers ---
-
-/**
- * MIGRATION USE ONLY.
- * Parses legacy description tags from an item. Do not call at runtime.
- * @param {Object} item - The item document
- * @returns {{price: number|null, tier: number|null, header: string|null}}
- */
-export function parseLegacyStoreTags(item) {
-    const desc = String(
-        foundry.utils.getProperty(item, "system.description") || ""
-    );
-
-    const priceMatch = desc.match(/\{\{\{(\d+)\}\}\}/);
-    const price = priceMatch ? parseInt(priceMatch[1]) : null;
-
-    const tierMatch = desc.match(/\{\{\{tier([1-4])\}\}\}/i);
-    const tier = tierMatch ? parseInt(tierMatch[1]) : null;
-
-    const allTags = [...desc.matchAll(/\{\{\{([^}]+)\}\}\}/g)];
-    let header = null;
-    for (const match of allTags) {
-        const content = match[1];
-        if (/^\d+$/.test(content)) continue;
-        if (/^tier[1-4]$/i.test(content)) continue;
-        header = content;
-        break;
-    }
-
-    return { price, tier, header };
-}
-
-/**
- * MIGRATION USE ONLY.
- * Removes store-specific {{{...}}} tags from a description HTML string.
- * Only strips patterns that match known store tag formats (price, tier, header).
- * Does NOT strip arbitrary {{{...}}} content unrelated to the store.
- * @param {string} desc - The raw description HTML
- * @param {{price: number|null, tier: number|null, header: string|null}} tags - Parsed tag values
- * @returns {string} Cleaned description
- */
-export function stripLegacyStoreTags(desc, { price, tier, header }) {
-    let result = desc;
-
-    if (price  !== null) result = result.replace(/\{\{\{\d+\}\}\}/g, "");
-    if (tier   !== null) result = result.replace(/\{\{\{tier[1-4]\}\}\}/gi, "");
-    if (header !== null) {
-        const escaped = header.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-        result = result.replace(new RegExp(`\\{\\{\\{${escaped}\\}\\}\\}`), "");
-    }
-
-    return result.replace(/<p>\s*<\/p>/g, "").trim();
-}
-
 // --- Dialog Helper ---
 
 /**

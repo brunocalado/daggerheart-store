@@ -1,6 +1,7 @@
 # Unreleased
 
 - [Breaking][Changed] Requires Daggerheart 2.13.0 or later. Verified with Daggerheart 2.13.0.
+- [Breaking][Removed] `game.daggerheartStore.migrateTags()` and the automatic upgrade of data from very old store versions (the single custom-tab compendium setting, the pre-profile stock flag, and price/tier/header tags written in item descriptions). Worlds that never ran those upgrades lose that data.
 
 # 0.7.0
 

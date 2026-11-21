@@ -17,8 +17,7 @@
 
 /**
  * Cleans unsafe HTML from a description for tooltip display and truncates
- * the result to 300 characters. Store tags no longer exist in descriptions
- * after the migration to flags.
+ * the result to 300 characters.
  *
  * Note: intentionally distinct from {@link cleanDescriptionString}, which
  * does not truncate.

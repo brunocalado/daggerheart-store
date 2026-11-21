@@ -11,7 +11,6 @@ import { StoreImportExport } from "./store-import-export.js";
 import { StoreItemTagger } from "./store-item-tagger.js";
 import { StoreWelcome } from "./store-welcome.js";
 import { StockManager } from "./stock-manager.js";
-import { migrateTags } from "./store-migration.js";
 import { registerQueryHandlers, queryCancelNegotiation, querySellFromParty } from "./socket.js";
 import { MODULE_ID, NEGOTIATION_FLAG_KEY, NEGOTIATION_STAGES } from "./store-constants.js";
 import { GMNegotiationApp } from "./store-negotiation-gm.js";
@@ -112,9 +111,6 @@ Hooks.once("init", () => {
     // Custom Tab Configuration
     game.settings.register(MODULE_ID, "customTabName", {
         name: "Custom Tab Name", scope: "world", config: false, type: String, default: "General"
-    });
-    game.settings.register(MODULE_ID, "customTabCompendium", {
-        name: "Custom Tab Compendium (Legacy)", scope: "world", config: false, type: String, default: ""
     });
     game.settings.register(MODULE_ID, "customTabCompendiums", {
         name: "Custom Tab Compendiums", scope: "world", config: false, type: Array, default: []
@@ -317,10 +313,6 @@ Hooks.once("init", () => {
     Handlebars.registerHelper("toString", (val) => {
         return String(val);
     });
-
-    Handlebars.registerHelper("tier", (val) => {
-        return `{{{tier${val}}}}`;
-    });
 });
 
 // Singleton Instance Holder
@@ -351,25 +343,13 @@ async function _handleOpenStoreRequest(value) {
 }
 
 Hooks.once("ready", async () => {
-    // Migrate legacy customTabCompendium (string) to customTabCompendiums (array)
+    // New world or cleared setting: the custom tab starts with the module's own pack.
     if (game.user.isGM) {
-        const legacy = game.settings.get(MODULE_ID, "customTabCompendium");
         const current = game.settings.get(MODULE_ID, "customTabCompendiums") || [];
         if (current.length === 0) {
-            if (legacy && legacy.trim() !== "") {
-                // Existing world: migrate old setting value
-                await game.settings.set(MODULE_ID, "customTabCompendiums", [legacy]);
-                await game.settings.set(MODULE_ID, "customTabCompendium", "");
-                console.log(`${MODULE_ID} | Migrated customTabCompendium to customTabCompendiums`);
-            } else {
-                // New world or cleared setting: set initial default
-                await game.settings.set(MODULE_ID, "customTabCompendiums", ["daggerheart-store.general-items"]);
-            }
+            await game.settings.set(MODULE_ID, "customTabCompendiums", [`${MODULE_ID}.general-items`]);
         }
     }
-
-    game.daggerheartStore = game.daggerheartStore ?? {};
-    game.daggerheartStore.migrateTags = migrateTags;
 
     globalThis.Store = {
         Open: async () => {
@@ -561,9 +541,7 @@ Hooks.on("updateActor", async (actor, changes, options, userId) => {
                 }
             } else {
                 // Sell: remove one unit of the owned item and credit the agreed price.
-                const itemToDelete = fullFlag.itemId
-                    ? userActor.items.get(fullFlag.itemId)
-                    : userActor.items.find(i => i.name === fullFlag.itemName);
+                const itemToDelete = userActor.items.get(fullFlag.itemId);
                 if (itemToDelete) await removeOneUnit(itemToDelete);
 
                 const stockEnabled = game.settings.get(MODULE_ID, "stockEnabled");

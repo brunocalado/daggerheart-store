@@ -1487,10 +1487,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const blockedSaleItems = game.settings.get(MODULE_ID, "blockedSaleItems") || {};
         if (blockedSaleItems[itemName]) return ui.notifications.warn("This item cannot be sold.");
 
-        // Prefer ID-based lookup for precision; name fallback covers legacy buttons without data-item-id
-        const itemToDelete = itemId
-            ? userActor.items.get(itemId)
-            : userActor.items.find(i => i.name === itemName);
+        const itemToDelete = userActor.items.get(itemId);
         if (!itemToDelete) return ui.notifications.warn(`You do not have a "${itemName}" to sell.`);
 
         await removeOneUnit(itemToDelete);
@@ -2263,11 +2260,6 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             "useDefaultCompendiums", "sellRatio", "stockEnabled", "showStockQuantity", "randomizerSettings",
             "vendorName", "vendorDescription", "vendorImage", "vendorRelationships", "vendorRelationLevels"
         ];
-
-        // Migrate old single-compendium string format to array
-        if (!profileData.customTabCompendiums && profileData.customTabCompendium) {
-            profileData.customTabCompendiums = [profileData.customTabCompendium];
-        }
 
         for (const key of settingsToUpdate) {
             if (profileData.hasOwnProperty(key)) await game.settings.set(MODULE_ID, key, profileData[key]);

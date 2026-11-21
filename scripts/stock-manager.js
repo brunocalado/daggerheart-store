@@ -85,17 +85,6 @@ export class StockManager {
 
         if (!game.user.isGM) return false;
 
-        // One-time migration: move legacy "stock" flag to "stock_Default"
-        const legacyStock = actor.getFlag(this.MODULE_ID, "stock");
-        const defaultKey = "stock_Default";
-        if (legacyStock && !actor.getFlag(this.MODULE_ID, defaultKey)) {
-            await actor.update({
-                [`flags.${this.MODULE_ID}.${defaultKey}`]: legacyStock,
-                [`flags.${this.MODULE_ID}.-=stock`]: null
-            });
-            console.log(`${this.MODULE_ID} | Migrated legacy stock to ${defaultKey}`);
-        }
-
         // Initialize stock bucket for the active profile if absent
         const stockKey = this.getStockKey();
         const existingStock = actor.getFlag(this.MODULE_ID, stockKey);

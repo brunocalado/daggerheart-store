@@ -296,7 +296,7 @@ export class StoreRandomizer extends HandlebarsApplicationMixin(ApplicationV2) {
                                 if (priceList.hasOwnProperty(originalName)) {
                                     basePrice = Math.ceil(priceList[originalName].price * priceMod);
                                 } else {
-                                    // Fallback: extract price from {{{number}}} tag
+                                    // Not in PRICE_DATA: use the price flag set with the Item Tagger
                                     const extracted = extractPriceFromDescription(doc);
                                     if (extracted > 0) {
                                         basePrice = Math.ceil(extracted * priceMod);
