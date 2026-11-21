@@ -1,3 +1,7 @@
+# Unreleased
+
+- [Breaking][Changed] Requires Daggerheart 2.13.0 or later. Verified with Daggerheart 2.13.0.
+
 # 0.7.0
 
 - [Changed] Releases are now published as GitHub releases and registered on foundryvtt.com automatically. The manifest URL is now `https://github.com/brunocalado/daggerheart-store/releases/latest/download/module.json`; existing installs pick it up on their next update.

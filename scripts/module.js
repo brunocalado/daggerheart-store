@@ -15,7 +15,7 @@ import { migrateTags } from "./store-migration.js";
 import { registerQueryHandlers, queryCancelNegotiation, querySellFromParty } from "./socket.js";
 import { MODULE_ID, NEGOTIATION_FLAG_KEY, NEGOTIATION_STAGES } from "./store-constants.js";
 import { GMNegotiationApp } from "./store-negotiation-gm.js";
-import { addGold, getActorWealth, createStoreChatMessage, formatPrice, removeOneUnit } from "./store-utils.js";
+import { addGold, getActorWealth, formatPrice, removeOneUnit } from "./store-utils.js";
 const { DialogV2 } = foundry.applications.api;
 
 Hooks.once("init", () => {
@@ -400,7 +400,7 @@ Hooks.once("ready", async () => {
                 const recipients = ChatMessage.getWhisperRecipients("GM").map(u => u.id);
                 if (!recipients.includes(game.user.id)) recipients.push(game.user.id);
 
-                await createStoreChatMessage({
+                await foundry.documents.ChatMessage.create({
                     content: messageContent,
                     speaker: { alias: "Store System" },
                     whisper: recipients
@@ -627,9 +627,7 @@ Hooks.on("deleteActor", (actor, options, userId) => {
     }
 });
 
-Hooks.on("renderDaggerheartMenu", (app, html, data) => {
-    // v14 ApplicationV2 always delivers HTMLElement; the jQuery fallback is a v13 remnant.
-    const element = html instanceof HTMLElement ? html : html[0];
+Hooks.on("renderDaggerheartMenu", (app, element, data) => {
     const myButton = document.createElement("button");
     myButton.type = "button";
     myButton.innerHTML = `<i class="fas fa-balance-scale"></i> Open Store`;

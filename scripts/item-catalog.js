@@ -55,8 +55,7 @@ export async function buildStoreCatalogIndex({ priceMod, priceOverrides, useDefa
                 }
                 if (priceOverrides.hasOwnProperty(doc.name)) basePrice = priceOverrides[doc.name];
 
-                const rawDesc = String(foundry.utils.getProperty(doc, "system.description.value") ||
-                                      foundry.utils.getProperty(doc, "system.description") || "");
+                const rawDesc = String(doc.system.description ?? "");
                 catalog.set(doc.name, { basePrice, img: doc.img, uuid: doc.uuid, description: cleanDescriptionString(rawDesc) });
             }
         }

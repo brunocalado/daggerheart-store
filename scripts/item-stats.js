@@ -21,27 +21,14 @@ import { getItemTier } from "./store-utils.js";
 import { cleanDescription, cleanDescriptionString, parseDamageTypes } from "./item-display.js";
 
 /**
- * Resolves the primary (hit points) damage part of an action.
- *
- * The Daggerheart system reshaped action damage: `damage.parts` — a keyed
- * object of parts — was replaced by `damage.main` (the hit-points part, with
- * `direct` and `includeBase` folded in) plus `damage.resources` for everything
- * else. `DHBaseAction.migrateData` deletes `parts` on load, so on a current
- * system only `main` exists. The `parts` fallback stays for raw/unmigrated
- * source data (e.g. objects read straight from a pack file).
+ * Resolves the primary (hit points) damage part of an action. `damage.main` is
+ * nullable, so a weapon without damage yields an empty object.
  *
  * @param {Object} attack - The action data (`system.attack`)
  * @returns {Object} The primary damage part, or an empty object when absent
  */
 function getPrimaryDamagePart(attack) {
-    const damage = attack?.damage;
-    if (!damage) return {};
-    if (damage.main) return damage.main;
-
-    const partsRaw = damage.parts;
-    if (!partsRaw) return {};
-    if (Array.isArray(partsRaw)) return partsRaw[0] || {};
-    return partsRaw.hitPoints || Object.values(partsRaw)[0] || {};
+    return attack.damage.main ?? {};
 }
 
 /**
@@ -87,7 +74,7 @@ export function getWeaponSummary(doc) {
         }
 
         const burdenRaw = String(system.burden || "");
-        const burdenMap = { "1": "One-Handed", "2": "Two-Handed", "oneHanded": "One-Handed", "twoHanded": "Two-Handed" };
+        const burdenMap = { "oneHanded": "One-Handed", "twoHanded": "Two-Handed" };
         const weaponBurden = burdenMap[burdenRaw] || burdenRaw;
 
         const parts = [weaponTrait, weaponRange, damageSection, weaponBurden];
@@ -129,9 +116,7 @@ export function extractWeaponStats(doc) {
 
         const traitMap = {
             "agility": "Agility", "strength": "Strength", "finesse": "Finesse",
-            "instinct": "Instinct", "presence": "Presence", "knowledge": "Knowledge",
-            "agi": "Agility", "str": "Strength", "fin": "Finesse",
-            "ins": "Instinct", "pre": "Presence", "kno": "Knowledge"
+            "instinct": "Instinct", "presence": "Presence", "knowledge": "Knowledge"
         };
         const traitRaw = String(system.attack.roll?.trait || "").toLowerCase();
         const trait = traitMap[traitRaw] || (traitRaw ? traitRaw.charAt(0).toUpperCase() + traitRaw.slice(1) : "");
@@ -164,18 +149,15 @@ export function extractWeaponStats(doc) {
             if (damageType) damageDisplay += ` (${damageType})`;
         }
 
-        // `direct` moved onto the damage part itself; the old top-level flag is
-        // only present on unmigrated source data.
-        const isDirect = part0.direct === true || system.attack.damage?.direct === true;
+        const isDirect = part0.direct === true;
         const burdenRaw = String(system.burden || "");
-        const burdenMap = { "1": "One-Handed", "2": "Two-Handed", "oneHanded": "One-Handed", "twoHanded": "Two-Handed" };
+        const burdenMap = { "oneHanded": "One-Handed", "twoHanded": "Two-Handed" };
         const burden = burdenMap[burdenRaw] || burdenRaw;
 
         const features = [];
-        // system.weaponFeatures is a getter the system marks for deprecation; itemFeatures is the stored
-        // field (an object keyed by id in 2.11, a getter returning the array in 2.8), and
-        // Object.values reads both shapes.
-        const weaponFeatures = Object.values(system.itemFeatures ?? {});
+        // system.weaponFeatures is a getter the system marks for deprecation, so read the stored
+        // itemFeatures object (keyed by id) directly.
+        const weaponFeatures = Object.values(system.itemFeatures);
         // CONFIG.DH.ITEM.weaponFeatures holds only the built-in features; homebrew ones are
         // merged in by allWeaponFeatures(). Built-in label/description are i18n keys, homebrew
         // ones are plain text and GM-written HTML, and localize() passes the latter through.
@@ -205,10 +187,9 @@ export function extractArmorStats(doc) {
     try {
         const system = doc.system;
         const features = [];
-        // system.armorFeatures is a getter the system marks for deprecation; itemFeatures is the stored
-        // field (an object keyed by id in 2.11, a getter returning the array in 2.8), and
-        // Object.values reads both shapes.
-        const armorFeatures = Object.values(system.itemFeatures ?? {});
+        // system.armorFeatures is a getter the system marks for deprecation, so read the stored
+        // itemFeatures object (keyed by id) directly.
+        const armorFeatures = Object.values(system.itemFeatures);
         // CONFIG.DH.ITEM.armorFeatures holds only the built-in features; homebrew ones are
         // merged in by allArmorFeatures(). Built-in label/description are i18n keys, homebrew
         // ones are plain text and GM-written HTML, and localize() passes the latter through.
@@ -241,8 +222,7 @@ export function extractArmorStats(doc) {
 export function formatItemForComparison(item) {
     if (!item) return null;
     const isWeapon = item.type === "weapon";
-    const rawDesc = foundry.utils.getProperty(item, "system.description.value") ||
-                    foundry.utils.getProperty(item, "system.description") || "";
+    const rawDesc = item.system.description ?? "";
     const base = {
         name: item.name, img: item.img,
         tier: getItemTier(item),

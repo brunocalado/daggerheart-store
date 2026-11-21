@@ -14,7 +14,7 @@
  */
 
 import { MODULE_ID, NEGOTIATION_FLAG_KEY, NEGOTIATION_STAGES } from "./store-constants.js";
-import { getChatWhisperRecipients, buildChatCard, getSystemCurrency, formatPrice, createStoreChatMessage } from "./store-utils.js";
+import { getChatWhisperRecipients, buildChatCard, getSystemCurrency, formatPrice } from "./store-utils.js";
 import { queryCancelNegotiation, queryAcceptCounter, querySubmitFinalOffer } from "./socket.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api;
@@ -258,7 +258,7 @@ export class PlayerNegotiationApp extends HandlebarsApplicationMixin(Application
         const whisperTo = getChatWhisperRecipients();
         if (whisperTo) chatData.whisper = whisperTo;
 
-        await createStoreChatMessage(chatData);
+        await foundry.documents.ChatMessage.create(chatData);
     }
 
     /**

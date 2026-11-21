@@ -17,7 +17,7 @@ import {
 import {
     getValidItemTypes, getItemTier, extractPriceFromDescription, getItemHeader,
     getOriginalName, getSystemCurrency, formatPrice, getActorWealth, deductGold, addGold,
-    getChatWhisperRecipients, buildChatCard, createStoreChatMessage,
+    getChatWhisperRecipients, buildChatCard,
     getEpicTextColor, getEpicBgColor,
     showStoreDialog, getUnidentifiedDisplayData, removeOneUnit
 } from "./store-utils.js";
@@ -207,7 +207,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         const whisperTo = getChatWhisperRecipients();
         if (whisperTo) chatData.whisper = whisperTo;
 
-        await createStoreChatMessage(chatData);
+        await foundry.documents.ChatMessage.create(chatData);
     }
 
     // --- Item Data Builder (shared between standard and custom tab) ---
@@ -968,8 +968,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
                     if (stdMaskedDesc !== null) {
                         itemData.description = cleanDescriptionString(stdMaskedDesc);
                     } else {
-                        const rawDesc = String(foundry.utils.getProperty(doc, "system.description.value") ||
-                                               foundry.utils.getProperty(doc, "system.description") || "");
+                        const rawDesc = String(doc.system.description ?? "");
                         itemData.description = buildTooltipContent(doc, cleanDescriptionString(rawDesc));
                     }
                     Object.assign(itemData, stockFields);
@@ -1518,7 +1517,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         };
         const whisperTo = getChatWhisperRecipients();
         if (whisperTo) chatData.whisper = whisperTo;
-        await createStoreChatMessage(chatData);
+        await foundry.documents.ChatMessage.create(chatData);
 
         if (game.audio) foundry.audio.AudioHelper.play({ src: "modules/daggerheart-store/assets/audio/coins.mp3", volume: 0.8, loop: false }, false);
         this.render();
@@ -1577,7 +1576,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         };
         const whisperTo = getChatWhisperRecipients();
         if (whisperTo) chatData.whisper = whisperTo;
-        await createStoreChatMessage(chatData);
+        await foundry.documents.ChatMessage.create(chatData);
 
         if (game.audio) foundry.audio.AudioHelper.play({ src: "modules/daggerheart-store/assets/audio/coins.mp3", volume: 0.8, loop: false }, false);
         this.render();
@@ -1744,7 +1743,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         };
         const whisperTo = getChatWhisperRecipients();
         if (whisperTo) chatData.whisper = whisperTo;
-        createStoreChatMessage(chatData);
+        foundry.documents.ChatMessage.create(chatData);
     }
 
     /**
@@ -1775,7 +1774,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         };
         const whisperTo = getChatWhisperRecipients();
         if (whisperTo) chatData.whisper = whisperTo;
-        createStoreChatMessage(chatData);
+        foundry.documents.ChatMessage.create(chatData);
     }
 
     async _onTransferFunds(event, target) {
@@ -1905,7 +1904,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
         };
         const whisperTo = getChatWhisperRecipients();
         if (whisperTo) chatData.whisper = whisperTo;
-        await createStoreChatMessage(chatData);
+        await foundry.documents.ChatMessage.create(chatData);
 
         if (game.audio) foundry.audio.AudioHelper.play({ src: "modules/daggerheart-store/assets/audio/coins.mp3", volume: 0.8, loop: false }, false);
     }
@@ -2055,7 +2054,7 @@ export class DaggerheartStore extends HandlebarsApplicationMixin(ApplicationV2) 
             const whisperTo = getChatWhisperRecipients();
             if (whisperTo) chatData.whisper = whisperTo;
         }
-        createStoreChatMessage(chatData);
+        foundry.documents.ChatMessage.create(chatData);
 
         if (game.audio) {
             const epicItems = game.settings.get(MODULE_ID, "epicItems") || {};

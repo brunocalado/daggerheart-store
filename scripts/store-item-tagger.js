@@ -166,7 +166,6 @@ export class StoreItemTagger extends HandlebarsApplicationMixin(ApplicationV2) {
         const itemPreview = this.element.querySelector(".item-preview");
         if (itemPreview) itemPreview.classList.remove("drag-over");
 
-        // Use the modern UX path for TextEditor in v13+.
         const data = foundry.applications.ux.TextEditor.getDragEventData(event);
         if (!data?.type) return;
 

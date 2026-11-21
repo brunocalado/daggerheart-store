@@ -50,39 +50,20 @@ export function cleanDescriptionString(descString) {
 }
 
 /**
- * Parses damage type from the various formats Foundry can store it in
- * (string, array, Set, object).
+ * Formats the damage types of a damage part (a Set of type ids such as
+ * `physical` / `magical`).
  *
- * @param {*} typeRaw - The raw type value
+ * @param {Set<string>} typeSet - The damage part's `type`
  * @param {boolean} [abbreviated=false] - If true, returns 3-char uppercase abbreviations
  * @returns {string} Joined damage type string (slash-separated)
  */
-export function parseDamageTypes(typeRaw, abbreviated = false) {
-    let typesList = [];
-    if (Array.isArray(typeRaw)) {
-        typesList = typeRaw;
-    } else if (typeRaw instanceof Set) {
-        typesList = Array.from(typeRaw);
-    } else if (typeof typeRaw === "string") {
-        typesList = typeRaw.includes(",") ? typeRaw.split(",") : [typeRaw];
-    } else if (typeRaw && typeof typeRaw === "object") {
-        typesList = Object.values(typeRaw);
-    }
+export function parseDamageTypes(typeSet, abbreviated = false) {
+    const fullNameMap = { "physical": "Physical", "magical": "Magical" };
 
-    const fullNameMap = {
-        "physical": "Physical", "phy": "Physical",
-        "magic": "Magic", "mag": "Magic"
-    };
-
-    return typesList
-        .map(t => {
-            const s = String(t || "").trim();
-            if (!s) return "";
-            if (abbreviated) {
-                return s.length >= 3 ? s.substring(0, 3).toUpperCase() : s.toUpperCase();
-            }
-            const lower = s.toLowerCase();
-            return fullNameMap[lower] || (s.charAt(0).toUpperCase() + s.slice(1));
+    return Array.from(typeSet ?? [])
+        .map(id => {
+            if (abbreviated) return id.substring(0, 3).toUpperCase();
+            return fullNameMap[id] || (id.charAt(0).toUpperCase() + id.slice(1));
         })
         .filter(t => t)
         .join("/");

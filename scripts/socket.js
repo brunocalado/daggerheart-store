@@ -9,7 +9,7 @@
 /**
  * Query-based inter-client communication for the Daggerheart Store.
  * Delegates all Party Actor writes (stock, funds) to the GM client
- * via Foundry VTT v13's CONFIG.queries system, eliminating race conditions.
+ * via Foundry's CONFIG.queries system, eliminating race conditions.
  *
  * Registered on the `init` hook by module.js on all clients.
  * Handlers only execute on the GM client; players call the exported
